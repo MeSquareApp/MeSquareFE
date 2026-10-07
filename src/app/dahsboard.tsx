@@ -1,5 +1,5 @@
-import { Ionicons } from "@react-native-vector-icons";
 import { Pressable, StyleSheet, View } from "react-native";
+import { Ionicons } from "react-native-vector-icons";
 
 
 export default function Dashboard() {
