@@ -184,27 +184,126 @@ export default function Dashboard() {
                             {/* grid */}
                             <View style={styles.metricsGrid}>
                                 {/* Apolipoprotein B */}
-                                <View style={styles.metricPlaceholder} />
+                                <View style={styles.metricCard}>
+                                    <View style={styles.metricCardTop}>
+                                        <Text style={styles.metricStatus}>✓ Optimal</Text>
+                                    </View>
+                                    <Text style={styles.metricLabel}>APoB</Text>
+                                    <Text style={styles.metricValue}>
+                                        85 <Text style={styles.metricUnit}>mg/dL</Text>
+                                    </Text>
+                                    <Text style={styles.metricChange}>-1.08% vs last month</Text>
+                                </View>
                                 {/* Lipoprotein(a) */}
-                                <View style={styles.metricPlaceholder} />
+                                <View style={styles.metricCard}>
+                                    <View style={styles.metricCardTop}>
+                                        <Text style={styles.metricStatus}>✓ Optimal</Text>
+                                    </View>
+                                    <Text style={styles.metricLabel}>LIPROTEIN(a)</Text>
+                                    <Text style={styles.metricValue}>
+                                        25 <Text style={styles.metricUnit}>nmol/L</Text>
+                                    </Text>
+                                    <Text style={styles.metricChange}>+1.2% vs last month</Text>
+                                </View>
                                 {/* HDL Cholesterol */}
-                                <View style={styles.metricPlaceholder} /> 
+                                <View style={styles.metricCard}>
+                                    <View style={styles.metricCardTop}>
+                                        <Text style={styles.metricStatus}>✓ Optimal</Text>
+                                    </View>
+                                    <Text style={styles.metricLabel}>HDL CHOLESTEROL</Text>
+                                    <Text style={styles.metricValue}>
+                                        45 <Text style={styles.metricUnit}>mg/dL</Text>
+                                    </Text>
+                                    <Text style={styles.metricChange}>+2.5% vs last month</Text>
+                                </View>
                                 {/* Non-HDL Cholesterol */}
-                                <View style={styles.metricPlaceholder} />
+                                <View style={styles.metricCard}>
+                                    <View style={styles.metricCardTop}>
+                                        <Text style={styles.metricStatus}>✓ Optimal</Text>
+                                    </View>
+                                    <Text style={styles.metricLabel}>NON-HDL CHOLESTEROL</Text>
+                                    <Text style={styles.metricValue}>
+                                        85 <Text style={styles.metricUnit}>mg/dL</Text>
+                                    </Text>
+                                    <Text style={styles.metricChange}>+3.1% vs last month</Text>
+                                </View>
                                 {/* Triglycerides */}
-                                <View style={styles.metricPlaceholder} />
+                                <View style={styles.metricCard}>
+                                    <View style={styles.metricCardTop}>
+                                        <Text style={styles.metricStatus}>✓ Optimal</Text>
+                                    </View>
+                                    <Text style={styles.metricLabel}>TRIGLYCERIDES</Text>
+                                    <Text style={styles.metricValue}>
+                                        110 <Text style={styles.metricUnit}>mg/dL</Text>
+                                    </Text>
+                                    <Text style={styles.metricChange}>+4.5% vs last month</Text>
+                                </View>
                                 {/* hs-CRP */}
-                                <View style={styles.metricPlaceholder} />
+                                <View style={styles.metricCard}>
+                                    <View style={styles.metricCardTop}>
+                                        <Text style={styles.metricStatus}>✓ Optimal</Text>
+                                    </View>
+                                    <Text style={styles.metricLabel}>hs-CRP</Text>
+                                    <Text style={styles.metricValue}>
+                                        1.2 <Text style={styles.metricUnit}>mg/L</Text>
+                                    </Text>
+                                    <Text style={styles.metricChange}>+1.2% vs last month</Text>
+                                </View>
                                 {/* Hemoglobin A1c */}
-                                <View style={styles.metricPlaceholder} />
+                                <View style={styles.metricCard}>
+                                    <View style={styles.metricCardTop}>
+                                        <Text style={styles.metricStatus}>✓ Optimal</Text>
+                                    </View>
+                                    <Text style={styles.metricLabel}>HEMOGLOBIN A1c</Text>
+                                    <Text style={styles.metricValue}>
+                                        6.8 <Text style={styles.metricUnit}>%</Text>
+                                    </Text>
+                                    <Text style={styles.metricChange}>+1.2% vs last month</Text>
+                                </View>
                                 {/* eGFR */}
-                                <View style={styles.metricPlaceholder} />
+                                <View style={styles.metricCard}>
+                                    <View style={styles.metricCardTop}>
+                                        <Text style={styles.metricStatus}>✓ Optimal</Text>
+                                    </View>
+                                    <Text style={styles.metricLabel}>eGFR</Text>
+                                    <Text style={styles.metricValue}>
+                                        68 <Text style={styles.metricUnit}>bpm</Text>
+                                    </Text>
+                                    <Text style={styles.metricChange}>+1.2% vs last month</Text>
+                                </View>
                                 {/* Homocysteine */}
-                                <View style={styles.metricPlaceholder} />
+                                <View style={styles.metricCard}>
+                                    <View style={styles.metricCardTop}>
+                                        <Text style={styles.metricStatus}>✓ Optimal</Text>
+                                    </View>
+                                    <Text style={styles.metricLabel}>HOMOCYSTEINE</Text>
+                                    <Text style={styles.metricValue}>
+                                        12.5 <Text style={styles.metricUnit}>μmol/L</Text>
+                                    </Text>
+                                    <Text style={styles.metricChange}>+1.2% vs last month</Text>
+                                </View>
                                 {/* Fibrinogen */}
-                                <View style={styles.metricPlaceholder} />
+                                <View style={styles.metricCard}>
+                                    <View style={styles.metricCardTop}>
+                                        <Text style={styles.metricStatus}>✓ Optimal</Text>
+                                    </View>
+                                    <Text style={styles.metricLabel}>FIBRINOGEN</Text>
+                                    <Text style={styles.metricValue}>
+                                        350 <Text style={styles.metricUnit}>mg/L</Text>
+                                    </Text>
+                                    <Text style={styles.metricChange}>+1.2% vs last month</Text>
+                                </View>
                                 {/* Uric acid */}
-                                <View style={styles.metricPlaceholder} />
+                                <View style={styles.metricCard}>
+                                    <View style={styles.metricCardTop}>
+                                        <Text style={styles.metricStatus}>✓ Optimal</Text>
+                                    </View>
+                                    <Text style={styles.metricLabel}>URIC ACID</Text>
+                                    <Text style={styles.metricValue}>
+                                        5.2 <Text style={styles.metricUnit}>mg/dL</Text>
+                                    </Text>
+                                    <Text style={styles.metricChange}>+1.2% vs last month</Text>
+                                </View>
                             </View>
                         </View>
 
