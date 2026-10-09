@@ -1,8 +1,8 @@
 
 export const fonts = {
-    regular: 'OpenSans_400Regular',
-    bold: 'OpenSans_700Bold',
-    semiBold: 'OpenSans_600SemiBold',
+    regular: 'AtkinsonHyperlegible_400Regular',
+    bold: 'AtkinsonHyperlegible_700Bold',
+    semiBold: 'AtkinsonHyperlegible_700Bold',
 } as const;
 
 export const fontsize = {

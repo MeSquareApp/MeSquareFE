@@ -1,16 +1,14 @@
 import {
-  OpenSans_400Regular,
-  OpenSans_600SemiBold,
-  OpenSans_700Bold,
-} from "@expo-google-fonts/open-sans";
+  AtkinsonHyperlegible_400Regular,
+  AtkinsonHyperlegible_700Bold,
+} from "@expo-google-fonts/atkinson-hyperlegible";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
-    OpenSans_400Regular,
-    OpenSans_600SemiBold,
-    OpenSans_700Bold,
+    AtkinsonHyperlegible_400Regular,
+    AtkinsonHyperlegible_700Bold,
   });
 
   if (fontError) {

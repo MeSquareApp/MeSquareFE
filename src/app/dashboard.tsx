@@ -494,7 +494,7 @@ const styles = StyleSheet.create({
         gap: 12,
     },
     sectionTitle: {
-        fontFamily: fonts.regular,
+        fontFamily: fonts.bold,
         fontSize: 16,
         fontWeight: "700",
         color: colors.black1,
@@ -523,6 +523,7 @@ const styles = StyleSheet.create({
         marginBottom: 8,
     },
     metricStatus: {
+        fontFamily: fonts.regular,
         fontSize: 12,
         color: "#369B63",
         backgroundColor: "#EFFAF3",
@@ -532,21 +533,25 @@ const styles = StyleSheet.create({
         paddingVertical: 4,
     },
     metricLabel: {
+        fontFamily: fonts.regular,
         fontSize: 11,
         letterSpacing: 1,
         color: colors.gray3,
         marginBottom: 5,
     },
     metricValue: {
+        fontFamily: fonts.bold,
         fontSize: 25,
         fontWeight: "700",
         color: colors.black1,
     },
     metricUnit: {
+        fontFamily: fonts.regular,
         fontSize: 13,
         fontWeight: "400",
     },
     metricChange: {
+        fontFamily: fonts.regular,
         fontSize: 12,
         color: "#369B63",
         marginTop: 8,
@@ -554,16 +559,19 @@ const styles = StyleSheet.create({
 
     // ---- TRENDS WIDGET PLACEHOLDER ----
     trendTitle: {
+        fontFamily: fonts.bold,
         fontSize: 14,
-        fontWeight: "600",
+        fontWeight: "700",
         color: colors.black1,
     },
     trendSubtitle: {
+        fontFamily: fonts.regular,
         fontSize: 12,
         color: colors.black1,
         marginTop: 4,
     },
     trendLegend: {
+        fontFamily: fonts.regular,
         fontSize: 12,
         color: "#369B63",
         marginTop: 16,
