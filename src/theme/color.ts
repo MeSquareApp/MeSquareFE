@@ -3,9 +3,8 @@
 
 export const colors = {
     // brand colors
-    primary: '#C165FF',
+    primary: '#6c12a9',
     secondary: '#1BCB9C',
-    background: '',
 
     // state colors
     info: '2F80ED',
@@ -24,4 +23,7 @@ export const colors = {
     gray3: '#6D6671',
     gray4: '#A29CA7',
     gray5: '#E5E1E8',
+
+    background: '#FFFFFF',
+    footer: '#E5E1E8',
 }

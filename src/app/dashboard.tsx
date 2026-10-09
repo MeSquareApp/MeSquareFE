@@ -1,5 +1,7 @@
 import { Ionicons } from "@react-native-vector-icons/ionicons";
 import { Dimensions, Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { colors } from '../theme/color';
+import { fonts, fontsize } from '../theme/typography';
 
 
 export default function Dashboard() {
@@ -23,17 +25,17 @@ export default function Dashboard() {
 
                     {/* data log */}
                     <Pressable style={styles.navItem}>
-                        <Ionicons name="analytics-outline" size={20} color="#666666" />
+                        <Ionicons name="analytics-outline" size={20} color={colors.gray3} />
                     </Pressable>
 
                     {/* forecasting */}
                     <Pressable style={styles.navItem}>
-                        <Ionicons name="bar-chart-outline" size={20} color="#666666" />
+                        <Ionicons name="bar-chart-outline" size={20} color={colors.gray3} />
                     </Pressable>
 
                     {/* account settings */}
                     <Pressable style={styles.navItem}>
-                        <Ionicons name="settings-outline" size={20} color="#666666" />
+                        <Ionicons name="settings-outline" size={20} color={colors.gray3} />
                     </Pressable>            
                 </View>
 
@@ -107,14 +109,15 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         flexDirection: "row",
-        backgroundColor: "#FFFFFF",
+        backgroundColor: colors.background,
     },
 
+    // ---- NAVBAR ----
     navbar: {
         width: Dimensions.get("window").width * 0.08,
-        backgroundColor: "#FFFFFF",
+        backgroundColor: colors.background,
         borderRightWidth: 1,
-        borderRightColor: "#E5E5E5",
+        borderRightColor: colors.gray5,
         alignItems: "center",
         paddingTop: 20,
     },
@@ -122,7 +125,7 @@ const styles = StyleSheet.create({
         width: Dimensions.get("window").width * 0.07,
         height: Dimensions.get("window").width * 0.07,
         borderWidth: 1,
-        borderColor: "#E5E5E5",
+        borderColor: colors.gray5,
         borderRadius: 12,
         alignItems: "center",
         justifyContent: "center",
@@ -144,7 +147,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
     },
     activeNavItem: {
-        backgroundColor: "#303030",
+        backgroundColor: colors.primary,
     },
 
     nonNavContent: {
@@ -155,16 +158,17 @@ const styles = StyleSheet.create({
     header:{
         height: Dimensions.get("window").height * 0.1,
         borderBottomWidth: 1,
-        borderBottomColor: "#E5E5E5",
+        borderBottomColor: colors.gray5,
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
         paddingHorizontal: Dimensions.get("window").width * 0.05,
     },
     headerTitle: {
-        fontSize: 20,
+        fontFamily: fonts.bold,
+        fontSize: fontsize.lg,
         fontWeight: "700",
-        color: "#171717",
+        color: colors.black1,
 
     },
     profileContainer: {
@@ -173,14 +177,15 @@ const styles = StyleSheet.create({
         gap: Dimensions.get("window").width * 0.01,
     },
     profileName: {
-        fontSize: 15,
-        color: "#171717",
+        fontFamily: fonts.regular,
+        fontSize: fontsize.md,
+        color: colors.black1,
     },
 
     // ---- MAIN CONTENT ----
     mainContent: {
         flex: 1,
-        backgroundColor: "#FFFFFF",
+        backgroundColor: colors.background,
         padding: Dimensions.get("window").width * 0.05,
     },
 
@@ -188,7 +193,7 @@ const styles = StyleSheet.create({
     footer: {
         height: Dimensions.get("window").height * 0.05,
         borderTopWidth: 1,
-        borderTopColor: "#E5E5E5",
+        borderTopColor: colors.gray5,
         alignItems: "center",
         justifyContent: "space-between",
         paddingHorizontal: Dimensions.get("window").width * 0.05,
@@ -199,10 +204,12 @@ const styles = StyleSheet.create({
         gap: Dimensions.get("window").width * 0.02,
     },
     footerLink: {
+        fontFamily: fonts.regular,
         fontSize: 12,
         color: "#202840",
     },
     copyright: {
+        fontFamily: fonts.regular,
         fontSize: 12,
         color: "#9699A5",
     },
