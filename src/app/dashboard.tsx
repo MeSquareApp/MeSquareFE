@@ -172,7 +172,15 @@ export default function Dashboard() {
                                 Trends
                             </Text>
 
-                            <View style={styles.trendPlaceholder} />
+                            <View style={styles.trendPlaceholder}>
+                                <Text style={styles.trendTitle}>Heart Rate Trend</Text>
+                                <Text style={styles.trendSubtitle}>
+                                    10-day rolling window
+                                </Text>
+                                <Text style={styles.trendLegend}>
+                                    ● Heart Rate
+                                </Text>
+                            </View>
                         </View>
 
                         {/* your twin's metrics */}
@@ -545,19 +553,29 @@ const styles = StyleSheet.create({
     },
 
     // ---- TRENDS WIDGET PLACEHOLDER ----
+    trendTitle: {
+        fontSize: 14,
+        fontWeight: "600",
+        color: colors.black1,
+    },
+    trendSubtitle: {
+        fontSize: 12,
+        color: colors.black1,
+        marginTop: 4,
+    },
+    trendLegend: {
+        fontSize: 12,
+        color: "#369B63",
+        marginTop: 16,
+    },
     trendPlaceholder: {
         width: "100%",
-        height: 210,
+        minHeight: 210,
         borderWidth: 1,
         borderColor: colors.gray5,
         borderRadius: 16,
         backgroundColor: colors.background,
-    },
-    // ---- PLACEHOLDER LABEL ----
-    placeholderText: {
-        fontFamily: fonts.regular,
-        fontSize: 14,
-        color: colors.gray3,
+        padding: 16,
     },
 
     // ---- FOOTER ----
