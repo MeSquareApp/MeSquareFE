@@ -1,5 +1,5 @@
 import { Ionicons } from "@react-native-vector-icons/ionicons";
-import { Dimensions, Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { Dimensions, Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { colors } from '../theme/color';
 import { fonts, fontsize } from '../theme/typography';
 
@@ -59,7 +59,82 @@ export default function Dashboard() {
                 {/* ---- MAIN CONTENT ---- */}
                 <View style={styles.mainContent}>
 
-                    {/* Dashboard content goes here */}
+                    {/* digital twin model */}
+                    <View style={styles.twinColumn}>
+                        <View style={styles.twinHeading}>
+                            <Text style={styles.sectionTitle}>Digital Twin Model</Text>
+                        </View>
+
+                        <Image source={require("../../assets/images/female_medium.png")} style={styles.twinImage} />
+
+                        {/* placeholder for twin summary info */}
+                        <View style={styles.twinStatsPlaceholder}>
+                            <View style={styles.twinStatBox}></View>
+                            <View style={styles.twinStatBox}></View>
+                            <View style={styles.twinStatBox}></View>
+                            <View style={styles.twinStatBox}></View>
+                        </View>
+                    </View>
+
+                    {/* widgets */}
+                    <ScrollView style={styles.dashboardScroll}
+                                contentContainerStyle={styles.dashboardScrollContent}
+                                showsVerticalScrollIndicator={true}>
+                    
+                        {/* today's metrics */}
+                        <View style={styles.dashboardSection}>
+                            <Text style={styles.sectionTitle}>
+                                Today's Metrics
+                            </Text>
+
+                            {/* grid */}
+                            <View style={styles.metricsGrid}>
+                            </View>
+                        </View>
+
+                        {/* trends */}
+                        <View style={styles.dashboardSection}>
+                            <Text style={styles.sectionTitle}>
+                                Trends
+                            </Text>
+
+                            {/* grid */}
+                            <View style={styles.metricsGrid}>
+                                {/* Resting Heart Rate */}
+                                {/* Heart Rate Variability */}
+                                {/* Systolic Blood Pressure */}
+                                {/* Diastolic Blood Pressure */}
+                                {/* Visceral Adipose Tissue */}
+                                {/* VO₂ max */}
+                            </View>
+                        </View>
+
+                        {/* your twin's metrics */}
+                        <View style={styles.dashboardSection}>
+                            <Text style={styles.sectionTitle}>
+                                Your Twin's Metrics
+                            </Text>
+
+                            {/* grid */}
+                            <View style={styles.metricsGrid}>
+                                {/* Apolioprotein B */}
+                                {/* Lipoprotein(a) */}
+                                {/* HDL Cholesterol */}
+                                {/* Non-HDL Cholesterol */}
+                                {/* Triglycerides */}
+                                {/* hs-CRP */}
+                                {/* Hemoglobin A1c */}
+                                {/* eGFR */}
+                                {/* Homocysteine */}
+                                {/* Fibrinogen */}
+                                {/* Uric acid */}
+                            </View>
+                        </View>
+
+
+                    
+                    </ScrollView>
+
 
                 </View>
 
@@ -182,11 +257,95 @@ const styles = StyleSheet.create({
         color: colors.black1,
     },
 
-    // ---- MAIN CONTENT ----
+     // ---- MAIN CONTENT ----
     mainContent: {
         flex: 1,
+        flexDirection: "row",
         backgroundColor: colors.background,
-        padding: Dimensions.get("window").width * 0.05,
+        minHeight: 0,
+    },
+    // digital twin model column
+    twinColumn: {
+        width: "26%",
+        minWidth: 220,
+        maxWidth: 340,
+        borderRightWidth: 1,
+        borderRightColor: '#F5F5F5',
+        padding: 16,
+        alignItems: "stretch",
+    },
+    twinHeading: {
+        marginBottom: 16,
+    },
+    twinImage: {
+        width: "100%",
+        height: Dimensions.get("window").height * 0.5,
+    },
+    twinStatsPlaceholder: {
+        flexDirection: "row",
+        flexWrap: "wrap",
+        gap: 8,
+        marginTop: 16,
+    },
+    twinStatBox: {
+        width: "47%",
+        height: 58,
+        borderWidth: 1,
+        borderColor: colors.gray5,
+        borderRadius: 12,
+        backgroundColor: colors.background,
+    },
+    // ---- WIDGETS ----
+    dashboardScroll: {
+        flex: 1,
+        minWidth: 0,
+    },
+    dashboardScrollContent: {
+        padding: 24,
+        paddingBottom: 32,
+        gap: 24,
+    },
+    dashboardSection: {
+        width: "100%",
+        gap: 12,
+    },
+    sectionTitle: {
+        fontFamily: fonts.regular,
+        fontSize: 16,
+        fontWeight: "700",
+        color: colors.black1,
+    },
+    // ---- METRIC WIDGET PLACEHOLDERS ----
+    metricsGrid: {
+        flexDirection: "row",
+        flexWrap: "wrap",
+        justifyContent: "flex-start",
+        gap: 16,
+    },
+    metricPlaceholder: {
+        flexBasis: "30%",
+        flexGrow: 1,
+        minWidth: 150,
+        height: 125,
+        borderWidth: 1,
+        borderColor: colors.gray5,
+        borderRadius: 16,
+        backgroundColor: colors.background,
+    },
+    // ---- TRENDS WIDGET PLACEHOLDER ----
+    trendPlaceholder: {
+        width: "100%",
+        height: 210,
+        borderWidth: 1,
+        borderColor: colors.gray5,
+        borderRadius: 16,
+        backgroundColor: colors.background,
+    },
+    // ---- PLACEHOLDER LABEL ----
+    placeholderText: {
+        fontFamily: fonts.regular,
+        fontSize: 14,
+        color: colors.gray3,
     },
 
     // ---- FOOTER ----
@@ -194,6 +353,7 @@ const styles = StyleSheet.create({
         height: Dimensions.get("window").height * 0.05,
         borderTopWidth: 1,
         borderTopColor: colors.gray5,
+        flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
         paddingHorizontal: Dimensions.get("window").width * 0.05,
