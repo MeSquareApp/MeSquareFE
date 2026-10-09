@@ -38,7 +38,9 @@ export default function Dashboard() {
                 </View>
 
             </View>
+
             <View style={styles.nonNavContent}>
+
                 {/* ---- HEADER ---- */}
                 <View style={styles.header}>
                     <Text style={styles.headerTitle}>Dashboard</Text>
@@ -52,6 +54,50 @@ export default function Dashboard() {
                     </View>
                 </View>
 
+                {/* ---- MAIN CONTENT ---- */}
+                <View style={styles.mainContent}>
+
+                    {/* Dashboard content goes here */}
+
+                </View>
+
+                {/* ---- FOOTER ---- */}
+                <View style={styles.footer}>
+
+                    <View style={styles.footerLinks}>
+                        <Pressable>
+                            <Text style={styles.footerLink}>
+                                ABOUT US
+                            </Text>
+                        </Pressable>
+                        <Pressable>
+                            <Text style={styles.footerLink}>
+                                CONTACT US
+                            </Text>
+                        </Pressable>
+                        <Pressable>
+                            <Text style={styles.footerLink}>
+                                HELP
+                            </Text>
+                        </Pressable>
+                        <Pressable>
+                            <Text style={styles.footerLink}>
+                                PRIVACY POLICY
+                            </Text>
+                        </Pressable>
+                        <Pressable>
+                            <Text style={styles.footerLink}>
+                                DISCLAIMER
+                            </Text>
+                        </Pressable>
+
+                    </View>
+
+                    <Text style={styles.copyright}>
+                        Copyright © 2024 Me². All rights reserved.
+                    </Text>
+
+                </View>
             </View>
         </View>
     )
@@ -130,4 +176,35 @@ const styles = StyleSheet.create({
         fontSize: 15,
         color: "#171717",
     },
+
+    // ---- MAIN CONTENT ----
+    mainContent: {
+        flex: 1,
+        backgroundColor: "#FFFFFF",
+        padding: Dimensions.get("window").width * 0.05,
+    },
+
+    // ---- FOOTER ----
+    footer: {
+        height: Dimensions.get("window").height * 0.05,
+        borderTopWidth: 1,
+        borderTopColor: "#E5E5E5",
+        alignItems: "center",
+        justifyContent: "space-between",
+        paddingHorizontal: Dimensions.get("window").width * 0.05,
+    },
+    footerLinks: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: Dimensions.get("window").width * 0.02,
+    },
+    footerLink: {
+        fontSize: 12,
+        color: "#202840",
+    },
+    copyright: {
+        fontSize: 12,
+        color: "#9699A5",
+    },
+
 })
