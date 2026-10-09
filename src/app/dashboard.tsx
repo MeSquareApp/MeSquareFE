@@ -1,5 +1,5 @@
 import { Ionicons } from "@react-native-vector-icons/ionicons";
-import { Pressable, StyleSheet, View } from "react-native";
+import { Dimensions, Image, Pressable, StyleSheet, Text, View } from "react-native";
 
 
 export default function Dashboard() {
@@ -11,7 +11,7 @@ export default function Dashboard() {
 
                 {/* logo */}
                 <View style={styles.logoContainer}>
-                    logo
+                    <Image source={require("../../assets/images/me2-logo.png")} style={styles.logo} />
                 </View>
 
                 {/* nav items */}
@@ -38,7 +38,21 @@ export default function Dashboard() {
                 </View>
 
             </View>
+            <View style={styles.nonNavContent}>
+                {/* ---- HEADER ---- */}
+                <View style={styles.header}>
+                    <Text style={styles.headerTitle}>Dashboard</Text>
 
+                    {/* user profile */}
+                    <View style={styles.profileContainer}>
+                        <Text style={styles.profileName}>
+                            John Doe
+                        </Text>
+                        <Ionicons name="person-circle-outline" size={30} color="#666666" />
+                    </View>
+                </View>
+
+            </View>
         </View>
     )
 }
@@ -51,7 +65,7 @@ const styles = StyleSheet.create({
     },
 
     navbar: {
-        width: 90,
+        width: Dimensions.get("window").width * 0.08,
         backgroundColor: "#FFFFFF",
         borderRightWidth: 1,
         borderRightColor: "#E5E5E5",
@@ -59,13 +73,17 @@ const styles = StyleSheet.create({
         paddingTop: 20,
     },
     logoContainer: {
-        width: 70,
-        height: 70,
+        width: Dimensions.get("window").width * 0.07,
+        height: Dimensions.get("window").width * 0.07,
         borderWidth: 1,
         borderColor: "#E5E5E5",
         borderRadius: 12,
         alignItems: "center",
         justifyContent: "center",
+    },
+    logo: {
+        width: Dimensions.get("window").width * 0.05,
+        height: Dimensions.get("window").width * 0.05,
     },
     navItems: {
         marginTop: 80,
@@ -73,13 +91,43 @@ const styles = StyleSheet.create({
         gap: 25,
     },
     navItem: {
-        width: 40,
-        height: 40,
+        width: Dimensions.get("window").width * 0.05,
+        height: Dimensions.get("window").width * 0.05,
         borderRadius: 12,
         alignItems: "center",
         justifyContent: "center",
     },
     activeNavItem: {
         backgroundColor: "#303030",
+    },
+
+    nonNavContent: {
+        flex: 1,
+    },
+
+    // ---- HEADER ----
+    header:{
+        height: Dimensions.get("window").height * 0.1,
+        borderBottomWidth: 1,
+        borderBottomColor: "#E5E5E5",
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        paddingHorizontal: Dimensions.get("window").width * 0.05,
+    },
+    headerTitle: {
+        fontSize: 20,
+        fontWeight: "700",
+        color: "#171717",
+
+    },
+    profileContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: Dimensions.get("window").width * 0.01,
+    },
+    profileName: {
+        fontSize: 15,
+        color: "#171717",
     },
 })
