@@ -20,22 +20,22 @@ export default function Dashboard() {
                 <View style={styles.navItems}>
                     {/* dashboard */}
                     <Pressable style={[styles.navItem, styles.activeNavItem]}>
-                        <Ionicons name="grid" size={22} color="#FFFFFF" />
+                        <Ionicons name="grid" size={25} color="#FFFFFF" />
                     </Pressable>
 
                     {/* data log */}
                     <Pressable style={styles.navItem}>
-                        <Ionicons name="analytics-outline" size={20} color={colors.gray3} />
+                        <Ionicons name="analytics-outline" size={22} color={colors.gray3} />
                     </Pressable>
 
                     {/* forecasting */}
                     <Pressable style={styles.navItem}>
-                        <Ionicons name="bar-chart-outline" size={20} color={colors.gray3} />
+                        <Ionicons name="bar-chart-outline" size={22} color={colors.gray3} />
                     </Pressable>
 
                     {/* account settings */}
                     <Pressable style={styles.navItem}>
-                        <Ionicons name="settings-outline" size={20} color={colors.gray3} />
+                        <Ionicons name="settings-outline" size={22} color={colors.gray3} />
                     </Pressable>            
                 </View>
 
@@ -65,7 +65,10 @@ export default function Dashboard() {
                             <Text style={styles.sectionTitle}>Digital Twin Model</Text>
                         </View>
 
-                        <Image source={require("../../assets/images/female_medium.png")} style={styles.twinImage} />
+                        <Image source={require("../../assets/images/female_medium.png")}
+                               style={styles.twinImage}
+                               resizeMode="contain"
+                        />
 
                         {/* placeholder for twin summary info */}
                         <View style={styles.twinStatsPlaceholder}>
@@ -89,24 +92,33 @@ export default function Dashboard() {
 
                             {/* grid */}
                             <View style={styles.metricsGrid}>
+                                {/* Resting Heart Rate */}
+                                <View style={styles.metricPlaceholder} />
+
+                                {/* Heart Rate Variability */}
+                                <View style={styles.metricPlaceholder} />
+
+                                {/* Blood Pressure */}
+                                <View style={styles.metricPlaceholder} />
+
+                                {/* Blood Oxygen */}
+                                <View style={styles.metricPlaceholder} />
+
+                                {/* Respiratory Rate */}
+                                <View style={styles.metricPlaceholder} />
+
+                                {/* VO2 Max */}
+                                <View style={styles.metricPlaceholder} />
                             </View>
                         </View>
 
-                        {/* trends */}
+                        {/* TRENDS */}
                         <View style={styles.dashboardSection}>
                             <Text style={styles.sectionTitle}>
                                 Trends
                             </Text>
 
-                            {/* grid */}
-                            <View style={styles.metricsGrid}>
-                                {/* Resting Heart Rate */}
-                                {/* Heart Rate Variability */}
-                                {/* Systolic Blood Pressure */}
-                                {/* Diastolic Blood Pressure */}
-                                {/* Visceral Adipose Tissue */}
-                                {/* VO₂ max */}
-                            </View>
+                            <View style={styles.trendPlaceholder} />
                         </View>
 
                         {/* your twin's metrics */}
@@ -117,22 +129,31 @@ export default function Dashboard() {
 
                             {/* grid */}
                             <View style={styles.metricsGrid}>
-                                {/* Apolioprotein B */}
+                                {/* Apolipoprotein B */}
+                                <View style={styles.metricPlaceholder} />
                                 {/* Lipoprotein(a) */}
+                                <View style={styles.metricPlaceholder} />
                                 {/* HDL Cholesterol */}
+                                <View style={styles.metricPlaceholder} /> 
                                 {/* Non-HDL Cholesterol */}
+                                <View style={styles.metricPlaceholder} />
                                 {/* Triglycerides */}
+                                <View style={styles.metricPlaceholder} />
                                 {/* hs-CRP */}
+                                <View style={styles.metricPlaceholder} />
                                 {/* Hemoglobin A1c */}
+                                <View style={styles.metricPlaceholder} />
                                 {/* eGFR */}
+                                <View style={styles.metricPlaceholder} />
                                 {/* Homocysteine */}
+                                <View style={styles.metricPlaceholder} />
                                 {/* Fibrinogen */}
+                                <View style={styles.metricPlaceholder} />
                                 {/* Uric acid */}
+                                <View style={styles.metricPlaceholder} />
                             </View>
                         </View>
 
-
-                    
                     </ScrollView>
 
 
@@ -189,7 +210,7 @@ const styles = StyleSheet.create({
 
     // ---- NAVBAR ----
     navbar: {
-        width: Dimensions.get("window").width * 0.08,
+        width: Dimensions.get("window").width * 0.07,
         backgroundColor: colors.background,
         borderRightWidth: 1,
         borderRightColor: colors.gray5,
@@ -197,8 +218,8 @@ const styles = StyleSheet.create({
         paddingTop: 20,
     },
     logoContainer: {
-        width: Dimensions.get("window").width * 0.07,
-        height: Dimensions.get("window").width * 0.07,
+        width: Dimensions.get("window").width * 0.05,
+        height: Dimensions.get("window").width * 0.05,
         borderWidth: 1,
         borderColor: colors.gray5,
         borderRadius: 12,
@@ -206,8 +227,8 @@ const styles = StyleSheet.create({
         justifyContent: "center",
     },
     logo: {
-        width: Dimensions.get("window").width * 0.05,
-        height: Dimensions.get("window").width * 0.05,
+        width: Dimensions.get("window").width * 0.03,
+        height: Dimensions.get("window").width * 0.03,
     },
     navItems: {
         marginTop: 80,
@@ -215,8 +236,8 @@ const styles = StyleSheet.create({
         gap: 25,
     },
     navItem: {
-        width: Dimensions.get("window").width * 0.05,
-        height: Dimensions.get("window").width * 0.05,
+        width: Dimensions.get("window").width * 0.03,
+        height: Dimensions.get("window").width * 0.03,
         borderRadius: 12,
         alignItems: "center",
         justifyContent: "center",
@@ -279,7 +300,7 @@ const styles = StyleSheet.create({
     },
     twinImage: {
         width: "100%",
-        height: Dimensions.get("window").height * 0.5,
+        height: Dimensions.get("window").height * 0.55,
     },
     twinStatsPlaceholder: {
         flexDirection: "row",
@@ -301,7 +322,9 @@ const styles = StyleSheet.create({
         minWidth: 0,
     },
     dashboardScrollContent: {
-        padding: 24,
+        padding: Dimensions.get("window").width * 0.05,
+        paddingTop: 24,
+        paddingLeft: 32,
         paddingBottom: 32,
         gap: 24,
     },
@@ -319,13 +342,11 @@ const styles = StyleSheet.create({
     metricsGrid: {
         flexDirection: "row",
         flexWrap: "wrap",
-        justifyContent: "flex-start",
-        gap: 16,
+        justifyContent: "space-between",
+        gap: 12,
     },
     metricPlaceholder: {
-        flexBasis: "30%",
-        flexGrow: 1,
-        minWidth: 150,
+        width: "31%",
         height: 125,
         borderWidth: 1,
         borderColor: colors.gray5,
