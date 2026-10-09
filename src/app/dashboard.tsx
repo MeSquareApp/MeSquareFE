@@ -93,22 +93,76 @@ export default function Dashboard() {
                             {/* grid */}
                             <View style={styles.metricsGrid}>
                                 {/* Resting Heart Rate */}
-                                <View style={styles.metricPlaceholder} />
+                                <View style={styles.metricCard}>
+                                    <View style={styles.metricCardTop}>
+                                        <Text style={styles.metricStatus}>✓ Optimal</Text>
+                                    </View>
+                                    <Text style={styles.metricLabel}>RESTING HEART RATE</Text>
+                                    <Text style={styles.metricValue}>
+                                        68 <Text style={styles.metricUnit}>bpm</Text>
+                                    </Text>
+                                    <Text style={styles.metricChange}>+1.2% vs last month</Text>
+                                </View>
 
                                 {/* Heart Rate Variability */}
-                                <View style={styles.metricPlaceholder} />
+                                <View style={styles.metricCard}>
+                                    <View style={styles.metricCardTop}>
+                                        <Text style={styles.metricStatus}>✓ Optimal</Text>
+                                    </View>
+                                    <Text style={styles.metricLabel}>HEART RATE VARIABILITY</Text>
+                                    <Text style={styles.metricValue}>
+                                        94 <Text style={styles.metricUnit}>ms</Text>
+                                    </Text>
+                                    <Text style={styles.metricChange}>+1.0% vs last month</Text>
+                                </View>
 
-                                {/* Blood Pressure */}
-                                <View style={styles.metricPlaceholder} />
+                                {/* Systolic Blood Pressure */}
+                                <View style={styles.metricCard}>
+                                    <View style={styles.metricCardTop}>
+                                        <Text style={styles.metricStatus}>✓ Optimal</Text>
+                                    </View>
+                                    <Text style={styles.metricLabel}>SYSTOLIC BLOOD PRESSURE</Text>
+                                    <Text style={styles.metricValue}>
+                                        120 <Text style={styles.metricUnit}>mmHg</Text>
+                                    </Text>
+                                    <Text style={styles.metricChange}>+1.2% vs last month</Text>
+                                </View>
 
-                                {/* Blood Oxygen */}
-                                <View style={styles.metricPlaceholder} />
+                                {/* Diastolic Blood Pressure */}
+                                <View style={styles.metricCard}>
+                                    <View style={styles.metricCardTop}>
+                                        <Text style={styles.metricStatus}>✓ Optimal</Text>
+                                    </View>
+                                    <Text style={styles.metricLabel}>DIASTOLIC BLOOD PRESSURE</Text>
+                                    <Text style={styles.metricValue}>
+                                        80 <Text style={styles.metricUnit}>mmHg</Text>
+                                    </Text>
+                                    <Text style={styles.metricChange}>+1.0% vs last month</Text>
+                                </View>
 
-                                {/* Respiratory Rate */}
-                                <View style={styles.metricPlaceholder} />
+                                {/* Visceral Fat Index */}
+                                <View style={styles.metricCard}>
+                                    <View style={styles.metricCardTop}>
+                                        <Text style={styles.metricStatus}>✓ Optimal</Text>
+                                    </View>
+                                    <Text style={styles.metricLabel}>VISERAL ADIPOSE TISSUE MASS</Text>
+                                    <Text style={styles.metricValue}>
+                                        5 <Text style={styles.metricUnit}>lbs</Text>
+                                    </Text>
+                                    <Text style={styles.metricChange}>-1.2% vs last month</Text>
+                                </View>
 
                                 {/* VO2 Max */}
-                                <View style={styles.metricPlaceholder} />
+                                <View style={styles.metricCard}>
+                                    <View style={styles.metricCardTop}>
+                                        <Text style={styles.metricStatus}>✓ Optimal</Text>
+                                    </View>
+                                    <Text style={styles.metricLabel}>VO2 MAX</Text>
+                                    <Text style={styles.metricValue}>
+                                        50 <Text style={styles.metricUnit}>ml/kg/min</Text>
+                                    </Text>
+                                    <Text style={styles.metricChange}>+2.0% vs last month</Text>
+                                </View>
                             </View>
                         </View>
 
@@ -338,21 +392,59 @@ const styles = StyleSheet.create({
         fontWeight: "700",
         color: colors.black1,
     },
-    // ---- METRIC WIDGET PLACEHOLDERS ----
+
+    // ---- METRIC CARD ----
     metricsGrid: {
         flexDirection: "row",
         flexWrap: "wrap",
         justifyContent: "space-between",
         gap: 12,
     },
-    metricPlaceholder: {
+    metricCard: {
         width: "31%",
-        height: 125,
+        minHeight: 125,
+        padding: 14,
         borderWidth: 1,
         borderColor: colors.gray5,
         borderRadius: 16,
         backgroundColor: colors.background,
+        justifyContent: "space-between",
     },
+    metricCardTop: {
+        flexDirection: "row",
+        alignItems: "center",
+        marginBottom: 8,
+    },
+    metricStatus: {
+        fontSize: 12,
+        color: "#369B63",
+        backgroundColor: "#EFFAF3",
+        overflow: "hidden",
+        borderRadius: 12,
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+    },
+    metricLabel: {
+        fontSize: 11,
+        letterSpacing: 1,
+        color: colors.gray3,
+        marginBottom: 5,
+    },
+    metricValue: {
+        fontSize: 25,
+        fontWeight: "700",
+        color: colors.black1,
+    },
+    metricUnit: {
+        fontSize: 13,
+        fontWeight: "400",
+    },
+    metricChange: {
+        fontSize: 12,
+        color: "#369B63",
+        marginTop: 8,
+    },
+
     // ---- TRENDS WIDGET PLACEHOLDER ----
     trendPlaceholder: {
         width: "100%",
