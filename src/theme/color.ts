@@ -7,7 +7,7 @@ export const colors = {
     secondary: '#14B8A6',
 
     // state colors
-    info: '2F80ED',
+    info: '#2F80ED',
     success: '#27AE60',
     warning: '#E2B93B',
     error: '#EB5757',

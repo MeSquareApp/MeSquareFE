@@ -2,6 +2,7 @@ import { Ionicons } from "@react-native-vector-icons/ionicons";
 import { Dimensions, Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { colors } from '../theme/color';
 import { fonts, fontsize } from '../theme/typography';
+import MetricCard from "../components/MetricCard";
 
 
 export default function Dashboard() {
@@ -92,78 +93,57 @@ export default function Dashboard() {
 
                             {/* grid */}
                             <View style={styles.metricsGrid}>
-                                {/* Resting Heart Rate */}
-                                <View style={styles.metricCard}>
-                                    <View style={styles.metricCardTop}>
-                                        <Text style={styles.metricStatus}>✓ Optimal</Text>
-                                    </View>
-                                    <Text style={styles.metricLabel}>RESTING HEART RATE</Text>
-                                    <Text style={styles.metricValue}>
-                                        68 <Text style={styles.metricUnit}>bpm</Text>
-                                    </Text>
-                                    <Text style={styles.metricChange}>+1.2% vs last month</Text>
-                                </View>
 
-                                {/* Heart Rate Variability */}
-                                <View style={styles.metricCard}>
-                                    <View style={styles.metricCardTop}>
-                                        <Text style={styles.metricStatus}>✓ Optimal</Text>
-                                    </View>
-                                    <Text style={styles.metricLabel}>HEART RATE VARIABILITY</Text>
-                                    <Text style={styles.metricValue}>
-                                        94 <Text style={styles.metricUnit}>ms</Text>
-                                    </Text>
-                                    <Text style={styles.metricChange}>+1.0% vs last month</Text>
-                                </View>
+                                <MetricCard
+                                    label="Resting Heart Rate"
+                                    value={68}
+                                    unit="bpm"
+                                    status="optimal"
+                                    change="+1.2%"
+                                />
 
-                                {/* Systolic Blood Pressure */}
-                                <View style={styles.metricCard}>
-                                    <View style={styles.metricCardTop}>
-                                        <Text style={styles.metricStatus}>✓ Optimal</Text>
-                                    </View>
-                                    <Text style={styles.metricLabel}>SYSTOLIC BLOOD PRESSURE</Text>
-                                    <Text style={styles.metricValue}>
-                                        120 <Text style={styles.metricUnit}>mmHg</Text>
-                                    </Text>
-                                    <Text style={styles.metricChange}>+1.2% vs last month</Text>
-                                </View>
+                                <MetricCard
+                                    label="Heart Rate Variability"
+                                    value={94}
+                                    unit="ms"
+                                    status="optimal"
+                                    change="-3.1%"
+                                />
 
-                                {/* Diastolic Blood Pressure */}
-                                <View style={styles.metricCard}>
-                                    <View style={styles.metricCardTop}>
-                                        <Text style={styles.metricStatus}>✓ Optimal</Text>
-                                    </View>
-                                    <Text style={styles.metricLabel}>DIASTOLIC BLOOD PRESSURE</Text>
-                                    <Text style={styles.metricValue}>
-                                        80 <Text style={styles.metricUnit}>mmHg</Text>
-                                    </Text>
-                                    <Text style={styles.metricChange}>+1.0% vs last month</Text>
-                                </View>
+                                <MetricCard
+                                    label="Blood Pressure"
+                                    value="128/82"
+                                    unit="mmHg"
+                                    status="warning"
+                                    change="+4.7%"
+                                />
 
-                                {/* Visceral Fat Index */}
-                                <View style={styles.metricCard}>
-                                    <View style={styles.metricCardTop}>
-                                        <Text style={styles.metricStatus}>✓ Optimal</Text>
-                                    </View>
-                                    <Text style={styles.metricLabel}>VISERAL ADIPOSE TISSUE MASS</Text>
-                                    <Text style={styles.metricValue}>
-                                        5 <Text style={styles.metricUnit}>lbs</Text>
-                                    </Text>
-                                    <Text style={styles.metricChange}>-1.2% vs last month</Text>
-                                </View>
+                                <MetricCard
+                                    label="Blood Oxygen"
+                                    value={97}
+                                    unit="%"
+                                    status="normal"
+                                    change="+0.5%"
+                                />
 
-                                {/* VO2 Max */}
-                                <View style={styles.metricCard}>
-                                    <View style={styles.metricCardTop}>
-                                        <Text style={styles.metricStatus}>✓ Optimal</Text>
-                                    </View>
-                                    <Text style={styles.metricLabel}>VO2 MAX</Text>
-                                    <Text style={styles.metricValue}>
-                                        50 <Text style={styles.metricUnit}>ml/kg/min</Text>
-                                    </Text>
-                                    <Text style={styles.metricChange}>+2.0% vs last month</Text>
-                                </View>
+                                <MetricCard
+                                    label="Respiratory Rate"
+                                    value={16}
+                                    unit="breaths/min"
+                                    status="optimal"
+                                    change=""
+                                />
+
+                                <MetricCard
+                                    label="Sleep Duration"
+                                    value={7.5}
+                                    unit="hours"
+                                    status="optimal"
+                                    change="+3.2%"
+                                />
+
                             </View>
+
                         </View>
 
                         {/* TRENDS */}
@@ -192,126 +172,93 @@ export default function Dashboard() {
                             {/* grid */}
                             <View style={styles.metricsGrid}>
                                 {/* Apolipoprotein B */}
-                                <View style={styles.metricCard}>
-                                    <View style={styles.metricCardTop}>
-                                        <Text style={styles.metricStatus}>✓ Optimal</Text>
-                                    </View>
-                                    <Text style={styles.metricLabel}>APoB</Text>
-                                    <Text style={styles.metricValue}>
-                                        85 <Text style={styles.metricUnit}>mg/dL</Text>
-                                    </Text>
-                                    <Text style={styles.metricChange}>-1.08% vs last month</Text>
-                                </View>
+                                <MetricCard
+                                    label="APOLIPOPROTEIN B"
+                                    value={85}
+                                    unit="mg/dL"
+                                    status="optimal"
+                                    change="-1.0%"
+                                />
                                 {/* Lipoprotein(a) */}
-                                <View style={styles.metricCard}>
-                                    <View style={styles.metricCardTop}>
-                                        <Text style={styles.metricStatus}>✓ Optimal</Text>
-                                    </View>
-                                    <Text style={styles.metricLabel}>LIPROTEIN(a)</Text>
-                                    <Text style={styles.metricValue}>
-                                        25 <Text style={styles.metricUnit}>nmol/L</Text>
-                                    </Text>
-                                    <Text style={styles.metricChange}>+1.2% vs last month</Text>
-                                </View>
+                                <MetricCard
+                                    label="LIPOPROTEIN(a)"
+                                    value={16}
+                                    unit="nmol/L"
+                                    status="optimal"
+                                    change="-1.0%"
+                                />
                                 {/* HDL Cholesterol */}
-                                <View style={styles.metricCard}>
-                                    <View style={styles.metricCardTop}>
-                                        <Text style={styles.metricStatus}>✓ Optimal</Text>
-                                    </View>
-                                    <Text style={styles.metricLabel}>HDL CHOLESTEROL</Text>
-                                    <Text style={styles.metricValue}>
-                                        45 <Text style={styles.metricUnit}>mg/dL</Text>
-                                    </Text>
-                                    <Text style={styles.metricChange}>+2.5% vs last month</Text>
-                                </View>
+                                <MetricCard
+                                    label="HDL CHOLESTEROL"
+                                    value={16}
+                                    unit="mg/dL"
+                                    status="optimal"
+                                    change="-1.0%"
+                                />
                                 {/* Non-HDL Cholesterol */}
-                                <View style={styles.metricCard}>
-                                    <View style={styles.metricCardTop}>
-                                        <Text style={styles.metricStatus}>✓ Optimal</Text>
-                                    </View>
-                                    <Text style={styles.metricLabel}>NON-HDL CHOLESTEROL</Text>
-                                    <Text style={styles.metricValue}>
-                                        85 <Text style={styles.metricUnit}>mg/dL</Text>
-                                    </Text>
-                                    <Text style={styles.metricChange}>+3.1% vs last month</Text>
-                                </View>
+                                <MetricCard
+                                    label="NON-HDL CHOLESTEROL"
+                                    value={16}
+                                    unit="mg/dL"
+                                    status="optimal"
+                                    change="-1.0%"
+                                />
                                 {/* Triglycerides */}
-                                <View style={styles.metricCard}>
-                                    <View style={styles.metricCardTop}>
-                                        <Text style={styles.metricStatus}>✓ Optimal</Text>
-                                    </View>
-                                    <Text style={styles.metricLabel}>TRIGLYCERIDES</Text>
-                                    <Text style={styles.metricValue}>
-                                        110 <Text style={styles.metricUnit}>mg/dL</Text>
-                                    </Text>
-                                    <Text style={styles.metricChange}>+4.5% vs last month</Text>
-                                </View>
+                                <MetricCard
+                                    label="TRIGLYCERIDES"
+                                    value={16}
+                                    unit="mg/dL"
+                                    status="optimal"
+                                    change="-1.0%"
+                                />
                                 {/* hs-CRP */}
-                                <View style={styles.metricCard}>
-                                    <View style={styles.metricCardTop}>
-                                        <Text style={styles.metricStatus}>✓ Optimal</Text>
-                                    </View>
-                                    <Text style={styles.metricLabel}>hs-CRP</Text>
-                                    <Text style={styles.metricValue}>
-                                        1.2 <Text style={styles.metricUnit}>mg/L</Text>
-                                    </Text>
-                                    <Text style={styles.metricChange}>+1.2% vs last month</Text>
-                                </View>
+                                <MetricCard
+                                    label="HS-CRP"
+                                    value={16}
+                                    unit="mg/L"
+                                    status="optimal"
+                                    change="-1.0%"
+                                />
                                 {/* Hemoglobin A1c */}
-                                <View style={styles.metricCard}>
-                                    <View style={styles.metricCardTop}>
-                                        <Text style={styles.metricStatus}>✓ Optimal</Text>
-                                    </View>
-                                    <Text style={styles.metricLabel}>HEMOGLOBIN A1c</Text>
-                                    <Text style={styles.metricValue}>
-                                        6.8 <Text style={styles.metricUnit}>%</Text>
-                                    </Text>
-                                    <Text style={styles.metricChange}>+1.2% vs last month</Text>
-                                </View>
+                                <MetricCard
+                                    label="HEMOGLOBIN A1C"
+                                    value={16}
+                                    unit="%"
+                                    status="optimal"
+                                    change="-1.0%"
+                                />
                                 {/* eGFR */}
-                                <View style={styles.metricCard}>
-                                    <View style={styles.metricCardTop}>
-                                        <Text style={styles.metricStatus}>✓ Optimal</Text>
-                                    </View>
-                                    <Text style={styles.metricLabel}>eGFR</Text>
-                                    <Text style={styles.metricValue}>
-                                        68 <Text style={styles.metricUnit}>bpm</Text>
-                                    </Text>
-                                    <Text style={styles.metricChange}>+1.2% vs last month</Text>
-                                </View>
+                                <MetricCard
+                                    label="eGFR"
+                                    value={16}
+                                    unit="mL/min/1.73 m²"
+                                    status="optimal"
+                                    change="-1.0%"
+                                />
                                 {/* Homocysteine */}
-                                <View style={styles.metricCard}>
-                                    <View style={styles.metricCardTop}>
-                                        <Text style={styles.metricStatus}>✓ Optimal</Text>
-                                    </View>
-                                    <Text style={styles.metricLabel}>HOMOCYSTEINE</Text>
-                                    <Text style={styles.metricValue}>
-                                        12.5 <Text style={styles.metricUnit}>μmol/L</Text>
-                                    </Text>
-                                    <Text style={styles.metricChange}>+1.2% vs last month</Text>
-                                </View>
+                                <MetricCard
+                                    label="HOMOCYSTEINE"
+                                    value={16}
+                                    unit="µmol/L"
+                                    status="optimal"
+                                    change=""
+                                />
                                 {/* Fibrinogen */}
-                                <View style={styles.metricCard}>
-                                    <View style={styles.metricCardTop}>
-                                        <Text style={styles.metricStatus}>✓ Optimal</Text>
-                                    </View>
-                                    <Text style={styles.metricLabel}>FIBRINOGEN</Text>
-                                    <Text style={styles.metricValue}>
-                                        350 <Text style={styles.metricUnit}>mg/L</Text>
-                                    </Text>
-                                    <Text style={styles.metricChange}>+1.2% vs last month</Text>
-                                </View>
+                                <MetricCard
+                                    label="FIBRINOGEN"
+                                    value={16}
+                                    unit="mg/dL"
+                                    status="optimal"
+                                    change="-1.0%"
+                                />
                                 {/* Uric acid */}
-                                <View style={styles.metricCard}>
-                                    <View style={styles.metricCardTop}>
-                                        <Text style={styles.metricStatus}>✓ Optimal</Text>
-                                    </View>
-                                    <Text style={styles.metricLabel}>URIC ACID</Text>
-                                    <Text style={styles.metricValue}>
-                                        5.2 <Text style={styles.metricUnit}>mg/dL</Text>
-                                    </Text>
-                                    <Text style={styles.metricChange}>+1.2% vs last month</Text>
-                                </View>
+                                <MetricCard
+                                    label="URIC ACID"
+                                    value={16}
+                                    unit="mg/dL"
+                                    status="optimal"
+                                    change="-1.0%"
+                                />
                             </View>
                         </View>
 
