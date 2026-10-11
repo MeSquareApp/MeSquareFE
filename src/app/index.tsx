@@ -1,16 +1,12 @@
+import { Link } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 
 export default function Index() {
   return (
     <View style={styles.container}>
-      <Text>Future Dashboard Page!</Text>
-    
-    {/*header*/}
-    <Text style={styles.title}>Dashboard</Text>
-
-    {/*body*/}
-
-    {/*footer*/}
+      <Text>esketit index.tsx</Text>
+      <Link href="/dashboard">Go to Dashboard</Link>
+      
     </View>
   );
 }
@@ -20,9 +16,5 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
   },
 });
