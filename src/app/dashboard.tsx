@@ -5,15 +5,40 @@ import { fonts, fontsize } from '../theme/typography';
 import MetricCard from "../components/MetricCard";
 import TwinStatBox from "@/components/TwinStatBox";
 import TrendCard from "@/components/TrendCard";
+import {useEffect, useState } from "react";
+import { getBiomarkers, type Biomarker } from "@/services/api"
 
 
 export default function Dashboard() {
     const twinStats = [
-    { label: "Heart Health", value: "92%",     color: "#369B63" },
-    { label: "Age",          value: 29,        color: colors.primary },
-    { label: "Height",       value: "5ft 11in", color: colors.info },
-    { label: "Weight",       value: 180,       color: colors.secondary },
-];
+        { label: "Heart Health", value: "92%",      color: "#369B63" },
+        { label: "Age",          value: 29,         color: colors.primary },
+        { label: "Height",       value: "5ft 11in", color: colors.info },
+        { label: "Weight",       value: 180,        color: colors.secondary },
+    ];
+    
+    const [biomarkers, setBiomarkers] = useState<Biomarker[]>([]);  // store biomarker data returned from backend
+    const [loading, setLoading] = useState(true);                   // track if app is still waiting for backend response
+    const [error, setError] = useState<string | null>(null);        // error message if request fails
+
+    // run effect when dashboard first loads
+    useEffect(() => {
+        async function loadBiomarkers() {
+            try {
+            const data = await getBiomarkers();
+            setBiomarkers(data);
+            } catch (err) {
+            setError(
+                err instanceof Error ? err.message : "Something went wrong"
+            );
+            } finally {
+            setLoading(false);
+            }
+        }
+
+        loadBiomarkers();
+    }, []);
+
     return (
         <View style={styles.container}>
 
