@@ -3,9 +3,17 @@ import { Dimensions, Image, Pressable, ScrollView, StyleSheet, Text, View } from
 import { colors } from '../theme/color';
 import { fonts, fontsize } from '../theme/typography';
 import MetricCard from "../components/MetricCard";
+import TwinStatBox from "@/components/TwinStatBox";
+import TrendCard from "@/components/TrendCard";
 
 
 export default function Dashboard() {
+    const twinStats = [
+    { label: "Heart Health", value: "92%",     color: "#369B63" },
+    { label: "Age",          value: 29,        color: colors.primary },
+    { label: "Height",       value: "5ft 11in", color: colors.info },
+    { label: "Weight",       value: 180,       color: colors.secondary },
+];
     return (
         <View style={styles.container}>
 
@@ -71,12 +79,16 @@ export default function Dashboard() {
                                resizeMode="contain"
                         />
 
-                        {/* placeholder for twin summary info */}
-                        <View style={styles.twinStatsPlaceholder}>
-                            <View style={styles.twinStatBox}></View>
-                            <View style={styles.twinStatBox}></View>
-                            <View style={styles.twinStatBox}></View>
-                            <View style={styles.twinStatBox}></View>
+                        {/* twin summary info */}
+                        <View style={styles.twinStats}>
+                            <View style={styles.twinStatsRow}>
+                                <TwinStatBox {...twinStats[0]} /> 
+                                <TwinStatBox {...twinStats[1]} />
+                            </View>
+                            <View style={styles.twinStatsRow}>
+                                <TwinStatBox {...twinStats[2]} />
+                                <TwinStatBox {...twinStats[3]} />
+                            </View>
                         </View>
                     </View>
 
@@ -148,19 +160,13 @@ export default function Dashboard() {
 
                         {/* TRENDS */}
                         <View style={styles.dashboardSection}>
-                            <Text style={styles.sectionTitle}>
-                                Trends
-                            </Text>
-
-                            <View style={styles.trendPlaceholder}>
-                                <Text style={styles.trendTitle}>Heart Rate Trend</Text>
-                                <Text style={styles.trendSubtitle}>
-                                    10-day rolling window
-                                </Text>
-                                <Text style={styles.trendLegend}>
-                                    ● Heart Rate
-                                </Text>
-                            </View>
+                            <TrendCard
+                                title="Resting Heart Rate"
+                                value={62}
+                                unit="bpm"
+                                trend="down"
+                                period="Last 30 days"
+                                />
                         </View>
 
                         {/* your twin's metrics */}
@@ -398,6 +404,7 @@ const styles = StyleSheet.create({
         width: "26%",
         minWidth: 220,
         maxWidth: 340,
+        minHeight: 0,
         borderRightWidth: 1,
         borderRightColor: '#F5F5F5',
         padding: 16,
@@ -407,22 +414,18 @@ const styles = StyleSheet.create({
         marginBottom: 16,
     },
     twinImage: {
+        flex: 1,
         width: "100%",
-        height: Dimensions.get("window").height * 0.55,
+        minHeight: 150,
     },
-    twinStatsPlaceholder: {
-        flexDirection: "row",
-        flexWrap: "wrap",
+    twinStats: {
+        alignSelf: "stretch",
         gap: 8,
         marginTop: 16,
     },
-    twinStatBox: {
-        width: "47%",
-        height: 58,
-        borderWidth: 1,
-        borderColor: colors.gray5,
-        borderRadius: 12,
-        backgroundColor: colors.background,
+    twinStatsRow: {
+        flexDirection: "row",
+        gap: 8,
     },
     // ---- WIDGETS ----
     dashboardScroll: {
