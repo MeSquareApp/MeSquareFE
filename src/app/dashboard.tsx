@@ -2,11 +2,11 @@ import { Ionicons } from "@react-native-vector-icons/ionicons";
 import { Dimensions, Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { colors } from '../theme/color';
 import { fonts, fontsize } from '../theme/typography';
+import { useEffect, useState } from "react";
+import { getBiomarkers, type Biomarker } from "@/services/api"
 import MetricCard from "../components/MetricCard";
 import TwinStatBox from "@/components/TwinStatBox";
 import TrendCard from "@/components/TrendCard";
-import {useEffect, useState } from "react";
-import { getBiomarkers, type Biomarker } from "@/services/api"
 
 
 export default function Dashboard() {
@@ -17,27 +17,28 @@ export default function Dashboard() {
         { label: "Weight",       value: 180,        color: colors.secondary },
     ];
     
-    const [biomarkers, setBiomarkers] = useState<Biomarker[]>([]);  // store biomarker data returned from backend
-    const [loading, setLoading] = useState(true);                   // track if app is still waiting for backend response
-    const [error, setError] = useState<string | null>(null);        // error message if request fails
-
-    // run effect when dashboard first loads
+    // get patient data from database
+    const [rhr, setRhr] = useState<Biomarker | null>(null);
+    
     useEffect(() => {
+        // load biomarkers from backend
         async function loadBiomarkers() {
             try {
             const data = await getBiomarkers();
-            setBiomarkers(data);
-            } catch (err) {
-            setError(
-                err instanceof Error ? err.message : "Something went wrong"
+
+            // find resting heart rate in the biomarker data
+            const restingHeartRate = data.find(
+                (item) => item.biomarker_abbr === "RHR"
             );
-            } finally {
-            setLoading(false);
+
+            setRhr(restingHeartRate ?? null);
+            } catch (err) {
+            console.error("Failed to load biomarkers:", err);
             }
         }
 
         loadBiomarkers();
-    }, []);
+        }, []);
 
     return (
         <View style={styles.container}>
@@ -131,9 +132,10 @@ export default function Dashboard() {
                             {/* grid */}
                             <View style={styles.metricsGrid}>
 
+                                {/*Resting Heart Rate*/}
                                 <MetricCard
                                     label="Resting Heart Rate"
-                                    value={68}
+                                    value={rhr ? rhr.value : "..."} // set rhr to value if it exists, otherwise ...
                                     unit="bpm"
                                     status="optimal"
                                     change="+1.2%"

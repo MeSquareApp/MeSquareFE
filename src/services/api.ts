@@ -1,4 +1,4 @@
-const API_BASE_URL = "http://localhold:800";
+const API_BASE_URL = "http://localhost:8000";
 
 // test user jane doe for initial data integration
 export const TEST_USER_ID = "550e8400-e29b-41d4-a716-446655440000";
@@ -16,7 +16,7 @@ export async function getBiomarkers(
     userId: string = TEST_USER_ID
 ): Promise<Biomarker[]> {
     const response = await fetch(
-        `${API_BASE_URL}/patients/$userID/biomarkers`
+        `${API_BASE_URL}/patients/${userId}/biomarkers`
     );
 
     if (!response.ok) {
