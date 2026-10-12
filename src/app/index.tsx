@@ -1,9 +1,21 @@
-import { Text, View, StyleSheet } from "react-native";
+import { Link } from "expo-router";
+import { StyleSheet, Text, View } from "react-native";
 
 export default function Index() {
   return (
     <View style={styles.container}>
       <Text>Hello Team, Let's cook this together!</Text>
+      <Link
+        style={{
+          marginBottom: 50,
+          marginTop: 50,
+          fontWeight: "bold",
+          fontSize: 25,
+        }}
+        href="/auth/login"
+      >
+        Login
+      </Link>
     </View>
   );
 }
