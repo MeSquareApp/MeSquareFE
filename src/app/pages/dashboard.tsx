@@ -2,13 +2,13 @@ import TrendCard from "@/components/TrendCard";
 import TwinStatBox from "@/components/TwinStatBox";
 import { Ionicons } from "@react-native-vector-icons/ionicons";
 import {
-    Dimensions,
-    Image,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    View,
+  Dimensions,
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
 import MetricCard from "../../components/MetricCard";
 import { colors } from "../../theme/color";
