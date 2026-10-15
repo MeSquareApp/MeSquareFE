@@ -5,8 +5,20 @@ export default function Index() {
   return (
     <View style={styles.container}>
       <Text>esketit index.tsx</Text>
-      <Link href="/dashboard">Go to Dashboard</Link>
-      
+      <Link href="../pages/dashboard">Go to Dashboard</Link>
+
+      <Text>Hello Team, Let's cook this together!</Text>
+      <Link
+        style={{
+          marginBottom: 50,
+          marginTop: 50,
+          fontWeight: "bold",
+          fontSize: 25,
+        }}
+        href="/auth/login"
+      >
+        Login
+      </Link>
     </View>
   );
 }
