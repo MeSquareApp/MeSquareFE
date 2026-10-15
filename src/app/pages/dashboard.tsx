@@ -28,7 +28,7 @@ export default function Dashboard() {
         {/* logo */}
         <View style={styles.logoContainer}>
           <Image
-            source={require("../../assets/images/me2-logo.png")}
+            source={require("../../../assets/images/me2-logo.png")}
             style={styles.logo}
           />
         </View>
@@ -78,7 +78,7 @@ export default function Dashboard() {
             </View>
 
             <Image
-              source={require("../../assets/images/female_medium.png")}
+              source={require("../../../assets/images/female_medium.png")}
               style={styles.twinImage}
               resizeMode="contain"
             />
