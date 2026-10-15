@@ -13,6 +13,8 @@ import {
 import MetricCard from "../../components/MetricCard";
 import { colors } from "../../theme/color";
 import { fonts, fontsize } from "../../theme/typography";
+import { getBiomarkers, type Biomarker } from "@/services/api"
+import { useEffect, useState } from "react";
 
 export default function Dashboard() {
   const twinStats = [
@@ -21,6 +23,29 @@ export default function Dashboard() {
     { label: "Height", value: "5ft 11in", color: colors.info },
     { label: "Weight", value: 180, color: colors.secondary },
   ];
+
+  // get patient data from database
+    const [rhr, setRhr] = useState<Biomarker | null>(null);
+    
+    useEffect(() => {
+        // load biomarkers from backend
+        async function loadBiomarkers() {
+            try {
+            const data = await getBiomarkers();
+
+            // find resting heart rate in the biomarker data
+            const restingHeartRate = data.find(
+                (item) => item.biomarker_abbr === "RHR"
+            );
+
+            setRhr(restingHeartRate ?? null);
+            } catch (err) {
+            console.error("Failed to load biomarkers:", err);
+            }
+        }
+
+        loadBiomarkers();
+        }, []);
   return (
     <View style={styles.container}>
       {/* ----- NAVBAR ----- */}
@@ -110,7 +135,7 @@ export default function Dashboard() {
               <View style={styles.metricsGrid}>
                 <MetricCard
                   label="Resting Heart Rate"
-                  value={68}
+                  value={rhr ? rhr.value : "..."} // set rhr to value if it exists, otherwise ...
                   unit="bpm"
                   status="optimal"
                   change="+1.2%"
