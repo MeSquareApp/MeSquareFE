@@ -5,7 +5,7 @@ export default function Index() {
   return (
     <View style={styles.container}>
       <Text>esketit index.tsx</Text>
-      <Link href="/dashboard">Go to Dashboard</Link>
+      <Link href="/pages/dashboard">Go to Dashboard</Link>
 
       <Text>Hello Team, Let's cook this together!</Text>
       <Link

@@ -1,72 +1,10 @@
-import { Link, router } from 'expo-router';
+import { Link } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
-import { supabase } from '../../../lib/supabase';
+import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 export default function Login() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-
-    async function handleLogin() {
-        if (!username || !password) {
-            Alert.alert('Error', 'Please fill in all fields');
-            return;
-        }
-        try {
-            console.log('Logging in with:', username, password);
-            // Note: supabase.auth.signInWithPassword usually takes an email. 
-            // If you are using a custom username login, ensure your Supabase auth is configured for it.
-            const { data, error } = await supabase.auth.signInWithPassword({
-                email: username, // Assuming username is the email here
-                password: password
-            });
-
-            if (error) {
-                Alert.alert('Login Error', error.message);
-            } else if (data.session) {
-                const { data: userData, error: userFetchError } = await supabase.auth.getUser();
-
-                if (userFetchError || !userData?.user) {
-                    console.error('Failed to fetch logged-in user:', userFetchError);
-                    Alert.alert('User Not Found', 'Failed to fetch user data');
-                    return;
-                }
-                const loggedInUser = userData.user;
-
-                const { data: existingUser, error: fetchError } = await supabase
-                    .from('users')
-                    .select('id')
-                    .eq('id', loggedInUser.id)
-                    .maybeSingle();
-
-                if (fetchError) {
-                    console.error('Error checking existing user:', fetchError);
-                    return;
-                }
-
-                if (existingUser && existingUser.id === data.user?.id) {
-                    router.replace('/pages/dashboard');
-                } else {
-                    console.log('New user detected, insert into users table');
-                    const { error: insertError } = await supabase.from('users').insert([{
-                        id: data.user?.id,
-                        // Fixed: changed 'email' to 'username' to prevent a crash
-                        email: username,
-                    }]);
-
-                    if (insertError) {
-                        console.error('Error inserting new user:', JSON.stringify(insertError, null, 2));
-                        Alert.alert('Error inserting UserID', 'You already have an existing account.');
-                        return;
-                    }
-                }
-            } else {
-                Alert.alert('Login Failed', 'No session returned from Authentication');
-            }
-        } catch (err) {
-            Alert.alert('Unexpected Error', err.message);
-        }
-    }
 
     return (
         <View style={styles.container}>
