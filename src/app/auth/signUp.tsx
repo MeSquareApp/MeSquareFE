@@ -202,39 +202,6 @@ export default function SignUp() {
           </View>
         </View>
 
-        {/* Date of Birth Picker (would've been ideal but only for iOS/Android (mobile)*/}
-        {/* <Pressable
-          style={styles.input}
-          onPress={() => setShowDatePicker((prev) => !prev)}
-        >
-          <Text style={{ color: dateOfBirth ? "#111827" : "#9CA3AF" }}>
-            {dateOfBirth
-              ? new Date(dateOfBirth).toLocaleDateString()
-              : "Date of Birth"}
-          </Text>
-        </Pressable>
-
-        {showDatePicker && (
-          <View style={{ marginBottom: 15 }}>
-            <DateTimePicker
-              mode="single"
-              date={dateOfBirth}
-              onChange={({ date }) => {
-                setDateOfBirth(date);
-                setShowDatePicker(false); // close after selection
-              }}
-              maxDate={new Date(2008, 0, 1)} // can't be born in the future
-              minDate={new Date(1900, 0, 1)} // reasonable lower bound
-              styles={{
-                // Optional: match your form's teal/grey theme
-                selected: { backgroundColor: "#14B8A6" },
-                selected_label: { color: "white" },
-                today: { borderColor: "#14B8A6", borderWidth: 1 },
-              }}
-            />
-          </View>
-        )} */}
-
         {Platform.OS === "web" ? (
           <input
             type="date"
@@ -405,30 +372,9 @@ export default function SignUp() {
           keyboardType="email-address"
         />
 
-        {/* <TextInput
-          placeholder="Username"
-          placeholderTextColor="#9CA3AF"
-          onChangeText={setUsername}
-          value={username}
-          style={styles.input}
-          autoCapitalize="none"
-        />
-
-        <TextInput
-          placeholder="Password"
-          placeholderTextColor="#9CA3AF"
-          onChangeText={setPassword}
-          value={password}
-          style={styles.input}
-          autoCapitalize="none"
-          secureTextEntry
-        /> */}
-
-        {/* <Link href="/pages/dashboard" asChild> */}
         <Pressable style={styles.button} onPress={handleSignUp}>
           <Text style={styles.buttonText}>Create Account</Text>
         </Pressable>
-        {/* </Link> */}
       </View>
     </ScrollView>
   );
