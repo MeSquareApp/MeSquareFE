@@ -1,8 +1,10 @@
 import Slider from "@react-native-community/slider";
 import { Picker } from "@react-native-picker/picker";
+import { router } from "expo-router";
 import { useState } from "react";
 import {
   Alert,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -10,13 +12,18 @@ import {
   TextInput,
   View,
 } from "react-native";
+import DateTimePicker from "react-native-ui-datepicker";
 import { supabase } from "../../../lib/supabase";
 
 export default function SignUp() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [age, setAge] = useState<number>();
-  const [dateOfBirth, setDateOfBirth] = useState("");
+  const [dateOfBirth, setDateOfBirth] = useState(""); //YYYY-MM-DD format for Supabase
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const maxDob = new Date();
+  maxDob.setFullYear(maxDob.getFullYear() - 18);
+  const maxDobString = `${maxDob.getFullYear()}-${String(maxDob.getMonth() + 1).padStart(2, "0")}-${String(maxDob.getDate()).padStart(2, "0")}`;
   const [sex, setSex] = useState("");
   const [feet, setFeet] = useState(5);
   const [inches, setInches] = useState(5);
@@ -26,6 +33,16 @@ export default function SignUp() {
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("");
   const isPatient = role === "Patient";
+
+  //helper function to show alerts for web and iOS/Android platforms
+  function showAlert(title: string, message?: string) {
+    if (Platform.OS === "web") {
+      // Browser's native dialog — blocking, but it works
+      window.alert(message ? `${title}\n\n${message}` : title);
+    } else {
+      Alert.alert(title, message);
+    }
+  }
 
   async function handleSignUp() {
     const normalizedEmail = email.trim().toLowerCase();
@@ -39,11 +56,13 @@ export default function SignUp() {
     if (checkError) {
       console.error(checkError.message);
       Alert.alert("Error checking existing user", checkError.message);
+      showAlert("Error checking existing user", checkError.message);
       return;
     }
 
     if (existingUser) {
       Alert.alert("Email already exists", "Please use a different email.");
+      showAlert("Email already exists", "Please use a different email.");
       return;
     }
 
@@ -65,6 +84,7 @@ export default function SignUp() {
     if (usersError) {
       console.error(usersError.message);
       Alert.alert("Could not create account", usersError.message);
+      showAlert("Could not create account", usersError.message);
       return;
     }
 
@@ -88,10 +108,13 @@ export default function SignUp() {
       if (patientError) {
         console.error(patientError.message);
         Alert.alert("Could not save patient details", patientError.message);
+
         return;
       }
     }
     Alert.alert("Account created", "Welcome!");
+    showAlert("Account created", "Welcome!");
+    router.replace("../pages/dashboard");
   }
 
   return (
@@ -178,6 +201,98 @@ export default function SignUp() {
             </View>
           </View>
         </View>
+
+        {/* Date of Birth Picker (would've been ideal but only for iOS/Android (mobile)*/}
+        {/* <Pressable
+          style={styles.input}
+          onPress={() => setShowDatePicker((prev) => !prev)}
+        >
+          <Text style={{ color: dateOfBirth ? "#111827" : "#9CA3AF" }}>
+            {dateOfBirth
+              ? new Date(dateOfBirth).toLocaleDateString()
+              : "Date of Birth"}
+          </Text>
+        </Pressable>
+
+        {showDatePicker && (
+          <View style={{ marginBottom: 15 }}>
+            <DateTimePicker
+              mode="single"
+              date={dateOfBirth}
+              onChange={({ date }) => {
+                setDateOfBirth(date);
+                setShowDatePicker(false); // close after selection
+              }}
+              maxDate={new Date(2008, 0, 1)} // can't be born in the future
+              minDate={new Date(1900, 0, 1)} // reasonable lower bound
+              styles={{
+                // Optional: match your form's teal/grey theme
+                selected: { backgroundColor: "#14B8A6" },
+                selected_label: { color: "white" },
+                today: { borderColor: "#14B8A6", borderWidth: 1 },
+              }}
+            />
+          </View>
+        )} */}
+
+        {Platform.OS === "web" ? (
+          <input
+            type="date"
+            value={dateOfBirth}
+            max={maxDobString}
+            min="1900-01-01"
+            onChange={(e) => setDateOfBirth(e.target.value)}
+            style={{
+              width: "45%",
+              alignSelf: "center",
+              backgroundColor: "#E5E7EB",
+              padding: 15,
+              borderRadius: 8,
+              borderWidth: 0,
+              marginBottom: 50,
+              marginTop: -30,
+              fontFamily: "Atkinson Hyperlegible",
+              fontSize: 16,
+              color: dateOfBirth ? "#111827" : "#9CA3AF",
+            }}
+          />
+        ) : (
+          <>
+            <Pressable
+              style={styles.input}
+              onPress={() => setShowDatePicker((prev) => !prev)}
+            >
+              <Text style={{ color: dateOfBirth ? "#111827" : "#9CA3AF" }}>
+                {dateOfBirth
+                  ? new Date(dateOfBirth + "T00:00:00").toLocaleDateString()
+                  : "Date of Birth"}
+              </Text>
+            </Pressable>
+
+            {showDatePicker && (
+              <View style={{ marginBottom: 15 }}>
+                <DateTimePicker
+                  mode="single"
+                  date={dateOfBirth}
+                  onChange={({ date }) => {
+                    // normalize to "YYYY-MM-DD" so state is always a string
+                    setDateOfBirth(
+                      new Date(date as any).toISOString().split("T")[0],
+                    );
+                    setShowDatePicker(false);
+                  }}
+                  maxDate={maxDob}
+                  minDate={new Date(1900, 0, 1)}
+                  styles={{
+                    selected: { backgroundColor: "#14B8A6" },
+                    selected_label: { color: "white" },
+                    today: { borderColor: "#14B8A6", borderWidth: 1 },
+                  }}
+                />
+              </View>
+            )}
+          </>
+        )}
 
         {/* Height Stepper */}
         <View style={styles.measurementContainer}>
