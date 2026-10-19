@@ -25,6 +25,7 @@ export default function SignUp() {
   const [medicalConditions, setMedicalConditions] = useState("");
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("");
+  const isPatient = role === "Patient";
 
   async function handleSignUp() {
     const normalizedEmail = email.trim().toLowerCase();
@@ -46,36 +47,51 @@ export default function SignUp() {
       return;
     }
 
-    const { usersError } = await supabase.from("users").insert([
-      {
-        first_name: firstName,
-        last_name: lastName,
-        email: email,
-        role: role,
-      },
-    ]);
+    const { error: usersError, data: newUser } = await supabase
+      .from("users")
+      .insert([
+        {
+          first_name: firstName,
+          last_name: lastName,
+          email: normalizedEmail,
+          role: role,
+          //username must come from auth, we'll satisfy that for now with full name
+          username: `${firstName}_${lastName}123`,
+        },
+      ])
+      .select()
+      .single();
 
     if (usersError) {
       console.error(usersError.message);
+      Alert.alert("Could not create account", usersError.message);
       return;
     }
 
-    const { patientError } = await supabase.from("patients").insert([
-      {
-        date_of_birth: dateOfBirth,
-        baseline_age: age,
-        baseline_height_ft: `${feet}' ${inches}"`,
-        baseline_weight_lbs: weight,
-        allergies: allergies,
-        medical_conditions: medicalConditions,
-        biological_sex: sex,
-      },
-    ]);
+    // If the user is a patient, insert data into the patients table
+    // May adapt UI to clear extra unnecessary fields if the user is not a patient, but for now, we just don't insert them into the patients table.
+    if (isPatient) {
+      const { error: patientError } = await supabase.from("patients").insert([
+        {
+          user_id: newUser.id, // ← link back to the users' id column (FK)
+          date_of_birth: dateOfBirth,
+          baseline_age: age,
+          baseline_height_ft: feet,
+          baseline_height_in: inches,
+          baseline_weight_lbs: weight,
+          allergies: allergies,
+          medical_conditions: medicalConditions,
+          biological_sex: sex,
+        },
+      ]);
 
-    if (patientError) {
-      console.error(patientError.message);
-      return;
+      if (patientError) {
+        console.error(patientError.message);
+        Alert.alert("Could not save patient details", patientError.message);
+        return;
+      }
     }
+    Alert.alert("Account created", "Welcome!");
   }
 
   return (
@@ -134,6 +150,7 @@ export default function SignUp() {
             label="Medical Professional"
             value="Medical Professional"
           />
+          <Picker.Item label="Admin" value="Admin" />
         </Picker>
 
         {/* Age Slider */}
@@ -293,7 +310,7 @@ export default function SignUp() {
         /> */}
 
         {/* <Link href="/pages/dashboard" asChild> */}
-        <Pressable style={styles.button}>
+        <Pressable style={styles.button} onPress={handleSignUp}>
           <Text style={styles.buttonText}>Create Account</Text>
         </Pressable>
         {/* </Link> */}
