@@ -15,7 +15,7 @@ import { supabase } from "../../../lib/supabase";
 export default function SignUp() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [age, setAge] = useState();
+  const [age, setAge] = useState<number>();
   const [dateOfBirth, setDateOfBirth] = useState("");
   const [sex, setSex] = useState("");
   const [feet, setFeet] = useState(5);
@@ -163,32 +163,57 @@ export default function SignUp() {
         </View>
 
         {/* Height Stepper */}
-        <View style={styles.heightContainer}>
-          <Text style={styles.measurementLabel}>Height</Text>
-          <View style={styles.heightRow}>
-            <View style={styles.heightBox}>
-              <Pressable
-                onPress={() => setFeet((prev) => Math.min(7, prev + 1))}
-                disabled={feet === 7}
-              >
-                <Text style={styles.arrow}>▲</Text>
-              </Pressable>
-              <Text style={styles.heightValue}>{feet} ft</Text>
-              <Pressable
-                onPress={() => setFeet((prev) => Math.max(4, prev - 1))}
-                disabled={feet === 4}
-              >
-                <Text style={styles.arrow}>▼</Text>
-              </Pressable>
-            </View>
-            <View style={styles.heightBox}>
-              <Pressable onPress={() => setInches((prev) => (prev + 1) % 12)}>
-                <Text style={styles.arrow}>▲</Text>
-              </Pressable>
-              <Text style={styles.heightValue}>{inches} in</Text>
-              <Pressable onPress={() => setInches((prev) => (prev + 11) % 12)}>
-                <Text style={styles.arrow}>▼</Text>
-              </Pressable>
+        <View style={styles.measurementContainer}>
+          <View style={styles.sliderCard}>
+            <Text style={styles.sliderTitle}>
+              Height:{" "}
+              <Text style={styles.sliderValue}>{`${feet}' ${inches}"`}</Text>
+            </Text>
+
+            <View style={styles.heightRow}>
+              <View style={styles.heightColumn}>
+                <Pressable
+                  onPress={() => setFeet((prev) => Math.min(7, prev + 1))}
+                  disabled={feet === 7}
+                  style={styles.arrowButton}
+                >
+                  <Text
+                    style={[styles.arrow, feet === 7 && styles.arrowDisabled]}
+                  >
+                    ▲
+                  </Text>
+                </Pressable>
+                <Text style={styles.heightValue}>{feet} ft</Text>
+                <Pressable
+                  onPress={() => setFeet((prev) => Math.max(4, prev - 1))}
+                  disabled={feet === 4}
+                  style={styles.arrowButton}
+                >
+                  <Text
+                    style={[styles.arrow, feet === 4 && styles.arrowDisabled]}
+                  >
+                    ▼
+                  </Text>
+                </Pressable>
+              </View>
+
+              <View style={styles.heightDivider} />
+
+              <View style={styles.heightColumn}>
+                <Pressable
+                  onPress={() => setInches((prev) => (prev + 1) % 12)}
+                  style={styles.arrowButton}
+                >
+                  <Text style={styles.arrow}>▲</Text>
+                </Pressable>
+                <Text style={styles.heightValue}>{inches} in</Text>
+                <Pressable
+                  onPress={() => setInches((prev) => (prev + 11) % 12)}
+                  style={styles.arrowButton}
+                >
+                  <Text style={styles.arrow}>▼</Text>
+                </Pressable>
+              </View>
             </View>
           </View>
         </View>
@@ -336,20 +361,6 @@ const styles = StyleSheet.create({
     marginBottom: 25,
     fontFamily: "Atkinson Hyperlegible",
   },
-  // valueBadge: {
-  //   backgroundColor: "#CCFBF1", // light teal
-  //   paddingHorizontal: 12,
-  //   paddingVertical: 10,
-  //   borderRadius: 999,
-  //   alignItems: "center",
-  //   justifyContent: "center",
-  // },
-  // valueBadgeText: {
-  //   color: "#0F766E",
-  //   fontWeight: "600",
-  //   fontSize: 15,
-  //   fontFamily: "Atkinson Hyperlegible",
-  // },
   sliderTitle: {
     fontSize: 18,
     color: "#374151",
@@ -357,7 +368,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   sliderCard: {
-    width: "50%", // same width as your TextInputs
+    width: "50%", // same width as TextInputs
     backgroundColor: "#E5E7EB", // same fill as your inputs
     borderRadius: 8,
     borderWidth: 1,
@@ -377,7 +388,7 @@ const styles = StyleSheet.create({
   },
   sliderValue: {
     fontWeight: "600",
-    color: "#111827", // bold "32 yrs" — the reading pops
+    color: "#111827", // bold "32 yrs", the reading pops
   },
   slider: {
     width: "100%", // Reduced from 100 to reduce width
@@ -404,8 +415,18 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 20,
-    marginTop: 10,
+    width: "100%",
+    marginTop: 4,
+  },
+  heightColumn: {
+    flex: 1,
+    alignItems: "center",
+  },
+  heightDivider: {
+    width: 1,
+    alignSelf: "stretch",
+    backgroundColor: "#D1D5DB",
+    marginVertical: 6,
   },
   heightBox: {
     width: 100,
@@ -421,11 +442,16 @@ const styles = StyleSheet.create({
     fontFamily: "Atkinson Hyperlegible",
     marginVertical: 5,
   },
+  arrowButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 4, // keeps the touch target ~24pt tall
+  },
   arrow: {
-    fontSize: 18,
-    color: "#14B8A6", // Teal accent
-    paddingHorizontal: 20,
-    paddingVertical: 5,
+    fontSize: 16,
+    color: "#14B8A6",
+  },
+  arrowDisabled: {
+    color: "#D1D5DB",
   },
   button: {
     backgroundColor: "#14B8A6", // Teal button
