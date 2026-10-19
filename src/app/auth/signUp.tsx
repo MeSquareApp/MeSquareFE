@@ -15,7 +15,7 @@ import { supabase } from "../../../lib/supabase";
 export default function SignUp() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [age, setAge] = useState<number>();
+  const [age, setAge] = useState();
   const [dateOfBirth, setDateOfBirth] = useState("");
   const [sex, setSex] = useState("");
   const [feet, setFeet] = useState(5);
@@ -111,24 +111,6 @@ export default function SignUp() {
           autoCapitalize="none"
         />
 
-        {/* Sex dropdown list */}
-        {/* <Pressable
-          style={styles.input}
-          onPress={() =>
-            setSex((prevSex) => {
-              const currentIndex = sexOptions.indexOf(prevSex);
-              const nextIndex =
-                currentIndex === -1
-                  ? 0
-                  : (currentIndex + 1) % sexOptions.length;
-              return sexOptions[nextIndex];
-            })
-          }
-        >
-          <Text>{sex || "Select sex"}</Text>
-          <Text style={styles.arrow}>▼</Text>
-        </Pressable> */}
-
         {/* Sex dropdown list, using picker library */}
         <Picker
           selectedValue={sex}
@@ -156,19 +138,28 @@ export default function SignUp() {
 
         {/* Age Slider */}
         <View style={styles.measurementContainer}>
-          <Text style={styles.measurementLabel}>Age </Text>
-          <Text style={styles.measurementValue}> {age} years</Text>
-          <Slider
-            style={styles.slider}
-            minimumValue={18}
-            maximumValue={100}
-            step={1}
-            value={age}
-            onValueChange={setAge}
-            minimumTrackTintColor="#14B8A6"
-            maximumTrackTintColor="#D1D5DB"
-            thumbTintColor="#14B8A6"
-          />
+          <View style={styles.sliderCard}>
+            <Text style={styles.sliderTitle}>
+              Age: <Text style={styles.sliderValue}>{age} yrs</Text>
+            </Text>
+            <Slider
+              style={styles.slider}
+              minimumValue={18}
+              maximumValue={100}
+              step={1}
+              value={age}
+              onValueChange={setAge}
+              minimumTrackTintColor="#14B8A6"
+              maximumTrackTintColor="#D1D5DB"
+              thumbTintColor="#14B8A6"
+              accessibilityLabel="Age"
+              accessibilityHint="Drag to adjust your age"
+            />
+            <View style={styles.rangeLabels}>
+              <Text style={styles.rangeLabel}>18</Text>
+              <Text style={styles.rangeLabel}>100</Text>
+            </View>
+          </View>
         </View>
 
         {/* Height Stepper */}
@@ -204,20 +195,29 @@ export default function SignUp() {
 
         {/* Weight Slider */}
         <View style={styles.measurementContainer}>
-          <Text style={styles.measurementLabel}>Weight</Text>
-          <Text style={styles.measurementValue}> {weight.toFixed(1)} lbs</Text>
-          <Slider
-            style={styles.slider}
-            minimumValue={90}
-            maximumValue={280}
-            //adjusted step to 1 for more precise/easier weight selection
-            step={1}
-            value={weight}
-            onValueChange={setWeight}
-            minimumTrackTintColor="#14B8A6"
-            maximumTrackTintColor="#D1D5DB"
-            thumbTintColor="#14B8A6"
-          />
+          <View style={styles.sliderCard}>
+            <Text style={styles.sliderTitle}>
+              Weight:{" "}
+              <Text style={styles.sliderValue}>{weight.toFixed(1)} lbs</Text>
+            </Text>
+            <Slider
+              style={styles.slider}
+              minimumValue={90}
+              maximumValue={280}
+              step={1}
+              value={weight}
+              onValueChange={setWeight}
+              minimumTrackTintColor="#14B8A6"
+              maximumTrackTintColor="#D1D5DB"
+              thumbTintColor="#14B8A6"
+              accessibilityLabel="Weight"
+              accessibilityHint="Drag to adjust your weight"
+            />
+            <View style={styles.rangeLabels}>
+              <Text style={styles.rangeLabel}>90</Text>
+              <Text style={styles.rangeLabel}>280</Text>
+            </View>
+          </View>
         </View>
 
         <TextInput
@@ -322,22 +322,78 @@ const styles = StyleSheet.create({
     marginTop: 20,
     alignItems: "center",
   },
+  measurementHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: "50%", // matches your input width
+    marginBottom: 10,
+  },
   measurementLabel: {
     fontSize: 20, //increased from 16 to 20 for better visibility
     fontWeight: "500",
     color: "#374151",
     marginBottom: 25,
     fontFamily: "Atkinson Hyperlegible",
-    textAlign: "left",
+  },
+  // valueBadge: {
+  //   backgroundColor: "#CCFBF1", // light teal
+  //   paddingHorizontal: 12,
+  //   paddingVertical: 10,
+  //   borderRadius: 999,
+  //   alignItems: "center",
+  //   justifyContent: "center",
+  // },
+  // valueBadgeText: {
+  //   color: "#0F766E",
+  //   fontWeight: "600",
+  //   fontSize: 15,
+  //   fontFamily: "Atkinson Hyperlegible",
+  // },
+  sliderTitle: {
+    fontSize: 18,
+    color: "#374151",
+    fontFamily: "Atkinson Hyperlegible",
+    textAlign: "center",
+  },
+  sliderCard: {
+    width: "50%", // same width as your TextInputs
+    backgroundColor: "#E5E7EB", // same fill as your inputs
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#D1D5DB", // slight outline = "this is a field"
+    paddingHorizontal: 16,
+    paddingTop: 10,
+    paddingBottom: 6,
+    alignItems: "center",
   },
   measurementValue: {
-    fontSize: 15,
+    fontSize: 17,
+    // fontWeight: "600",
     color: "#111827",
     fontFamily: "Atkinson Hyperlegible",
+    textAlign: "center",
+    marginTop: 5,
+  },
+  sliderValue: {
+    fontWeight: "600",
+    color: "#111827", // bold "32 yrs" — the reading pops
   },
   slider: {
-    width: "50%", // Reduced from 100 to reduce width
-    height: 60, // Reduced from 80 to remove empty space
+    width: "100%", // Reduced from 100 to reduce width
+    height: 34, // Reduced from 80, 60 to remove empty space (vertical slack for 2nd change)
+  },
+  rangeLabels: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingHorizontal: 4,
+    width: "100%",
+    marginTop: -5, // pulls 18/100 & 90/280 up under the track
+  },
+  rangeLabel: {
+    fontSize: 12,
+    color: "#6B7280",
+    fontFamily: "Atkinson Hyperlegible",
   },
   heightContainer: {
     width: "100%",
