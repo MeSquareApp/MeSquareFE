@@ -15,6 +15,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScreenContainer } from "react-native-screens";
+import { colors } from "../../theme/color";
 
 type FormData = {
     heightFeet:               string;
@@ -486,6 +487,8 @@ export default function App() {
 
     return (
         <SafeAreaView style={styles.safeArea}>
+
+            {/* ===== HEADER ===== */}
             <StatusBar style="dark" />
             <View style={styles.header}>
                 <View style={styles.brand}>
@@ -499,6 +502,7 @@ export default function App() {
                 <Text style={styles.privateText}>PRIVATE INTAKE</Text>
             </View>
 
+            {/* ===== SIDE NAVBAR ===== */}
             <View style={styles.contentShell}>
                 <View style={styles.sidebar}>
                     <Text style={styles.sidebarEyebrow}>NEW PATIENT INTAKE</Text>
@@ -507,16 +511,9 @@ export default function App() {
                         Your answers help your care team prepare for a more focused first visit.
                     </Text>
                     <SectionNavigation activeSection={activeSection} onSelect={goTo} />
-                    <View style={styles.helpCard}>
-                        <View style={styles.helpMark}><Text style={styles.helpMarkText}>?</Text></View>
-                        <View>
-                            <Text style={styles.helpTitle}>Need help?</Text>
-                            <Text style={styles.helpText}>Patient support</Text>
-                            <Text style={styles.helpPhone}>1 800 555 0148</Text>
-                        </View>
-                    </View>
                 </View>
 
+                {/* main content */}
                 <KeyboardAvoidingView
                     behavior={Platform.OS === "ios" ? "padding" : undefined}
                     keyboardVerticalOffset={Platform.OS === "ios" ? 8 : 0}
@@ -528,6 +525,7 @@ export default function App() {
                         ref={scrollRef}
                         showsVerticalScrollIndicator={false}
                     >
+                        {/* ===== PROGRESS BAR ===== */}
                         <View style={styles.progressMeta}>
                             <Text style={styles.progressStep}>STEP {activeSection + 1} OF {sections.length}</Text>
                             <Text style={styles.progressLabel}>{section.short}</Text>
@@ -536,13 +534,14 @@ export default function App() {
                             <View style={[styles.progressFill, { width: `${((activeSection + 1) / sections.length) * 100}%` }]} />
                         </View>
 
+                        {/* ===== FORM ===== */}
                         <View style={styles.card}>
                             <Text style={styles.eyebrow}>STEP 0{activeSection + 1}</Text>
                             <Text style={styles.title}>{section.title}</Text>
                             <Text style={styles.description}>{section.description}</Text>
                             <View style={styles.divider} />
 
-                            {/*<><><> PERSONAL INFORMATION <><><>*/}
+                            {/*---- PERSONAL INFORMATION -----*/}
                             {activeSection === 0 ? (
                                 <>
                                     <View style={styles.measurementHeader}>
@@ -633,7 +632,7 @@ export default function App() {
                                 </>
                             ) : null}
 
-                            {/* <><><> MEDICAL HISTORY <><><> */}
+                            {/* ----- MEDICAL HISTORY ----- */}
                             {activeSection === 1 ? (
                                 <>
                                     <Input label="Allergies" value={form.allergies} onChangeText={(value) => update("allergies", value)} placeholder="List allergies and reactions, or enter “None”" multiline />
@@ -667,7 +666,7 @@ export default function App() {
                                 </>
                             ) : null}
 
-                            {/* <><><> MEDICATIONS <><><> */}
+                            {/* ----- MEDICATIONS ----- */}
                             {activeSection === 2 ? (
                                 <>
                                     <Input label="Current medications" value={form.currentMedications} onChangeText={(value) => update("currentMedications", value)} placeholder="Example: Metformin, 500 mg, twice daily" multiline />
@@ -678,7 +677,7 @@ export default function App() {
                                 </>
                             ) : null}
 
-                            {/* <><><> LIFESTYLE FACTORS <><><> */}
+                            {/* ----- LIFESTYLE FACTORS ----- */}
                             {activeSection === 3 ? (
                                 <>
                                     <ChoiceGroup label="Do you smoke?" options={["No", "Yes", "Previously"]} value={form.smoking} onChange={(value) => update("smoking", value)} />
@@ -689,7 +688,7 @@ export default function App() {
                                 </>
                             ) : null}
 
-                            {/* <><><> CARDIOVASCULAR HEALTH <><><> */}
+                            {/* ----- CARDIOVASCULAR HEALTH ----- */}
                             {activeSection === 4 ? (
                                 <>
                                     <View style={styles.callout}>
@@ -719,6 +718,7 @@ export default function App() {
                                 </Pressable>
                             </View>
                         </View>
+                        {/* ===== FOOTER ===== */}
                         <Text style={styles.footer}>Your information is handled with care and used to support your visit.</Text>
                     </ScrollView>
                 </KeyboardAvoidingView>
@@ -729,7 +729,7 @@ export default function App() {
 
 const styles = StyleSheet.create({
     flex: { flex: 1 },
-    safeArea: { backgroundColor: "#F4F8F7", flex: 1 },
+    safeArea: { backgroundColor: "#f4f7f8", flex: 1 },
     header: {
         alignItems: "center",
         backgroundColor: "#FFFFFF",
@@ -741,23 +741,21 @@ const styles = StyleSheet.create({
         paddingVertical: 12,
     },
     brand: { alignItems: "center", flexDirection: "row", gap: 9 },
-    brandMark: { alignItems: "center", backgroundColor: "#237568", borderRadius: 17, height: 34, justifyContent: "center", width: 34 },
-    brandPlus: { color: "#FFFFFF", fontSize: 23, fontWeight: "300", lineHeight: 26, transform: [{ rotate: "45deg" }] },
-    brandName: { color: "#173B40", fontSize: 17, fontWeight: "600", letterSpacing: -0.5 },
-    brandAccent: { color: "#3B887A", fontWeight: "700" },
+    brandName: { color: colors.primary, fontSize: 17, fontWeight: "600", letterSpacing: -0.5 },
+    brandAccent: { color: colors.secondary, fontWeight: "700" },
     privateText: { color: "#84938F", fontSize: 9, fontWeight: "600", letterSpacing: 0.8 },
     contentShell: { flex: 1, flexDirection: "row" },
     sidebar: {
-        backgroundColor: "#F1F7F5",
+        backgroundColor: colors.background,
         borderRightColor: "#DCE8E4",
         borderRightWidth: 1,
         paddingHorizontal: 38,
         paddingTop: 46,
         width: 320,
     },
-    sidebarEyebrow: { color: "#318172", fontSize: 10, fontWeight: "700", letterSpacing: 1.2, marginBottom: 10 },
-    sidebarTitle: { color: "#173B40", fontSize: 30, fontWeight: "700", letterSpacing: -1, lineHeight: 36, maxWidth: 240 },
-    sidebarDescription: { color: "#6D817D", fontSize: 12, lineHeight: 19, marginBottom: 28, marginTop: 12, maxWidth: 245 },
+    sidebarEyebrow: { color: colors.primary, fontSize: 10, fontWeight: "700", letterSpacing: 1.2, marginBottom: 10 },
+    sidebarTitle: { color: colors.gray1, fontSize: 30, fontWeight: "700", letterSpacing: -1, lineHeight: 36, maxWidth: 240 },
+    sidebarDescription: { color: "#6d7581", fontSize: 12, lineHeight: 19, marginBottom: 28, marginTop: 12, maxWidth: 245 },
     sidebarNav: { gap: 3 },
     sidebarNavItem: {
         alignItems: "center",
@@ -766,41 +764,25 @@ const styles = StyleSheet.create({
         minHeight: 57,
         paddingHorizontal: 8,
     },
-    sidebarNavItemActive: { backgroundColor: "#E2F0EC" },
+    sidebarNavItemActive: { backgroundColor: "#e2e9f0" },
     sidebarStepCircle: {
         alignItems: "center",
-        backgroundColor: "#E6EFEC",
-        borderColor: "#D6E3DF",
+        backgroundColor: "#e6edef",
+        borderColor: "#d6dee3",
         borderRadius: 20,
         borderWidth: 1,
         height: 40,
         justifyContent: "center",
         width: 40,
     },
-    stepCircleActive: { backgroundColor: "#2F8072", borderColor: "#2F8072" },
-    stepNumber: { color: "#7D918C", fontSize: 11, fontWeight: "700" },
+    stepCircleActive: { backgroundColor: colors.primary, borderColor: colors.secondary },
+    stepNumber: { color: colors.secondary, fontSize: 11, fontWeight: "700" },
     stepNumberActive: { color: "#FFFFFF" },
     sidebarStepCopy: { flex: 1, marginLeft: 13 },
-    sidebarStepLabel: { color: "#96A6A2", fontSize: 8, fontWeight: "700", letterSpacing: 1, marginBottom: 2 },
-    sidebarStepLabelActive: { color: "#4C8A80" },
+    sidebarStepLabel: { color: "#969da6", fontSize: 8, fontWeight: "700", letterSpacing: 1, marginBottom: 2 },
+    sidebarStepLabelActive: { color: "#4c758a" },
     sidebarStepTitle: { color: "#748783", fontSize: 12, fontWeight: "600", lineHeight: 16 },
-    sidebarStepTitleActive: { color: "#1E6259" },
-    helpCard: {
-        alignItems: "flex-start",
-        backgroundColor: "rgba(255,255,255,0.7)",
-        borderColor: "#DFE9E6",
-        borderRadius: 12,
-        borderWidth: 1,
-        flexDirection: "row",
-        gap: 10,
-        marginTop: 24,
-        padding: 13,
-    },
-    helpMark: { alignItems: "center", borderColor: "#A7BDB8", borderRadius: 12, borderWidth: 1, height: 24, justifyContent: "center", width: 24 },
-    helpMarkText: { color: "#3D786E", fontSize: 11, fontWeight: "700" },
-    helpTitle: { color: "#34534F", fontSize: 11, fontWeight: "700", marginBottom: 2 },
-    helpText: { color: "#879994", fontSize: 10 },
-    helpPhone: { color: "#397B71", fontSize: 10, fontWeight: "700", marginTop: 2 },
+    sidebarStepTitleActive: { color: "#1e3a62" },
     mobileNav: { marginBottom: 18, marginHorizontal: -16 },
     mobileNavContent: { gap: 8, paddingHorizontal: 16 },
     mobileNavItem: {
@@ -820,10 +802,10 @@ const styles = StyleSheet.create({
     scrollContent: { paddingBottom: 36, paddingHorizontal: 16, paddingTop: 20 },
     desktopScrollContent: { alignSelf: "center", maxWidth: 760, paddingHorizontal: 34, paddingTop: 46, width: "100%" },
     progressMeta: { flexDirection: "row", justifyContent: "space-between", marginBottom: 9 },
-    progressStep: { color: "#81938F", fontSize: 10, fontWeight: "600", letterSpacing: 0.8 },
-    progressLabel: { color: "#36796F", fontSize: 11, fontWeight: "600" },
-    progressTrack: { backgroundColor: "#E1EAE7", borderRadius: 3, height: 4, marginBottom: 20, overflow: "hidden" },
-    progressFill: { backgroundColor: "#38877A", borderRadius: 3, height: 4 },
+    progressStep: { color: "#818b93", fontSize: 10, fontWeight: "600", letterSpacing: 0.8 },
+    progressLabel: { color: colors.primary, fontSize: 11, fontWeight: "600" },
+    progressTrack: { backgroundColor: "#e1e6ea", borderRadius: 3, height: 4, marginBottom: 20, overflow: "hidden" },
+    progressFill: { backgroundColor: colors.primary, borderRadius: 3, height: 4 },
     card: {
         backgroundColor: "#FFFFFF",
         borderColor: "#E2EBE8",
@@ -831,13 +813,13 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         paddingHorizontal: 20,
         paddingVertical: 28,
-        shadowColor: "#234944",
+        shadowColor: "#233749",
         shadowOffset: { width: 0, height: 12 },
         shadowOpacity: 0.07,
         shadowRadius: 24,
         elevation: 3,
     },
-    eyebrow: { color: "#318172", fontSize: 10, fontWeight: "700", letterSpacing: 1.3, marginBottom: 8 },
+    eyebrow: { color: "colors.primary", fontSize: 10, fontWeight: "700", letterSpacing: 1.3, marginBottom: 8 },
     title: { color: "#17393E", fontSize: 28, fontWeight: "700", letterSpacing: -1, lineHeight: 34 },
     description: { color: "#78908B", fontSize: 13, lineHeight: 19, marginTop: 7 },
     divider: { backgroundColor: "#E8EFED", height: 1, marginBottom: 25, marginTop: 22 },
@@ -849,7 +831,8 @@ const styles = StyleSheet.create({
         alignItems: "center",
         flexDirection: "row",
         justifyContent: "space-between",
-        marginBottom: 16,
+        marginBottom: 10,
+        marginTop: 0,
     },
     measurementTitle: { color: "#34534F", fontSize: 12, fontWeight: "700" },
     unitToggle: {
@@ -978,9 +961,9 @@ const styles = StyleSheet.create({
     actions: { alignItems: "center", borderTopColor: "#E8EFED", borderTopWidth: 1, flexDirection: "row", justifyContent: "space-between", marginTop: 10, paddingTop: 22 },
     backButton: { paddingHorizontal: 3, paddingVertical: 13 },
     backText: { color: "#5E7772", fontSize: 12, fontWeight: "600" },
-    primaryButton: { alignItems: "center", backgroundColor: "#246F64", borderRadius: 9, justifyContent: "center", minHeight: 46, paddingHorizontal: 19 },
+    primaryButton: { alignItems: "center", backgroundColor: colors.primary, borderRadius: 9, justifyContent: "center", minHeight: 46, paddingHorizontal: 19 },
     primaryButtonText: { color: "#FFFFFF", fontSize: 12, fontWeight: "700" },
-    buttonPressed: { backgroundColor: "#1D6258", opacity: 0.9 },
+    buttonPressed: { backgroundColor: colors.secondaryDark, opacity: 0.9 },
     footer: { color: "#91A29E", fontSize: 10, lineHeight: 15, paddingHorizontal: 25, paddingTop: 18, textAlign: "center" },
     successScreen: { alignItems: "center", flex: 1, justifyContent: "center", padding: 20 },
     successCard: { alignItems: "center", backgroundColor: "#FFFFFF", borderColor: "#DFEBE7", borderRadius: 20, borderWidth: 1, maxWidth: 520, paddingHorizontal: 30, paddingVertical: 48, shadowColor: "#234944", shadowOffset: { width: 0, height: 14 }, shadowOpacity: 0.09, shadowRadius: 28, width: "100%", elevation: 4 },
