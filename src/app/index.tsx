@@ -6,6 +6,7 @@ export default function Index() {
     <View style={styles.container}>
       <Text>esketit index.tsx</Text>
       <Link href="../pages/dashboard">Go to Dashboard</Link>
+      <Link href="../pages/initialDataForm">Initial Data form</Link>
 
       <Text>Hello Team, Let's cook this together!</Text>
       <Link
