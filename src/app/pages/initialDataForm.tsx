@@ -5,7 +5,6 @@ import {
     KeyboardAvoidingView,
     Platform,
     Pressable,
-    SafeAreaView,
     ScrollView,
     StyleSheet,
     Text,
@@ -14,6 +13,7 @@ import {
     View,
     Image,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { ScreenContainer } from "react-native-screens";
 
 type FormData = {
@@ -114,6 +114,9 @@ function FieldLabel({ children, optional }: { children: React.ReactNode; optiona
     );
 }
 
+/**
+ * Input component for text entry fields in the form.
+ */
 function Input({
     label,
     value,
@@ -153,6 +156,7 @@ function Input({
     );
 }
 
+/* radio button group */
 function ChoiceGroup({
     label,
     options,
@@ -191,7 +195,10 @@ function ChoiceGroup({
     );
 }
 
-function PickerField({
+/***dropdown select field
+ * used for: sex, geographical region 
+ */
+function SelectField({
     label,
     options,
     value,
@@ -216,6 +223,7 @@ function PickerField({
                 <Text numberOfLines={1} style={value ? styles.selectValue : styles.selectPlaceholder}>
                     {value || `Select ${label.toLowerCase()}`}
                 </Text>
+                {/* TODO: replace with vector/icon */}
                 <Text style={styles.chevron}>{expanded ? "⌃" : "⌄"}</Text>
             </Pressable>
             {expanded ? (
@@ -243,6 +251,9 @@ function PickerField({
     );
 }
 
+/*** select all option
+ * used for: race, conditions
+*/
 function MultiSelectField({
     label,
     options,
@@ -287,6 +298,9 @@ function MultiSelectField({
     );
 }
 
+/***
+ * navigation bar on the left pane
+ */
 function SectionNavigation({
     activeSection,
     compact,
@@ -604,7 +618,7 @@ export default function App() {
 
                                         {/* -- sex -- */}
                                         <View style={{ flex: 2, paddingStart: 20 }}>
-                                            <PickerField
+                                            <SelectField
                                                 label="Sex"
                                                 options={["Female", "Male", "Other", "Prefer not to say"]}
                                                 value={form.sex}
@@ -615,7 +629,7 @@ export default function App() {
 
                                     {/* -- race  & geographic region -- */}
                                     <MultiSelectField label="Race" options={raceOptions} values={form.race} onToggle={toggleRace} />
-                                    <PickerField label="Geographical region" options={regionOptions} value={form.region} onChange={(value) => update("region", value)} />
+                                    <SelectField label="Geographical region" options={regionOptions} value={form.region} onChange={(value) => update("region", value)} />
                                 </>
                             ) : null}
 
@@ -653,6 +667,7 @@ export default function App() {
                                 </>
                             ) : null}
 
+                            {/* <><><> MEDICATIONS <><><> */}
                             {activeSection === 2 ? (
                                 <>
                                     <Input label="Current medications" value={form.currentMedications} onChangeText={(value) => update("currentMedications", value)} placeholder="Example: Metformin, 500 mg, twice daily" multiline />
@@ -663,6 +678,7 @@ export default function App() {
                                 </>
                             ) : null}
 
+                            {/* <><><> LIFESTYLE FACTORS <><><> */}
                             {activeSection === 3 ? (
                                 <>
                                     <ChoiceGroup label="Do you smoke?" options={["No", "Yes", "Previously"]} value={form.smoking} onChange={(value) => update("smoking", value)} />
@@ -673,6 +689,7 @@ export default function App() {
                                 </>
                             ) : null}
 
+                            {/* <><><> CARDIOVASCULAR HEALTH <><><> */}
                             {activeSection === 4 ? (
                                 <>
                                     <View style={styles.callout}>
