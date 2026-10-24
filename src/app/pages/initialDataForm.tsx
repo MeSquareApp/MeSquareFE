@@ -575,27 +575,27 @@ export default function App() {
                                             <FieldLabel>Height</FieldLabel>
                                             <View style={styles.heightInputs}>
                                                 {/* feet/meters */}
-                                                <View style={styles.measurementInputWrap}>
+                                                <View style={styles.heightInputWrap}>
                                                     <TextInput
                                                         accessibilityLabel={measurementSystem === "customary" ? "Height in feet" : "Height in meters"}
                                                         keyboardType="numeric"
                                                         onChangeText={(value) => update("heightFeet", value)}
                                                         placeholder={measurementSystem === "customary" ? "5" : "1"}
                                                         placeholderTextColor="#A4B3AF"
-                                                        style={styles.measurementInput}
+                                                        style={styles.heightInput}
                                                         value={form.heightFeet}
                                                     />
                                                     <Text style={styles.suffix}>{measurementSystem === "customary" ? "ft" : "m"}</Text>
                                                 </View>
                                                 {/* inches/cm */}
-                                                <View style={styles.measurementInputWrap}>
+                                                <View style={styles.heightInputWrap}>
                                                     <TextInput
                                                         accessibilityLabel={measurementSystem === "customary" ? "Additional height in inches" : "Additional height in centimeters"}
                                                         keyboardType="numeric"
                                                         onChangeText={(value) => update("heightInches", value)}
                                                         placeholder={measurementSystem === "customary" ? "8" : "73"}
                                                         placeholderTextColor="#A4B3AF"
-                                                        style={styles.measurementInput}
+                                                        style={styles.heightInput}
                                                         value={form.heightInches}
                                                     />
                                                     <Text style={styles.suffix}>{measurementSystem === "customary" ? "in" : "cm"}</Text>
@@ -707,6 +707,7 @@ export default function App() {
                                 </>
                             ) : null}
 
+                            {/* ----- SAVE & CONTINUE / SUBMIT BUTTON  ----- */}
                             <View style={styles.actions}>
                                 {activeSection > 0 ? (
                                     <Pressable onPress={() => goTo(activeSection - 1)} style={({ pressed }) => [styles.backButton, pressed && styles.pressed]}>
@@ -745,6 +746,8 @@ const styles = StyleSheet.create({
     brandAccent: { color: colors.secondary, fontWeight: "700" },
     privateText: { color: "#84938F", fontSize: 9, fontWeight: "600", letterSpacing: 0.8 },
     contentShell: { flex: 1, flexDirection: "row" },
+    
+    // ===== SIDEBAR =====
     sidebar: {
         backgroundColor: colors.background,
         borderRightColor: "#DCE8E4",
@@ -776,7 +779,7 @@ const styles = StyleSheet.create({
         width: 40,
     },
     stepCircleActive: { backgroundColor: colors.primary, borderColor: colors.secondary },
-    stepNumber: { color: colors.secondary, fontSize: 11, fontWeight: "700" },
+    stepNumber: { color: colors.primaryLight, fontSize: 11, fontWeight: "700" },
     stepNumberActive: { color: "#FFFFFF" },
     sidebarStepCopy: { flex: 1, marginLeft: 13 },
     sidebarStepLabel: { color: "#969da6", fontSize: 8, fontWeight: "700", letterSpacing: 1, marginBottom: 2 },
@@ -801,11 +804,15 @@ const styles = StyleSheet.create({
     mobileNavTextActive: { color: "#246B60" },
     scrollContent: { paddingBottom: 36, paddingHorizontal: 16, paddingTop: 20 },
     desktopScrollContent: { alignSelf: "center", maxWidth: 760, paddingHorizontal: 34, paddingTop: 46, width: "100%" },
+    
+    // ===== PROGRESS BAR =====
     progressMeta: { flexDirection: "row", justifyContent: "space-between", marginBottom: 9 },
     progressStep: { color: "#818b93", fontSize: 10, fontWeight: "600", letterSpacing: 0.8 },
     progressLabel: { color: colors.primary, fontSize: 11, fontWeight: "600" },
     progressTrack: { backgroundColor: "#e1e6ea", borderRadius: 3, height: 4, marginBottom: 20, overflow: "hidden" },
     progressFill: { backgroundColor: colors.primary, borderRadius: 3, height: 4 },
+    
+    // ===== FORM =====
     card: {
         backgroundColor: "#FFFFFF",
         borderColor: "#E2EBE8",
@@ -834,13 +841,10 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         marginTop: 0,
     },
+
+    // measurement row & unit toggle
     measurementTitle: { color: "#34534F", fontSize: 12, fontWeight: "700" },
-    unitToggle: {
-        backgroundColor: "#EDF3F1",
-        borderRadius: 8,
-        flexDirection: "row",
-        padding: 3,
-    },
+    unitToggle: { backgroundColor: "#EDF3F1", borderRadius: 8, flexDirection: "row", padding: 3 },
     unitToggleButton: {
         borderRadius: 6,
         paddingHorizontal: 12,
@@ -854,13 +858,14 @@ const styles = StyleSheet.create({
         shadowRadius: 3,
         elevation: 1,
     },
-    unitToggleText: { color: "#7C8E89", fontSize: 10, fontWeight: "600" },
+    unitToggleText: { color: colors.secondaryLight, fontSize: 10, fontWeight: "600" },
     unitToggleTextActive: { color: "#246F64" },
     measurementRow: { flexDirection: "row", gap: 16, marginBottom: 2 },
+    // height fields
     heightField: { flex: 2 },
     heightInputs: { flexDirection: "row", gap: 9 },
-    measurementInputWrap: { flex: 1, position: "relative" },
-    measurementInput: {
+    heightInputWrap: { flex: 1, position: "relative" },
+    heightInput: {
         backgroundColor: "#FBFCFC",
         borderColor: "#D8E3E0",
         borderRadius: 9,
@@ -871,7 +876,7 @@ const styles = StyleSheet.create({
         paddingLeft: 13,
         paddingRight: 39,
     },
-    weightField: { flex: 2, paddingStart: 40 },
+    // text inputs
     inputWrap: { position: "relative" },
     inputWrapMultiline: { minHeight: 104 },
     input: {
@@ -886,9 +891,8 @@ const styles = StyleSheet.create({
     },
     multilineInput: { height: 104, lineHeight: 20, paddingTop: 13 },
     inputWithSuffix: { paddingRight: 55 },
-    suffix: { color: "#93A49F", fontSize: 11, position: "absolute", right: 13, top: 17 },
-    twoColumn: { flexDirection: "row", gap: 12 },
-    half: { flex: 1 },
+    suffix: { color: "#939ba4", fontSize: 11, position: "absolute", right: 13, top: 17 },
+    // multiple choice inputs (radio button)
     choiceRow: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
     choice: {
         alignItems: "center",
@@ -901,10 +905,11 @@ const styles = StyleSheet.create({
         paddingHorizontal: 13,
         paddingVertical: 12,
     },
-    choiceSelected: { backgroundColor: "#E9F4F1", borderColor: "#3E887C" },
-    choiceText: { color: "#617772", fontSize: 12, fontWeight: "500" },
-    choiceTextSelected: { color: "#25695F", fontWeight: "700" },
+    choiceSelected: { backgroundColor: "#e9edf4", borderColor: "#3e5088" },
+    choiceText: { color: "#616b77", fontSize: 12, fontWeight: "500" },
+    choiceTextSelected: { color: "#253869", fontWeight: "700" },
     pressed: { opacity: 0.72 },
+    // select option inputs (checkbox)
     selectButton: {
         alignItems: "center",
         backgroundColor: "#FBFCFC",
@@ -922,14 +927,15 @@ const styles = StyleSheet.create({
     optionList: { borderColor: "#D8E3E0", borderRadius: 9, borderWidth: 1, marginTop: 7, overflow: "hidden" },
     option: { alignItems: "center", backgroundColor: "#FFFFFF", borderBottomColor: "#E8EFED", borderBottomWidth: StyleSheet.hairlineWidth, flexDirection: "row", justifyContent: "space-between", padding: 13 },
     optionSelected: { backgroundColor: "#EDF6F4" },
-    optionText: { color: "#536B66", flex: 1, fontSize: 13 },
-    optionTextSelected: { color: "#27695F", fontWeight: "600" },
-    check: { color: "#2D7D70", fontSize: 15, fontWeight: "700" },
+    optionText: { color: "#535d6b", flex: 1, fontSize: 13 },
+    optionTextSelected: { color: "#273b69", fontWeight: "600" },
+    check: { color: "#2d4c7d", fontSize: 15, fontWeight: "700" },
     helperText: { color: "#94A49F", fontSize: 10, marginBottom: 10, marginTop: -4 },
+    // select options ( yes | no | idk )
     multiSelectGrid: { flexDirection: "row", flexWrap: "wrap", gap: 9 },
     multiSelectOption: {
         alignItems: "center",
-        backgroundColor: "#FBFCFC",
+        backgroundColor: "#fbfbfc",
         borderColor: "#DCE5E3",
         borderRadius: 9,
         borderWidth: 1,
@@ -938,17 +944,20 @@ const styles = StyleSheet.create({
         padding: 11,
         width: "48%",
     },
-    multiSelectOptionSelected: { backgroundColor: "#EDF6F4", borderColor: "#6AA398" },
-    multiSelectText: { color: "#627772", flex: 1, fontSize: 11, lineHeight: 15 },
-    multiSelectTextSelected: { color: "#27695F", fontWeight: "600" },
+    multiSelectOptionSelected: { backgroundColor: "#EDF6F4", borderColor: "#6a82a3" },
+    multiSelectText: { color: "#626b77", flex: 1, fontSize: 11, lineHeight: 15 },
+    multiSelectTextSelected: { color: "#274869", fontWeight: "600" },
+    // pre-existing conditions question specific
     conditionGrid: { flexDirection: "row", flexWrap: "wrap", gap: 9 },
     condition: { alignItems: "center", backgroundColor: "#FBFCFC", borderColor: "#DCE5E3", borderRadius: 9, borderWidth: 1, flexDirection: "row", padding: 11, width: "48%" },
-    conditionSelected: { backgroundColor: "#EDF6F4", borderColor: "#6AA398" },
-    checkbox: { alignItems: "center", borderColor: "#B5C7C2", borderRadius: 4, borderWidth: 1, height: 17, justifyContent: "center", marginRight: 8, width: 17 },
-    checkboxSelected: { backgroundColor: "#378578", borderColor: "#378578" },
+    conditionSelected: { backgroundColor: "#edf0f6", borderColor: "#6a80a3" },
+    // checkbox
+    checkbox: { alignItems: "center", borderColor: "#b5bbc7", borderRadius: 4, borderWidth: 1, height: 17, justifyContent: "center", marginRight: 8, width: 17 },
+    checkboxSelected: { backgroundColor: "#375c85", borderColor: "#374f85" },
     checkboxCheck: { color: "#FFFFFF", fontSize: 11, fontWeight: "700" },
-    conditionText: { color: "#627772", flex: 1, fontSize: 11 },
-    conditionTextSelected: { color: "#27695F", fontWeight: "600" },
+    conditionText: { color: "#626877", flex: 1, fontSize: 11 },
+    conditionTextSelected: { color: "#273d69", fontWeight: "600" },
+    // cardiovascular question specific
     callout: { backgroundColor: "#EEF7F4", borderColor: "#D5EBE5", borderRadius: 11, borderWidth: 1, flexDirection: "row", marginBottom: 25, padding: 15 },
     calloutMark: { alignItems: "center", borderColor: "#5C998F", borderRadius: 14, borderWidth: 1, height: 28, justifyContent: "center", marginRight: 11, width: 28 },
     calloutMarkText: { color: "#337F73", fontSize: 18 },
@@ -959,11 +968,14 @@ const styles = StyleSheet.create({
     reviewTitle: { color: "#2D625A", fontSize: 12, fontWeight: "700", marginBottom: 3 },
     reviewText: { color: "#718B85", fontSize: 11, lineHeight: 16 },
     actions: { alignItems: "center", borderTopColor: "#E8EFED", borderTopWidth: 1, flexDirection: "row", justifyContent: "space-between", marginTop: 10, paddingTop: 22 },
+    // button
     backButton: { paddingHorizontal: 3, paddingVertical: 13 },
     backText: { color: "#5E7772", fontSize: 12, fontWeight: "600" },
     primaryButton: { alignItems: "center", backgroundColor: colors.primary, borderRadius: 9, justifyContent: "center", minHeight: 46, paddingHorizontal: 19 },
     primaryButtonText: { color: "#FFFFFF", fontSize: 12, fontWeight: "700" },
     buttonPressed: { backgroundColor: colors.secondaryDark, opacity: 0.9 },
+    
+    // ===== FOOTER =====
     footer: { color: "#91A29E", fontSize: 10, lineHeight: 15, paddingHorizontal: 25, paddingTop: 18, textAlign: "center" },
     successScreen: { alignItems: "center", flex: 1, justifyContent: "center", padding: 20 },
     successCard: { alignItems: "center", backgroundColor: "#FFFFFF", borderColor: "#DFEBE7", borderRadius: 20, borderWidth: 1, maxWidth: 520, paddingHorizontal: 30, paddingVertical: 48, shadowColor: "#234944", shadowOffset: { width: 0, height: 14 }, shadowOpacity: 0.09, shadowRadius: 28, width: "100%", elevation: 4 },
