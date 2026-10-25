@@ -614,8 +614,9 @@ export default function App() {
                         <Text style={styles.successCopy}>
                             Your intake form is complete and ready for your care team to review.
                         </Text>
-                        <Pressable onPress={() => setSubmitted(false)} style={({ pressed }) => [styles.primaryButton, pressed && styles.buttonPressed]}>
-                            <Text style={styles.primaryButtonText}>Review responses</Text>
+                        <Pressable onPress={() => { setSubmitted(false); goTo(0); }}
+                          style={({ pressed }) => [ styles.primaryButton, pressed && styles.buttonPressed, ]}>
+                            <Text style={styles.primaryButtonText}>Edit responses</Text>
                         </Pressable>
                     </View>
                 </View>
@@ -1084,14 +1085,16 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         minHeight: 43,
         padding: 11,
-        width: "48%",
+        flexBasis: "48%",
+        flexGrow: 1,
+        flexShrink: 1,
     },
     multiSelectOptionSelected: { backgroundColor: "#EDF6F4", borderColor: "#6a82a3" },
     multiSelectText: { color: "#626b77", flex: 1, fontSize: 11, lineHeight: 15 },
     multiSelectTextSelected: { color: "#274869", fontWeight: "600" },
     // pre-existing conditions question specific
     conditionGrid: { flexDirection: "row", flexWrap: "wrap", gap: 9 },
-    condition: { alignItems: "center", backgroundColor: "#FBFCFC", borderColor: "#DCE5E3", borderRadius: 9, borderWidth: 1, flexDirection: "row", padding: 11, width: "48%" },
+    condition: { alignItems: "center", backgroundColor: "#FBFCFC", borderColor: "#DCE5E3", borderRadius: 9, borderWidth: 1, flexDirection: "row", padding: 11, flexBasis: "48%", flexGrow: 1, flexShrink: 1 },
     conditionSelected: { backgroundColor: "#edf0f6", borderColor: "#6a80a3" },
     // checkbox
     checkbox: { alignItems: "center", borderColor: "#b5bbc7", borderRadius: 4, borderWidth: 1, height: 17, justifyContent: "center", marginRight: 8, width: 17 },
