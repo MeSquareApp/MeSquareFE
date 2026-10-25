@@ -13,7 +13,7 @@ import {
 import MetricCard from "../../components/MetricCard";
 import { colors } from "../../theme/color";
 import { fonts, fontsize } from "../../theme/typography";
-import { getBiomarkers, type Biomarker } from "@/services/api"
+import { getBiomarkers, type Biomarker, getPatientProfile, type PatientProfile } from "@/services/api"
 import { useEffect, useState } from "react";
 
 export default function Dashboard() {
@@ -25,7 +25,9 @@ export default function Dashboard() {
   ];
 
   // get patient data from database
-    const [rhr, setRhr] = useState<Biomarker | null>(null);
+    const [rhr, setRhr]             = useState<Biomarker | null>(null);
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName]   = useState("");
     
     useEffect(() => {
         // load biomarkers from backend
@@ -39,12 +41,30 @@ export default function Dashboard() {
             );
 
             setRhr(restingHeartRate ?? null);
-            } catch (err) {
+          } catch (err) {
             console.error("Failed to load biomarkers:", err);
-            }
+          }
+        }
+
+        async function loadPatientName(){
+          // get first name
+          try {
+            const data = await getPatientProfile();
+            setFirstName(data[0]?.user.first_name ?? "");
+          } catch (err) {
+            console.error("Failed to load patient's first name:", err);
+          }
+          // get last name
+          try {
+            const data = await getPatientProfile();
+            setLastName(data[0]?.user.last_name ?? "");
+          } catch (err) {
+            console.error("Failed to load patient's last name:", err);
+          }
         }
 
         loadBiomarkers();
+        loadPatientName();
         }, []);
   return (
     <View style={styles.container}>
@@ -89,7 +109,7 @@ export default function Dashboard() {
 
           {/* user profile */}
           <View style={styles.profileContainer}>
-            <Text style={styles.profileName}>John Doe</Text>
+            <Text style={styles.profileName}>{firstName || "Patient"} {lastName}</Text>
             <Ionicons name="person-circle-outline" size={30} color="#666666" />
           </View>
         </View>
