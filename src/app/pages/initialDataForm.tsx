@@ -386,20 +386,44 @@ export default function App() {
         }));
     };
 
+    
     const toggleRace = (race: string) => {
-        setForm((current) => ({
-            ...current,
-            race: current.race.includes(race)
-                ? current.race.filter((item) => item !== race)
-                : [...current.race, race],
-        }));
-    };
+        setForm((current) => {
+            const preferNotToSay = "Prefer not to say";
+
+            // selecting "Prefer not to say" clears other selections
+            if (race === preferNotToSay) {
+                return {
+                    ...current,
+                    race: current.race.includes(preferNotToSay)
+                        ? []
+                        : [preferNotToSay],
+                };
+            }
+
+            // selecting another option removes "Prefer not to say"
+            const selectedWithoutPreferNotToSay =
+                current.race.filter(
+                    (item) => item !== preferNotToSay
+                );
+
+            return {
+                ...current,
+                race: selectedWithoutPreferNotToSay.includes(race)
+                    ? selectedWithoutPreferNotToSay.filter(
+                        (item) => item !== race
+                    )
+                    : [...selectedWithoutPreferNotToSay, race],
+            };
+        });
+};
+
 
     const changeMeasurementSystem = (system: "customary" | "metric") => {
         if (system === measurementSystem) return;
 
         setForm((current) => {
-            // Convert the current height to total centimeters.
+            // convert the current height to total centimeters
             const first = Number(current.heightFeet);
             const second = Number(current.heightInches);
 
@@ -411,7 +435,7 @@ export default function App() {
                         ? (first * 12 + second) * 2.54
                         : first * 100 + second;
 
-            // Convert weight based on the current unit system.
+            // convert weight based on the current unit system
             const weightValue = Number(current.weight);
             const weight = current.weight.trim() === ""
                 ? ""
@@ -508,7 +532,7 @@ export default function App() {
             }
         }
 
-        // Validate lifestyle hours.
+        // validate lifestyle hours
         if (activeSection === 3) {
             const exercise = Number(form.exerciseHours);
             const sleep = Number(form.sleepHours);
@@ -532,16 +556,49 @@ export default function App() {
         return true;
     };
 
-
     const continueForm = () => {
         if (!validateCurrentSection()) return;
+
         if (activeSection < sections.length - 1) {
             goTo(activeSection + 1);
-        } else {
-            setSubmitted(true);
-            scrollRef.current?.scrollTo({ y: 0, animated: true });
+            return;
         }
+
+        if (!validateAllSections()) return;
+
+        setSubmitted(true);
+        scrollRef.current?.scrollTo({ y: 0, animated: true });
     };
+
+    const validateAllSections = () => {
+        for (let index = 0; index < sections.length; index++) {
+            const required: StringField[][] = [
+                ["heightFeet", "heightInches", "weight", "sex", "region"],
+                [],
+                ["bloodPressureMedication", "cholesterolMedication"],
+                ["smoking", "alcohol", "recreationalDrugs", "exerciseHours", "sleepHours"],
+                ["highBloodPressureHistory", "highCholesterolHistory"],
+            ];
+
+            const missingRace =
+                index === 0 && form.race.length === 0;
+            const missingFields = required[index].some(
+                (field) => !form[field].trim()
+            );
+
+            if (missingRace || missingFields) {
+                Alert.alert(
+                    "Incomplete section",
+                    `Please complete the ${sections[index].title.toLowerCase()} section before submitting.`
+                );
+                goTo(index);
+                return false;
+            }
+        }
+
+        return true;
+    };
+
 
     if (submitted) {
         return (
