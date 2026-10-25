@@ -15,7 +15,6 @@ import {
     Dimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { ScreenContainer } from "react-native-screens";
 import { colors } from "../../theme/color";
 import { fonts, fontsize } from "../../theme/typography"
 import { Ionicons } from "@react-native-vector-icons/ionicons";
@@ -77,12 +76,12 @@ const sections = [
     {
         short:       "History",
         title:       "Medical history",
-        description: "Share any health details that may help us understand your care needs.",
+        description: "Share any health details that may help us build your twin",
     },
     {
         short:       "Medications",
         title:       "Medications",
-        description: "List what you currently take so we can provide safe, coordinated care.",
+        description: "List what medications you currently take.",
     },
     {
         short:       "Lifestyle",
@@ -107,7 +106,7 @@ const raceOptions = [
 ];
 
 const regionOptions = ["North America", "Australia and the Pacific", "East and Southeast Asia", "Europe", "Middle and South America", "North Africa and Southwest Asia", "Russia", "South Asia", "Sub-Saharan Africa"];
-const conditions    = ["Diabetes", "Hypertension", "Heart disease", "Asthma", "Cancer", "Stroke"];
+const conditions    = ["Diabetes", "Hypertension (High Blood Pressure)", "Heart disease", "Asthma", "Cancer", "Stroke"];
 
 function FieldLabel({ children, optional }: { children: React.ReactNode; optional?: boolean }) {
     return (
@@ -227,7 +226,7 @@ function SelectField({
                 <Text numberOfLines={1} style={value ? styles.selectValue : styles.selectPlaceholder}>
                     {value || `Select ${label.toLowerCase()}`}
                 </Text>
-                <Text style={styles.chevron}>{expanded ? "⌃" : "⌄"}</Text>
+                <Ionicons name={expanded ? "chevron-up" : "chevron-down"} size={18}color="#6D817D"/>
             </Pressable>
             {expanded ? (
                 <View style={styles.optionList}>
@@ -373,7 +372,6 @@ export default function App() {
     const [submitted, setSubmitted] = useState(false);
     const [measurementSystem, setMeasurementSystem] = useState<"customary" | "metric">("customary");
     const scrollRef = useRef<ScrollView>(null);
-    const { width, height, scale, fontScale } = useWindowDimensions();
 
     const update = (field: StringField, value: string) => {
         setForm((current) => ({ ...current, [field]: value }));
@@ -401,32 +399,55 @@ export default function App() {
         if (system === measurementSystem) return;
 
         setForm((current) => {
-            const firstHeightValue = Number(current.heightFeet);
-            const secondHeightValue = Number(current.heightInches);
-            const weight = Number(current.weight);
+            // Convert the current height to total centimeters.
+            const first = Number(current.heightFeet);
+            const second = Number(current.heightInches);
+
+            const totalCm =
+                current.heightFeet.trim() === "" &&
+                current.heightInches.trim() === ""
+                    ? 0
+                    : measurementSystem === "customary"
+                        ? (first * 12 + second) * 2.54
+                        : first * 100 + second;
+
+            // Convert weight based on the current unit system.
+            const weightValue = Number(current.weight);
+            const weight = current.weight.trim() === ""
+                ? ""
+                : system === "metric"
+                    ? String(Math.round(weightValue * 0.45359237 * 10) / 10)
+                    : String(Math.round(weightValue / 0.45359237 * 10) / 10);
 
             if (system === "metric") {
-                const totalCentimeters = Math.round(
-                    ((firstHeightValue || 0) * 12 + (secondHeightValue || 0)) * 2.54,
-                );
+                const roundedCm = Math.round(totalCm);
+
                 return {
                     ...current,
-                    heightFeet: totalCentimeters ? String(Math.floor(totalCentimeters / 100)) : "",
-                    heightInches: totalCentimeters ? String(totalCentimeters % 100) : "",
-                    weight: weight ? String(Math.round(weight * 0.453592 * 10) / 10) : "",
+                    heightFeet: totalCm === 0
+                        ? ""
+                        : String(Math.floor(roundedCm / 100)),
+                    heightInches: totalCm === 0
+                        ? ""
+                        : String(roundedCm % 100),
+                    weight,
                 };
             }
 
-            const totalInches = Math.round(
-                ((firstHeightValue || 0) * 100 + (secondHeightValue || 0)) / 2.54,
-            );
+            const totalInches = Math.round(totalCm / 2.54);
+
             return {
                 ...current,
-                heightFeet: totalInches ? String(Math.floor(totalInches / 12)) : "",
-                heightInches: totalInches ? String(totalInches % 12) : "",
-                weight: weight ? String(Math.round(weight * 2.20462 * 10) / 10) : "",
+                heightFeet: totalCm === 0
+                    ? ""
+                    : String(Math.floor(totalInches / 12)),
+                heightInches: totalCm === 0
+                    ? ""
+                    : String(totalInches % 12),
+                weight,
             };
         });
+
         setMeasurementSystem(system);
     };
 
@@ -435,6 +456,7 @@ export default function App() {
         scrollRef.current?.scrollTo({ y: 0, animated: true });
     };
 
+    
     const validateCurrentSection = () => {
         const required: StringField[][] = [
             ["heightFeet", "heightInches", "weight", "sex", "region"],
@@ -444,13 +466,72 @@ export default function App() {
             ["highBloodPressureHistory", "highCholesterolHistory"],
         ];
 
-        const missingRace = activeSection === 0 && form.race.length === 0;
-        if (missingRace || required[activeSection].some((field) => !form[field].trim())) {
-            Alert.alert("A few details are missing", "Please complete all required questions before continuing.");
+        const missingRace =
+            activeSection === 0 && form.race.length === 0;
+
+        const missingFields = required[activeSection].some(
+            (field) => !form[field].trim()
+        );
+
+        if (missingRace || missingFields) {
+            Alert.alert(
+                "A few details are missing",
+                "Please complete all required questions before continuing."
+            );
             return false;
         }
+
+        // validate personal measurements
+        if (activeSection === 0) {
+            const first = Number(form.heightFeet);
+            const second = Number(form.heightInches);
+            const weight = Number(form.weight);
+
+            const validHeight =
+                Number.isFinite(first) &&
+                Number.isFinite(second) &&
+                first >= 0 &&
+                second >= 0 &&
+                (measurementSystem === "metric"
+                    ? second < 100 && (first > 0 || second > 0)
+                    : second < 12 && (first > 0 || second > 0));
+
+            const validWeight =
+                Number.isFinite(weight) && weight > 0;
+
+            if (!validHeight || !validWeight) {
+                Alert.alert(
+                    "Check your measurements",
+                    "Enter a valid height and a weight greater than zero."
+                );
+                return false;
+            }
+        }
+
+        // Validate lifestyle hours.
+        if (activeSection === 3) {
+            const exercise = Number(form.exerciseHours);
+            const sleep = Number(form.sleepHours);
+
+            if (
+                !Number.isFinite(exercise) ||
+                exercise < 0 ||
+                exercise > 168 ||
+                !Number.isFinite(sleep) ||
+                sleep < 0 ||
+                sleep > 24
+            ) {
+                Alert.alert(
+                    "Check your hours",
+                    "Exercise must be between 0 and 168 hours per week, and sleep must be between 0 and 24 hours per night."
+                );
+                return false;
+            }
+        }
+
         return true;
     };
+
 
     const continueForm = () => {
         if (!validateCurrentSection()) return;
@@ -513,7 +594,7 @@ export default function App() {
                     <Text style={styles.sidebarEyebrow}>NEW PATIENT INTAKE</Text>
                     <Text style={styles.sidebarTitle}>Help us get to know you.</Text>
                     <Text style={styles.sidebarDescription}>
-                        Your answers are essential for building your digital twin.
+                        Your answers will help build your digital twin.
                     </Text>
                     <SectionNavigation activeSection={activeSection} onSelect={goTo} />
                 </View>
@@ -696,15 +777,8 @@ export default function App() {
                             {/* ----- CARDIOVASCULAR HEALTH ----- */}
                             {activeSection === 4 ? (
                                 <>
-                                    <View style={styles.callout}>
-                                        <View style={styles.calloutMark}><Text style={styles.calloutMarkText}>+</Text></View>
-                                        <View style={styles.calloutCopy}>
-                                            <Text style={styles.calloutTitle}>Why we ask</Text>
-                                            <Text style={styles.calloutText}>Cardiovascular history helps your care team identify risk factors and tailor preventive care.</Text>
-                                        </View>
-                                    </View>
                                     <ChoiceGroup label="History of high blood pressure?" options={["No", "Yes", "Not sure"]} value={form.highBloodPressureHistory} onChange={(value) => update("highBloodPressureHistory", value)} />
-                                    <ChoiceGroup label="History of high cholesterol?" options={["No", "Yes", "Not sure"]} value={form.highCholesterolHistory} onChange={(value) => update("highCholesterolHistory", value)} />
+                                    <ChoiceGroup label="History of high cholesterol?"    options={["No", "Yes", "Not sure"]} value={form.highCholesterolHistory} onChange={(value) => update("highCholesterolHistory", value)} />
                                     <View style={styles.reviewNote}>
                                         <Text style={styles.reviewTitle}>You’re ready to submit.</Text>
                                         <Text style={styles.reviewText}>Review your answers with the back button before completing your intake.</Text>
@@ -725,7 +799,7 @@ export default function App() {
                             </View>
                         </View>
                         {/* ===== FOOTER ===== */}
-                        <Text style={styles.footer}>Your information is handled with care and used to support your visit.</Text>
+                        <Text style={styles.footer}>Your information is handled with care and used to create your digital twin.</Text>
                     </ScrollView>
                 </KeyboardAvoidingView>
             </View>
@@ -838,7 +912,7 @@ const styles = StyleSheet.create({
         shadowRadius: 24,
         elevation: 3,
     },
-    eyebrow: { color: "colors.primary", fontSize: 10, fontWeight: "700", letterSpacing: 1.3, marginBottom: 8 },
+    eyebrow: { color: colors.primary, fontSize: 10, fontWeight: "700", letterSpacing: 1.3, marginBottom: 8 },
     title: { color: "#17393E", fontSize: 28, fontWeight: "700", letterSpacing: -1, lineHeight: 34 },
     description: { color: "#78908B", fontSize: 13, lineHeight: 19, marginTop: 7 },
     divider: { backgroundColor: "#E8EFED", height: 1, marginBottom: 25, marginTop: 22 },
@@ -935,7 +1009,6 @@ const styles = StyleSheet.create({
     },
     selectPlaceholder: { color: "#A4B3AF", flex: 1, fontSize: 14 },
     selectValue: { color: "#284843", flex: 1, fontSize: 14 },
-    chevron: { color: "#6D817D", fontSize: 16 },
     optionList: { borderColor: "#D8E3E0", borderRadius: 9, borderWidth: 1, marginTop: 7, overflow: "hidden" },
     option: { alignItems: "center", backgroundColor: "#FFFFFF", borderBottomColor: "#E8EFED", borderBottomWidth: StyleSheet.hairlineWidth, flexDirection: "row", justifyContent: "space-between", padding: 13 },
     optionSelected: { backgroundColor: "#EDF6F4" },
@@ -970,12 +1043,6 @@ const styles = StyleSheet.create({
     conditionText: { color: "#626877", flex: 1, fontSize: 11 },
     conditionTextSelected: { color: "#273d69", fontWeight: "600" },
     // cardiovascular question specific
-    callout: { backgroundColor: "#EEF7F4", borderColor: "#D5EBE5", borderRadius: 11, borderWidth: 1, flexDirection: "row", marginBottom: 25, padding: 15 },
-    calloutMark: { alignItems: "center", borderColor: "#5C998F", borderRadius: 14, borderWidth: 1, height: 28, justifyContent: "center", marginRight: 11, width: 28 },
-    calloutMarkText: { color: "#337F73", fontSize: 18 },
-    calloutCopy: { flex: 1 },
-    calloutTitle: { color: "#2D625A", fontSize: 12, fontWeight: "700", marginBottom: 3 },
-    calloutText: { color: "#718B85", fontSize: 11, lineHeight: 16 },
     reviewNote: { backgroundColor: "#F5F9F8", borderRadius: 10, marginTop: 3, padding: 15 },
     reviewTitle: { color: "#2D625A", fontSize: 12, fontWeight: "700", marginBottom: 3 },
     reviewText: { color: "#718B85", fontSize: 11, lineHeight: 16 },
