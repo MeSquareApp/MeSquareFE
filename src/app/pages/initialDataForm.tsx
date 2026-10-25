@@ -1,3 +1,6 @@
+/**
+ * file generated with Figma AI and altered for optimal content.
+ */
 import { StatusBar } from "expo-status-bar";
 import React, { useRef, useState } from "react";
 import {
@@ -214,21 +217,37 @@ function SelectField({
 }) {
     const [expanded, setExpanded] = useState(false);
 
+    
     return (
-        <View style={styles.field}>
+        <View style={[styles.field, expanded && styles.fieldExpanded]}>
             <FieldLabel>{label}</FieldLabel>
+
+            {/* Dropdown button */}
             <Pressable
                 accessibilityRole="button"
                 accessibilityState={{ expanded }}
                 onPress={() => setExpanded((current) => !current)}
-                style={({ pressed }) => [styles.selectButton, pressed && styles.pressed]}
+                style={({ pressed }) => [
+                    styles.selectButton,
+                    pressed && styles.pressed,
+                ]}
             >
-                <Text numberOfLines={1} style={value ? styles.selectValue : styles.selectPlaceholder}>
+                <Text
+                    numberOfLines={1}
+                    style={value ? styles.selectValue : styles.selectPlaceholder}
+                >
                     {value || `Select ${label.toLowerCase()}`}
                 </Text>
-                <Ionicons name={expanded ? "chevron-up" : "chevron-down"} size={18}color="#6D817D"/>
+
+                <Ionicons
+                    name={expanded ? "chevron-up" : "chevron-down"}
+                    size={18}
+                    color="#6D817D"
+                />
             </Pressable>
-            {expanded ? (
+
+            {/* Floating dropdown options */}
+            {expanded && (
                 <View style={styles.optionList}>
                     {options.map((option) => (
                         <Pressable
@@ -243,12 +262,22 @@ function SelectField({
                                 pressed && styles.pressed,
                             ]}
                         >
-                            <Text style={[styles.optionText, option === value && styles.optionTextSelected]}>{option}</Text>
-                            {option === value ? <Text style={styles.check}>✓</Text> : null}
+                            <Text
+                                style={[
+                                    styles.optionText,
+                                    option === value && styles.optionTextSelected,
+                                ]}
+                            >
+                                {option}
+                            </Text>
+
+                            {option === value && (
+                                <Text style={styles.check}>✓</Text>
+                            )}
                         </Pressable>
                     ))}
                 </View>
-            ) : null}
+            )}
         </View>
     );
 }
@@ -917,7 +946,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         width: 40,
     },
-    stepCircleActive: { backgroundColor: colors.primary, borderColor: colors.secondary },
+    stepCircleActive: { backgroundColor: colors.primary, borderColor: colors.secondaryDark },
     stepNumber: { color: colors.primaryLight, fontSize: 11, fontWeight: "700" },
     stepNumberActive: { color: "#FFFFFF" },
     sidebarStepCopy: { flex: 1, marginLeft: 13 },
@@ -975,6 +1004,7 @@ const styles = StyleSheet.create({
     description: { color: "#78908B", fontSize: 13, lineHeight: 19, marginTop: 7 },
     divider: { backgroundColor: "#E8EFED", height: 1, marginBottom: 25, marginTop: 22 },
     field: { marginBottom: 22 },
+    fieldExpanded: { zIndex: 1000, elevation: 1000 },
     labelRow: { alignItems: "center", flexDirection: "row", justifyContent: "space-between", marginBottom: 8 },
     label: { color: "#34534F", flex: 1, fontSize: 12, fontWeight: "600", lineHeight: 17 },
     optional: { color: "#9AA9A5", fontSize: 9, fontWeight: "600", letterSpacing: 0.5 },
@@ -1002,9 +1032,9 @@ const styles = StyleSheet.create({
         shadowRadius: 3,
         elevation: 1,
     },
-    unitToggleText: { color: colors.secondaryLight, fontSize: 10, fontWeight: "600" },
+    unitToggleText: { color: colors.secondary, fontSize: 10, fontWeight: "600" },
     unitToggleTextActive: { color: "#246F64" },
-    measurementRow: { flexDirection: "row", gap: 16, marginBottom: 2 },
+    measurementRow: { flexDirection: "row", gap: 16, marginBottom: 2, zIndex: 10, elevation: 10 },
     // height fields
     heightField: { flex: 2 },
     heightInputs: { flexDirection: "row", gap: 9 },
@@ -1064,11 +1094,31 @@ const styles = StyleSheet.create({
         height: 48,
         justifyContent: "space-between",
         paddingHorizontal: 13,
+        zIndex: 1,
     },
     selectPlaceholder: { color: "#A4B3AF", flex: 1, fontSize: 14 },
     selectValue: { color: "#284843", flex: 1, fontSize: 14 },
-    optionList: { borderColor: "#D8E3E0", borderRadius: 9, borderWidth: 1, marginTop: 7, overflow: "hidden" },
-    option: { alignItems: "center", backgroundColor: "#FFFFFF", borderBottomColor: "#E8EFED", borderBottomWidth: StyleSheet.hairlineWidth, flexDirection: "row", justifyContent: "space-between", padding: 13 },
+    optionList: {   //dropdown menu
+        backgroundColor: "#FFFFFF",
+        borderColor: "#D8E3E0",
+        borderRadius: 9,
+        borderWidth: 1,
+        position: "absolute",
+        top: 74,
+        left: 0,
+        right: 0,
+        zIndex: 1000,
+        elevation: 10,
+    },
+    option: { 
+        alignItems: "center", 
+        backgroundColor: "#FFFFFF", 
+        borderBottomColor: "#E8EFED", 
+        borderBottomWidth: StyleSheet.hairlineWidth, 
+        flexDirection: "row", 
+        justifyContent: "space-between", 
+        padding: 13 
+    },
     optionSelected: { backgroundColor: "#EDF6F4" },
     optionText: { color: "#535d6b", flex: 1, fontSize: 13 },
     optionTextSelected: { color: "#273b69", fontWeight: "600" },
@@ -1094,7 +1144,18 @@ const styles = StyleSheet.create({
     multiSelectTextSelected: { color: "#274869", fontWeight: "600" },
     // pre-existing conditions question specific
     conditionGrid: { flexDirection: "row", flexWrap: "wrap", gap: 9 },
-    condition: { alignItems: "center", backgroundColor: "#FBFCFC", borderColor: "#DCE5E3", borderRadius: 9, borderWidth: 1, flexDirection: "row", padding: 11, flexBasis: "48%", flexGrow: 1, flexShrink: 1 },
+    condition: { 
+        alignItems: "center", 
+        backgroundColor: "#FBFCFC", 
+        borderColor: "#DCE5E3", 
+        borderRadius: 9, 
+        borderWidth: 1, 
+        flexDirection: "row", 
+        padding: 11, 
+        flexBasis: "48%", 
+        flexGrow: 1, 
+        flexShrink: 1 
+    },
     conditionSelected: { backgroundColor: "#edf0f6", borderColor: "#6a80a3" },
     // checkbox
     checkbox: { alignItems: "center", borderColor: "#b5bbc7", borderRadius: 4, borderWidth: 1, height: 17, justifyContent: "center", marginRight: 8, width: 17 },
@@ -1117,7 +1178,22 @@ const styles = StyleSheet.create({
     // ===== FOOTER =====
     footer: { color: "#91A29E", fontSize: 10, lineHeight: 15, paddingHorizontal: 25, paddingTop: 18, textAlign: "center" },
     successScreen: { alignItems: "center", flex: 1, justifyContent: "center", padding: 20 },
-    successCard: { alignItems: "center", backgroundColor: "#FFFFFF", borderColor: "#DFEBE7", borderRadius: 20, borderWidth: 1, maxWidth: 520, paddingHorizontal: 30, paddingVertical: 48, shadowColor: "#234944", shadowOffset: { width: 0, height: 14 }, shadowOpacity: 0.09, shadowRadius: 28, width: "100%", elevation: 4 },
+    successCard: { 
+        alignItems: "center", 
+        backgroundColor: "#FFFFFF", 
+        borderColor: "#DFEBE7", 
+        borderRadius: 20, 
+        borderWidth: 1, 
+        maxWidth: 520, 
+        paddingHorizontal: 30, 
+        paddingVertical: 48, 
+        shadowColor: "#234944", 
+        shadowOffset: { width: 0, height: 14 }, 
+        shadowOpacity: 0.09, 
+        shadowRadius: 28, 
+        width: "100%", 
+        elevation: 4 
+    },
     successIcon: { alignItems: "center", backgroundColor: "#E4F3EF", borderRadius: 32, height: 64, justifyContent: "center", marginBottom: 21, width: 64 },
     successCheck: { color: "#2E8173", fontSize: 30, fontWeight: "600" },
     successTitle: { color: "#17393E", fontSize: 27, fontWeight: "700", letterSpacing: -0.8, lineHeight: 34, textAlign: "center" },
