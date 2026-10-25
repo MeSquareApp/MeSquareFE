@@ -12,10 +12,13 @@ import {
     useWindowDimensions,
     View,
     Image,
+    Dimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { ScreenContainer } from "react-native-screens";
 import { colors } from "../../theme/color";
+import { fonts, fontsize } from "../../theme/typography"
+import { Ionicons } from "@react-native-vector-icons/ionicons";
 
 type FormData = {
     heightFeet:               string;
@@ -224,7 +227,6 @@ function SelectField({
                 <Text numberOfLines={1} style={value ? styles.selectValue : styles.selectPlaceholder}>
                     {value || `Select ${label.toLowerCase()}`}
                 </Text>
-                {/* TODO: replace with vector/icon */}
                 <Text style={styles.chevron}>{expanded ? "⌃" : "⌄"}</Text>
             </Pressable>
             {expanded ? (
@@ -498,8 +500,11 @@ export default function App() {
                     />
                     <Text style={styles.brandName}>Me<Text style={styles.brandAccent}>²</Text></Text>
                 </View>
-                {/* TODO: replace with name & profile image */}
-                <Text style={styles.privateText}>PRIVATE INTAKE</Text>
+                {/* user profile */}
+                          <View style={styles.profileContainer}>
+                            <Text style={styles.profileName}>Patient</Text>
+                            <Ionicons name="person-circle-outline" size={30} color="#666666" />
+                          </View>
             </View>
 
             {/* ===== SIDE NAVBAR ===== */}
@@ -508,7 +513,7 @@ export default function App() {
                     <Text style={styles.sidebarEyebrow}>NEW PATIENT INTAKE</Text>
                     <Text style={styles.sidebarTitle}>Help us get to know you.</Text>
                     <Text style={styles.sidebarDescription}>
-                        Your answers help your care team prepare for a more focused first visit.
+                        Your answers are essential for building your digital twin.
                     </Text>
                     <SectionNavigation activeSection={activeSection} onSelect={goTo} />
                 </View>
@@ -635,7 +640,7 @@ export default function App() {
                             {/* ----- MEDICAL HISTORY ----- */}
                             {activeSection === 1 ? (
                                 <>
-                                    <Input label="Allergies" value={form.allergies} onChangeText={(value) => update("allergies", value)} placeholder="List allergies and reactions, or enter “None”" multiline />
+                                    <Input label="Allergies"            value={form.allergies}      onChangeText={(value) => update("allergies", value)}      placeholder="List allergies and reactions, or enter “None”" multiline />
                                     <Input label="Past medical history" value={form.medicalHistory} onChangeText={(value) => update("medicalHistory", value)} placeholder="Previous illnesses, surgeries, or hospital stays" multiline />
                                     <View style={styles.field}>
                                         <FieldLabel>Diagnosed conditions</FieldLabel>
@@ -669,7 +674,7 @@ export default function App() {
                             {/* ----- MEDICATIONS ----- */}
                             {activeSection === 2 ? (
                                 <>
-                                    <Input label="Current medications" value={form.currentMedications} onChangeText={(value) => update("currentMedications", value)} placeholder="Example: Metformin, 500 mg, twice daily" multiline />
+                                    <Input label="Current medications. Separate with a comma." value={form.currentMedications} onChangeText={(value) => update("currentMedications", value)} placeholder="Example: Metformin, Bupropion" multiline />
                                     <ChoiceGroup label="Do you take blood pressure medication?" options={["Yes", "No", "Not sure"]} value={form.bloodPressureMedication} onChange={(value) => update("bloodPressureMedication", value)} />
                                     <Input label="Blood pressure medication details" value={form.bloodPressureDetails} onChangeText={(value) => update("bloodPressureDetails", value)} placeholder="Medication name and dosage" optional />
                                     <ChoiceGroup label="Do you take cholesterol-lowering medication?" options={["Yes", "No", "Not sure"]} value={form.cholesterolMedication} onChange={(value) => update("cholesterolMedication", value)} />
@@ -680,11 +685,11 @@ export default function App() {
                             {/* ----- LIFESTYLE FACTORS ----- */}
                             {activeSection === 3 ? (
                                 <>
-                                    <ChoiceGroup label="Do you smoke?" options={["No", "Yes", "Previously"]} value={form.smoking} onChange={(value) => update("smoking", value)} />
-                                    <ChoiceGroup label="Do you consume alcohol?" options={["No", "Yes", "Occasionally"]} value={form.alcohol} onChange={(value) => update("alcohol", value)} />
-                                    <ChoiceGroup label="Do you use recreational drugs?" options={["No", "Yes"]} value={form.recreationalDrugs} onChange={(value) => update("recreationalDrugs", value)} />
-                                    <Input label="Exercise per week" value={form.exerciseHours} onChangeText={(value) => update("exerciseHours", value)} placeholder="0" keyboardType="numeric" suffix="hours" />
-                                    <Input label="Sleep per night" value={form.sleepHours} onChangeText={(value) => update("sleepHours", value)} placeholder="0" keyboardType="numeric" suffix="hours" />
+                                    <ChoiceGroup label="Do you smoke?"                  options={["No", "Yes", "Previously"]}   value={form.smoking}           onChange={(value) => update("smoking", value)} />
+                                    <ChoiceGroup label="Do you consume alcohol?"        options={["No", "Yes", "Occasionally"]} value={form.alcohol}           onChange={(value) => update("alcohol", value)} />
+                                    <ChoiceGroup label="Do you use recreational drugs?" options={["No", "Yes"]}                 value={form.recreationalDrugs} onChange={(value) => update("recreationalDrugs", value)} />
+                                    <Input label="How many hours per week do you exercise?" value={form.exerciseHours} onChangeText={(value) => update("exerciseHours", value)} placeholder="0" keyboardType="numeric" suffix="hours" />
+                                    <Input label="How much sleep do you get per night?"     value={form.sleepHours}    onChangeText={(value) => update("sleepHours", value)}    placeholder="0" keyboardType="numeric" suffix="hours" />
                                 </>
                             ) : null}
 
@@ -731,6 +736,7 @@ export default function App() {
 const styles = StyleSheet.create({
     flex: { flex: 1 },
     safeArea: { backgroundColor: "#f4f7f8", flex: 1 },
+    // ===== HEADER =====
     header: {
         alignItems: "center",
         backgroundColor: "#FFFFFF",
@@ -746,6 +752,7 @@ const styles = StyleSheet.create({
     brandAccent: { color: colors.secondary, fontWeight: "700" },
     privateText: { color: "#84938F", fontSize: 9, fontWeight: "600", letterSpacing: 0.8 },
     contentShell: { flex: 1, flexDirection: "row" },
+    profileName: { fontFamily: fonts.regular, fontSize: fontsize.md, color: colors.black1 },
     
     // ===== SIDEBAR =====
     sidebar: {
@@ -804,6 +811,11 @@ const styles = StyleSheet.create({
     mobileNavTextActive: { color: "#246B60" },
     scrollContent: { paddingBottom: 36, paddingHorizontal: 16, paddingTop: 20 },
     desktopScrollContent: { alignSelf: "center", maxWidth: 760, paddingHorizontal: 34, paddingTop: 46, width: "100%" },
+    profileContainer: {
+        flexDirection: "row",
+        alignItems: "center",
+        gap: Dimensions.get("window").width * 0.01,
+      },
     
     // ===== PROGRESS BAR =====
     progressMeta: { flexDirection: "row", justifyContent: "space-between", marginBottom: 9 },
