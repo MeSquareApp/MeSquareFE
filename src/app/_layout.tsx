@@ -4,6 +4,7 @@ import {
 } from "@expo-google-fonts/atkinson-hyperlegible";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
@@ -19,5 +20,9 @@ export default function RootLayout() {
     return null;
   }
 
-  return <Stack screenOptions={{ headerShown: false }}/>;
+  return (
+    <SafeAreaProvider>
+      <Stack screenOptions={{ headerShown: false }} />
+    </SafeAreaProvider>
+  );
 }

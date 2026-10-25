@@ -6,6 +6,13 @@ export const colors = {
     primary: '#1565C0',
     secondary: '#14B8A6',
 
+    // varieties of brand colors
+    primaryDark: '#052b56',
+    primaryLight: '#2d88ef',
+    secondaryDark: '#08453e',
+    secondaryLight: '#51e9d7',
+
+
     // state colors
     info: '#2F80ED',
     success: '#27AE60',
@@ -14,16 +21,16 @@ export const colors = {
 
     // black colors
     black1: '#000000',
-    black2: '#130020',
-    black3: '#1C002F',
+    black2: '#000f20',
+    black3: '#000f2f',
 
     // gray colors
-    gray1: '#121214',
+    gray1: '#2b2b2d',
     gray2: '#383a44',
     gray3: '#666a71',
     gray4: '#A29CA7',
     gray5: '#e1e5e8',
 
     background: '#ffffff',
-    footer: '#E5E1E8',
+    footer: '#e1e3e8',
 }
