@@ -1,5 +1,4 @@
-import { Link } from "expo-router";
-import React, { useEffect } from 'react';
+import React from 'react';
 import { 
   StyleSheet, 
   Text, 
@@ -8,28 +7,19 @@ import {
   ActivityIndicator, 
   Image 
 } from "react-native";
+import { colors } from "../theme/color";
 import { useAuth0 } from 'react-native-auth0';
 import { useRouter } from 'expo-router';
 
 export default function Index() {
-  const { authorize, user, clearSession, isLoading } = useAuth0();
+  const { authorize, user, isLoading } = useAuth0();
   const router = useRouter();
-
-  /*
-    Checks if user is authenticated and redirects to dashboard
-    if they from the home page (root)
-  */
-  useEffect(() => {
-    if (!isLoading && user) {
-      router.replace("/pages/dashboard");
-    }
-  }, [isLoading, user]);
 
   // If the user is loading, show a loading indicator
   if (isLoading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" color="0066CC" />
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
@@ -38,6 +28,7 @@ export default function Index() {
   const handleLogin = async () => {
     try {
       await authorize({ scope: 'openid profile email offline_access' });
+      router.replace("/user/dashboard");
     } catch (e) {
       console.error('Login Error:', e);
     }
@@ -45,11 +36,11 @@ export default function Index() {
 
   const handleSignUp = async () => {
     try {
-      // screen_hint: 'signup' opens Auth0 directly to the registration tab
       await authorize({
         screen_hint: 'signup',
         scope: 'openid profile email offline_access'
       } as Parameters<typeof authorize>[0] & { screen_hint: string });
+      router.replace("/user/dashboard");
     } catch (e) {
       console.error('Sign Up Error:', e);
     }
@@ -69,15 +60,27 @@ export default function Index() {
 
       {/* 2. ACTION BUTTONS */}
       <View style={styles.buttonContainer}>
-        {/* Log In Button */}
-        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-          <Text style={styles.loginButtonText}>Log In</Text>
-        </TouchableOpacity>
+        {user ? (
+          // If a session is active, let them choose to go back to their dashboard
+          <TouchableOpacity 
+            style={styles.loginButton} 
+            onPress={() => router.replace("/user/dashboard")}
+          >
+            <Text style={styles.loginButtonText}>Go to Dashboard</Text>
+          </TouchableOpacity>
+        ) : (
+          <>
+            {/* Log In Button */}
+            <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+              <Text style={styles.loginButtonText}>Log In</Text>
+            </TouchableOpacity>
 
-        {/* Sign Up Button */}
-        <TouchableOpacity style={styles.signUpButton} onPress={handleSignUp}>
-          <Text style={styles.signUpButtonText}>Create Account</Text>
-        </TouchableOpacity>
+            {/* Sign Up Button */}
+            <TouchableOpacity style={styles.signUpButton} onPress={handleSignUp}>
+              <Text style={styles.signUpButtonText}>Create Account</Text>
+            </TouchableOpacity>
+          </>
+        )}
       </View>
     </View>
   );
@@ -86,7 +89,7 @@ export default function Index() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF', // Dark modern background
+    backgroundColor: colors.background,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 24,
@@ -95,11 +98,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  loadingText: {
-    marginTop: 12,
-    color: '#94A3B8',
-    fontSize: 14,
   },
   logoContainer: {
     alignItems: 'center',
@@ -123,7 +121,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   loginButton: {
-    backgroundColor: '#1565C0',
+    backgroundColor: colors.primary,
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
@@ -139,10 +137,10 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#1565C0',
+    borderColor: colors.primary,
   },
   signUpButtonText: {
-    color: '#1565C0',
+    color: colors.primary,
     fontSize: 16,
     fontWeight: '600',
   },

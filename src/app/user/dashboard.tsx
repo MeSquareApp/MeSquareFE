@@ -33,14 +33,11 @@ export default function Dashboard() {
   // get patient data from database
   const [rhr, setRhr] = useState<Biomarker | null>(null);
 
-  // Logout function
+// Logout function for Web & Native
   const handleLogout = async () => {
     try {
-      // 1. Clears the Auth0 session cookies and redirects back to your allowed logout URL
-      await clearSession();
-      
-      // 2. Fallback router redirect just in case
-      router.replace('/');
+      // Pass returnTo on web so Auth0 knows exactly where to drop the browser back
+      await clearSession({ returnTo: window.location.origin } as any);
     } catch (error) {
       console.error('Logout failed:', error);
     }

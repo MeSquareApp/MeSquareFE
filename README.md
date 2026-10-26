@@ -55,3 +55,9 @@ Join our community of developers creating universal apps.
 
 - [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+
+## Important Note on Authentication-Required Pages
+
+Web pages that require the user to be logged in should be placed in the src/app/user directory. Only pages placed in here
+will be checked for authentication and will redirect those that
+try to access it without authentication.
