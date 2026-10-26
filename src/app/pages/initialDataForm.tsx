@@ -4,7 +4,6 @@
 import { StatusBar } from "expo-status-bar";
 import React, { useRef, useState } from "react";
 import {
-    Alert,
     KeyboardAvoidingView,
     Platform,
     Pressable,
@@ -48,30 +47,31 @@ type FormData = {
 };
 
 type StringField = Exclude<keyof FormData, "diagnosedConditions" | "race">;
+type FieldErrors = Partial<Record<StringField | "race", string>>;
 
 const initialForm: FormData = {
-    heightFeet: "",
-    heightInches: "",
-    weight: "",
-    sex: "",
-    race: [],
-    region: "",
-    allergies: "",
-    medicalHistory: "",
-    diagnosedConditions: [],
-    otherCondition: "",
-    currentMedications: "",
-    bloodPressureMedication: "",
-    bloodPressureDetails: "",
-    cholesterolMedication: "",
-    cholesterolDetails: "",
-    smoking: "",
-    alcohol: "",
-    recreationalDrugs: "",
-    exerciseHours: "",
-    sleepHours: "",
+    heightFeet:               "",
+    heightInches:             "",
+    weight:                   "",
+    sex:                      "",
+    race:                     [],
+    region:                   "",
+    allergies:                "",
+    medicalHistory:           "",
+    diagnosedConditions:      [],
+    otherCondition:           "",
+    currentMedications:       "",
+    bloodPressureMedication:  "",
+    bloodPressureDetails:     "",
+    cholesterolMedication:    "",
+    cholesterolDetails:       "",
+    smoking:                  "",
+    alcohol:                  "",
+    recreationalDrugs:        "",
+    exerciseHours:            "",
+    sleepHours:               "",
     highBloodPressureHistory: "",
-    highCholesterolHistory: "",
+    highCholesterolHistory:   "",
 };
 
 const sections = [
@@ -111,6 +111,9 @@ const raceOptions = [
 const regionOptions = ["North America", "Australia and the Pacific", "East and Southeast Asia", "Europe", "Middle and South America", "North Africa and Southwest Asia", "Russia", "South Asia", "Sub-Saharan Africa"];
 const conditions    = ["Diabetes", "Hypertension (High Blood Pressure)", "Heart disease", "Asthma", "Cancer", "Stroke"];
 
+/***
+ * Label for each question field
+ */
 function FieldLabel({ children, optional }: { children: React.ReactNode; optional?: boolean }) {
     return (
         <View style={styles.labelRow}>
@@ -132,15 +135,17 @@ function Input({
     suffix,
     multiline,
     optional,
+    error,
 }: {
-    label: string;
-    value: string;
+    label:         string;
+    value:         string;
     onChangeText: (value: string) => void;
-    placeholder: string;
+    placeholder:   string;
     keyboardType?: "default" | "numeric";
-    suffix?: string;
-    multiline?: boolean;
-    optional?: boolean;
+    suffix?:       string;
+    multiline?:    boolean;
+    optional?:     boolean;
+    error?:        string;
 }) {
     return (
         <View style={styles.field}>
@@ -158,21 +163,26 @@ function Input({
                 />
                 {suffix ? <Text style={styles.suffix}>{suffix}</Text> : null}
             </View>
+            <FieldError message={error} />
         </View>
     );
 }
 
-/* radio button group */
+/***
+ * radio button group
+ */
 function ChoiceGroup({
     label,
     options,
     value,
     onChange,
+    error,
 }: {
-    label: string;
-    options: string[];
-    value: string;
+    label:    string;
+    options:  string[];
+    value:    string;
     onChange: (value: string) => void;
+    error?:   string;
 }) {
     return (
         <View style={styles.field}>
@@ -197,11 +207,12 @@ function ChoiceGroup({
                     );
                 })}
             </View>
+            <FieldError message={error} />
         </View>
     );
 }
 
-/***dropdown select field
+/*** dropdown select field
  * used for: sex, geographical region 
  */
 function SelectField({
@@ -209,15 +220,16 @@ function SelectField({
     options,
     value,
     onChange,
+    error,
 }: {
-    label: string;
-    options: string[];
-    value: string;
+    label:     string;
+    options:   string[];
+    value:     string;
     onChange: (value: string) => void;
+    error?:    string;
 }) {
     const [expanded, setExpanded] = useState(false);
 
-    
     return (
         <View style={[styles.field, expanded && styles.fieldExpanded]}>
             <FieldLabel>{label}</FieldLabel>
@@ -278,6 +290,7 @@ function SelectField({
                     ))}
                 </View>
             )}
+            <FieldError message={error} />
         </View>
     );
 }
@@ -290,11 +303,13 @@ function MultiSelectField({
     options,
     values,
     onToggle,
+    error,
 }: {
-    label: string;
-    options: string[];
-    values: string[];
+    label:    string;
+    options:  string[];
+    values:   string[];
     onToggle: (value: string) => void;
+    error?:   string;
 }) {
     return (
         <View style={styles.field}>
@@ -325,7 +340,18 @@ function MultiSelectField({
                     );
                 })}
             </View>
+            <FieldError message={error} />
         </View>
+    );
+}
+
+function FieldError({ message }: { message?: string }) {
+    if (!message) return null;
+
+    return (
+        <Text accessibilityRole="alert" style={styles.fieldError}>
+            {message}
+        </Text>
     );
 }
 
@@ -338,8 +364,8 @@ function SectionNavigation({
     onSelect,
 }: {
     activeSection: number;
-    compact?: boolean;
-    onSelect: (section: number) => void;
+    compact?:      boolean;
+    onSelect:      (section: number) => void;
 }) {
     const steps = sections.map((section, index) => {
         const active = activeSection === index;
@@ -396,13 +422,21 @@ function SectionNavigation({
 }
 
 export default function App() {
-    const [activeSection, setActiveSection] = useState(0);
-    const [form, setForm] = useState<FormData>(initialForm);
-    const [submitted, setSubmitted] = useState(false);
+    const [activeSection, setActiveSection]         = useState(0);
+    const [form, setForm]                           = useState<FormData>(initialForm);
+    const [submitted, setSubmitted]                 = useState(false);
+    const [fieldErrors, setFieldErrors]             = useState<FieldErrors>({});
     const [measurementSystem, setMeasurementSystem] = useState<"customary" | "metric">("customary");
-    const scrollRef = useRef<ScrollView>(null);
+    const scrollRef                                 = useRef<ScrollView>(null);
 
     const update = (field: StringField, value: string) => {
+        setFieldErrors((current) => {
+            const remaining = { ...current };
+            delete remaining[field];
+            if (field === "heightFeet")   delete remaining.heightInches;
+            if (field === "heightInches") delete remaining.heightFeet;
+            return remaining;
+        });
         setForm((current) => ({ ...current, [field]: value }));
     };
 
@@ -415,8 +449,11 @@ export default function App() {
         }));
     };
 
-    
     const toggleRace = (race: string) => {
+        setFieldErrors((current) => {
+            const { race: _removed, ...remaining } = current;
+            return remaining;
+        });
         setForm((current) => {
             const preferNotToSay = "Prefer not to say";
 
@@ -445,11 +482,20 @@ export default function App() {
                     : [...selectedWithoutPreferNotToSay, race],
             };
         });
-};
-
+    };
 
     const changeMeasurementSystem = (system: "customary" | "metric") => {
         if (system === measurementSystem) return;
+
+        setFieldErrors((current) => {
+            const {
+                heightFeet: _heightFeet,
+                heightInches: _heightInches,
+                weight: _weight,
+                ...remaining
+            } = current;
+            return remaining;
+        });
 
         setForm((current) => {
             // convert the current height to total centimeters
@@ -509,8 +555,7 @@ export default function App() {
         scrollRef.current?.scrollTo({ y: 0, animated: true });
     };
 
-    
-    const validateCurrentSection = () => {
+    const getSectionErrors = (sectionIndex: number): FieldErrors => {
         const required: StringField[][] = [
             ["heightFeet", "heightInches", "weight", "sex", "region"],
             [],
@@ -519,69 +564,69 @@ export default function App() {
             ["highBloodPressureHistory", "highCholesterolHistory"],
         ];
 
-        const missingRace =
-            activeSection === 0 && form.race.length === 0;
-
-        const missingFields = required[activeSection].some(
-            (field) => !form[field].trim()
-        );
-
-        if (missingRace || missingFields) {
-            Alert.alert(
-                "A few details are missing",
-                "Please complete all required questions before continuing."
-            );
-            return false;
+        const errors: FieldErrors = {};
+        for (const field of required[sectionIndex]) {
+            if (!form[field].trim()) {
+                errors[field] = "This question is required.";
+            }
         }
 
-        // validate personal measurements
-        if (activeSection === 0) {
+        if (sectionIndex === 0 && form.race.length === 0) {
+            errors.race = "Select at least one option.";
+        }
+
+        if (sectionIndex === 0) {
             const first = Number(form.heightFeet);
             const second = Number(form.heightInches);
             const weight = Number(form.weight);
+            const heightLimit = measurementSystem === "metric" ? 100 : 12;
 
-            const validHeight =
-                Number.isFinite(first) &&
-                Number.isFinite(second) &&
-                first >= 0 &&
-                second >= 0 &&
-                (measurementSystem === "metric"
-                    ? second < 100 && (first > 0 || second > 0)
-                    : second < 12 && (first > 0 || second > 0));
-
-            const validWeight =
-                Number.isFinite(weight) && weight > 0;
-
-            if (!validHeight || !validWeight) {
-                Alert.alert(
-                    "Check your measurements",
-                    "Enter a valid height and a weight greater than zero."
-                );
-                return false;
+            if (!errors.heightFeet && (!Number.isFinite(first) || first < 0)) {
+                errors.heightFeet = "Enter a valid height.";
+            }
+            if (!errors.heightInches && (
+                !Number.isFinite(second) || second < 0 || second >= heightLimit
+            )) {
+                errors.heightInches = measurementSystem === "metric"
+                    ? "Enter a value from 0 to 99 cm."
+                    : "Enter a value from 0 to 11 in.";
+            }
+            if (
+                !errors.heightFeet &&
+                !errors.heightInches &&
+                first === 0 &&
+                second === 0
+            ) {
+                errors.heightFeet = "Height must be greater than zero.";
+            }
+            if (!errors.weight && (!Number.isFinite(weight) || weight <= 0)) {
+                errors.weight = "Enter a weight greater than zero.";
             }
         }
 
-        // validate lifestyle hours
-        if (activeSection === 3) {
+        if (sectionIndex === 3) {
             const exercise = Number(form.exerciseHours);
             const sleep = Number(form.sleepHours);
 
-            if (
-                !Number.isFinite(exercise) ||
-                exercise < 0 ||
-                exercise > 168 ||
-                !Number.isFinite(sleep) ||
-                sleep < 0 ||
-                sleep > 24
-            ) {
-                Alert.alert(
-                    "Check your hours",
-                    "Exercise must be between 0 and 168 hours per week, and sleep must be between 0 and 24 hours per night."
-                );
-                return false;
+            if (!errors.exerciseHours && (
+                !Number.isFinite(exercise) || exercise < 0 || exercise > 168
+            )) {
+                errors.exerciseHours = "Enter 0 to 168 hours per week.";
+            }
+            if (!errors.sleepHours && (
+                !Number.isFinite(sleep) || sleep < 0 || sleep > 24
+            )) {
+                errors.sleepHours = "Enter 0 to 24 hours per night.";
             }
         }
 
+        return errors;
+    };
+
+    const validateCurrentSection = () => {
+        const errors = getSectionErrors(activeSection);
+        setFieldErrors(errors);
+        if (Object.keys(errors).length > 0) return false;
         return true;
     };
 
@@ -601,30 +646,15 @@ export default function App() {
 
     const validateAllSections = () => {
         for (let index = 0; index < sections.length; index++) {
-            const required: StringField[][] = [
-                ["heightFeet", "heightInches", "weight", "sex", "region"],
-                [],
-                ["bloodPressureMedication", "cholesterolMedication"],
-                ["smoking", "alcohol", "recreationalDrugs", "exerciseHours", "sleepHours"],
-                ["highBloodPressureHistory", "highCholesterolHistory"],
-            ];
-
-            const missingRace =
-                index === 0 && form.race.length === 0;
-            const missingFields = required[index].some(
-                (field) => !form[field].trim()
-            );
-
-            if (missingRace || missingFields) {
-                Alert.alert(
-                    "Incomplete section",
-                    `Please complete the ${sections[index].title.toLowerCase()} section before submitting.`
-                );
+            const errors = getSectionErrors(index);
+            if (Object.keys(errors).length > 0) {
+                setFieldErrors(errors);
                 goTo(index);
                 return false;
             }
         }
 
+        setFieldErrors({});
         return true;
     };
 
@@ -641,7 +671,7 @@ export default function App() {
                         <Text style={styles.eyebrow}>INTAKE COMPLETE</Text>
                         <Text style={styles.successTitle}>Thank you for sharing your information.</Text>
                         <Text style={styles.successCopy}>
-                            Your intake form is complete and ready for your care team to review.
+                            Your initial data form is complete and in our system.
                         </Text>
                         <Pressable onPress={() => { setSubmitted(false); goTo(0); }}
                           style={({ pressed }) => [ styles.primaryButton, pressed && styles.buttonPressed, ]}>
@@ -759,6 +789,7 @@ export default function App() {
                                                         value={form.heightFeet}
                                                     />
                                                     <Text style={styles.suffix}>{measurementSystem === "customary" ? "ft" : "m"}</Text>
+                                                    <FieldError message={fieldErrors.heightFeet} />
                                                 </View>
                                                 {/* inches/cm */}
                                                 <View style={styles.heightInputWrap}>
@@ -772,6 +803,7 @@ export default function App() {
                                                         value={form.heightInches}
                                                     />
                                                     <Text style={styles.suffix}>{measurementSystem === "customary" ? "in" : "cm"}</Text>
+                                                    <FieldError message={fieldErrors.heightInches} />
                                                 </View>
                                             </View>
                                         </View>
@@ -784,6 +816,7 @@ export default function App() {
                                                 onChangeText={(value) => update("weight", value)}
                                                 placeholder={measurementSystem === "customary" ? "165" : "75"}
                                                 suffix={measurementSystem === "customary" ? "lbs" : "kg"}
+                                                error={fieldErrors.weight}
                                                 value={form.weight}
                                             />
                                         </View>
@@ -795,13 +828,14 @@ export default function App() {
                                                 options={["Female", "Male", "Other", "Prefer not to say"]}
                                                 value={form.sex}
                                                 onChange={(value) => update("sex", value)}
+                                                error={fieldErrors.sex}
                                             />
                                         </View>
                                     </View>
 
                                     {/* -- race  & geographic region -- */}
-                                    <MultiSelectField label="Race" options={raceOptions} values={form.race} onToggle={toggleRace} />
-                                    <SelectField label="Geographical region" options={regionOptions} value={form.region} onChange={(value) => update("region", value)} />
+                                    <MultiSelectField label="Race" options={raceOptions} values={form.race} onToggle={toggleRace} error={fieldErrors.race} />
+                                    <SelectField label="Geographical region" options={regionOptions} value={form.region} onChange={(value) => update("region", value)} error={fieldErrors.region} />
                                 </>
                             ) : null}
 
@@ -843,9 +877,9 @@ export default function App() {
                             {activeSection === 2 ? (
                                 <>
                                     <Input label="Current medications. Separate with a comma." value={form.currentMedications} onChangeText={(value) => update("currentMedications", value)} placeholder="Example: Metformin, Bupropion" multiline />
-                                    <ChoiceGroup label="Do you take blood pressure medication?" options={["Yes", "No", "Not sure"]} value={form.bloodPressureMedication} onChange={(value) => update("bloodPressureMedication", value)} />
+                                    <ChoiceGroup label="Do you take blood pressure medication?" options={["Yes", "No", "Not sure"]} value={form.bloodPressureMedication} onChange={(value) => update("bloodPressureMedication", value)} error={fieldErrors.bloodPressureMedication} />
                                     <Input label="Blood pressure medication details" value={form.bloodPressureDetails} onChangeText={(value) => update("bloodPressureDetails", value)} placeholder="Medication name and dosage" optional />
-                                    <ChoiceGroup label="Do you take cholesterol-lowering medication?" options={["Yes", "No", "Not sure"]} value={form.cholesterolMedication} onChange={(value) => update("cholesterolMedication", value)} />
+                                    <ChoiceGroup label="Do you take cholesterol-lowering medication?" options={["Yes", "No", "Not sure"]} value={form.cholesterolMedication} onChange={(value) => update("cholesterolMedication", value)} error={fieldErrors.cholesterolMedication} />
                                     <Input label="Cholesterol medication details" value={form.cholesterolDetails} onChangeText={(value) => update("cholesterolDetails", value)} placeholder="Medication name and dosage" optional />
                                 </>
                             ) : null}
@@ -853,19 +887,19 @@ export default function App() {
                             {/* ----- LIFESTYLE FACTORS ----- */}
                             {activeSection === 3 ? (
                                 <>
-                                    <ChoiceGroup label="Do you smoke?"                  options={["No", "Yes", "Previously"]}   value={form.smoking}           onChange={(value) => update("smoking", value)} />
-                                    <ChoiceGroup label="Do you consume alcohol?"        options={["No", "Yes", "Occasionally"]} value={form.alcohol}           onChange={(value) => update("alcohol", value)} />
-                                    <ChoiceGroup label="Do you use recreational drugs?" options={["No", "Yes"]}                 value={form.recreationalDrugs} onChange={(value) => update("recreationalDrugs", value)} />
-                                    <Input label="How many hours per week do you exercise?" value={form.exerciseHours} onChangeText={(value) => update("exerciseHours", value)} placeholder="0" keyboardType="numeric" suffix="hours" />
-                                    <Input label="How much sleep do you get per night?"     value={form.sleepHours}    onChangeText={(value) => update("sleepHours", value)}    placeholder="0" keyboardType="numeric" suffix="hours" />
+                                    <ChoiceGroup label="Do you smoke?"                  options={["No", "Yes", "Previously"]}   value={form.smoking}           onChange={(value) => update("smoking", value)} error={fieldErrors.smoking} />
+                                    <ChoiceGroup label="Do you consume alcohol?"        options={["No", "Yes", "Occasionally"]} value={form.alcohol}           onChange={(value) => update("alcohol", value)} error={fieldErrors.alcohol} />
+                                    <ChoiceGroup label="Do you use recreational drugs?" options={["No", "Yes"]}                 value={form.recreationalDrugs} onChange={(value) => update("recreationalDrugs", value)} error={fieldErrors.recreationalDrugs} />
+                                    <Input label="How many hours per week do you exercise?" value={form.exerciseHours} onChangeText={(value) => update("exerciseHours", value)} placeholder="0" keyboardType="numeric" suffix="hours" error={fieldErrors.exerciseHours} />
+                                    <Input label="How much sleep do you get per night?"     value={form.sleepHours}    onChangeText={(value) => update("sleepHours", value)}    placeholder="0" keyboardType="numeric" suffix="hours" error={fieldErrors.sleepHours} />
                                 </>
                             ) : null}
 
                             {/* ----- CARDIOVASCULAR HEALTH ----- */}
                             {activeSection === 4 ? (
                                 <>
-                                    <ChoiceGroup label="History of high blood pressure?" options={["No", "Yes", "Not sure"]} value={form.highBloodPressureHistory} onChange={(value) => update("highBloodPressureHistory", value)} />
-                                    <ChoiceGroup label="History of high cholesterol?"    options={["No", "Yes", "Not sure"]} value={form.highCholesterolHistory} onChange={(value) => update("highCholesterolHistory", value)} />
+                                    <ChoiceGroup label="History of high blood pressure?" options={["No", "Yes", "Not sure"]} value={form.highBloodPressureHistory} onChange={(value) => update("highBloodPressureHistory", value)} error={fieldErrors.highBloodPressureHistory} />
+                                    <ChoiceGroup label="History of high cholesterol?"    options={["No", "Yes", "Not sure"]} value={form.highCholesterolHistory} onChange={(value) => update("highCholesterolHistory", value)} error={fieldErrors.highCholesterolHistory} />
                                     <View style={styles.reviewNote}>
                                         <Text style={styles.reviewTitle}>You’re ready to submit.</Text>
                                         <Text style={styles.reviewText}>Review your answers with the back button before completing your intake.</Text>
@@ -986,6 +1020,7 @@ const styles = StyleSheet.create({
     progressFill: { backgroundColor: colors.primary, borderRadius: 3, height: 4 },
     
     // ===== FORM =====
+    fieldError: { color: "#9C3028", fontSize: 11, lineHeight: 15, marginTop: 6 },
     card: {
         backgroundColor: "#FFFFFF",
         borderColor: "#E2EBE8",
