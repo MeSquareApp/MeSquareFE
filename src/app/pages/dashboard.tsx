@@ -15,6 +15,8 @@ import { colors } from "../../theme/color";
 import { fonts, fontsize } from "../../theme/typography";
 import { getBiomarkers, type Biomarker } from "@/services/api"
 import { useEffect, useState } from "react";
+import { useAuth0 } from 'react-native-auth0';
+import { useRouter } from 'expo-router';
 
 export default function Dashboard() {
   const twinStats = [
@@ -24,9 +26,26 @@ export default function Dashboard() {
     { label: "Weight", value: 180, color: colors.secondary },
   ];
 
+  // Logout constants
+  const { clearSession } = useAuth0();
+  const router = useRouter();
+
   // get patient data from database
-    const [rhr, setRhr] = useState<Biomarker | null>(null);
-    
+  const [rhr, setRhr] = useState<Biomarker | null>(null);
+
+  // Logout function
+  const handleLogout = async () => {
+    try {
+      // 1. Clears the Auth0 session cookies and redirects back to your allowed logout URL
+      await clearSession();
+      
+      // 2. Fallback router redirect just in case
+      router.replace('/');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
+
     useEffect(() => {
         // load biomarkers from backend
         async function loadBiomarkers() {
@@ -78,6 +97,10 @@ export default function Dashboard() {
           {/* account settings */}
           <Pressable style={styles.navItem}>
             <Ionicons name="settings-outline" size={22} color={colors.gray3} />
+          </Pressable>
+          {/* sign out */}
+          <Pressable style={styles.navItem} onPress={handleLogout}>
+            <Ionicons name="log-out-outline" size={22} color={colors.error} />
           </Pressable>
         </View>
       </View>
