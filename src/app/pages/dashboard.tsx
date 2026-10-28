@@ -25,19 +25,18 @@ export default function Dashboard() {
   ];
 
   // get patient data from database
-    const [rhr, setRhr]             = useState<Biomarker | null>(null);
-    const [firstName, setFirstName] = useState("");
-    const [lastName, setLastName]   = useState("");
-    
+    const [rhr, setRhr]                       = useState<Biomarker      | null>(null);
+    const [patientProfile, setPatientProfile] = useState<PatientProfile | null>(null);
+
     useEffect(() => {
         // load biomarkers from backend
         async function loadBiomarkers() {
-            try {
+          try {
             const data = await getBiomarkers();
 
             // find resting heart rate in the biomarker data
             const restingHeartRate = data.find(
-                (item) => item.biomarker_abbr === "RHR"
+              (item) => item.biomarker_abbr === "hdl"
             );
 
             setRhr(restingHeartRate ?? null);
@@ -46,25 +45,17 @@ export default function Dashboard() {
           }
         }
 
-        async function loadPatientName(){
-          // get first name
-          try {
-            const data = await getPatientProfile();
-            setFirstName(data[0]?.user.first_name ?? "");
-          } catch (err) {
-            console.error("Failed to load patient's first name:", err);
-          }
-          // get last name
-          try {
-            const data = await getPatientProfile();
-            setLastName(data[0]?.user.last_name ?? "");
-          } catch (err) {
-            console.error("Failed to load patient's last name:", err);
-          }
+        async function loadPatientProfile() {
+            try {
+              const data = await getPatientProfile();
+              setPatientProfile(data);
+            } catch (err) {
+              console.error("Failed to load patient profile:", err);
+            }
         }
 
         loadBiomarkers();
-        loadPatientName();
+        loadPatientProfile();
         }, []);
   return (
     <View style={styles.container}>
@@ -109,7 +100,9 @@ export default function Dashboard() {
 
           {/* user profile */}
           <View style={styles.profileContainer}>
-            <Text style={styles.profileName}>{firstName || "Patient"} {lastName}</Text>
+            <Text style={styles.profileName}>
+               {patientProfile ? `${patientProfile.user.first_name} ${patientProfile.user.last_name}` : "Loading..."}
+            </Text>
             <Ionicons name="person-circle-outline" size={30} color="#666666" />
           </View>
         </View>

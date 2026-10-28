@@ -1,6 +1,9 @@
 /**
  * file generated with Figma AI and altered for optimal content.
  */
+
+// TODO: Explain to the user why we need this info
+// TODO: emphasize the importance of entering accurate data
 import { StatusBar } from "expo-status-bar";
 import React, { useRef, useState } from "react";
 import {
@@ -22,9 +25,9 @@ import { fonts, fontsize } from "../../theme/typography"
 import { Ionicons } from "@react-native-vector-icons/ionicons";
 
 type FormData = {
-    heightFeet:               string;
-    heightInches:             string;
-    weight:                   string;
+    heightCm:                 string;
+    weightKg:                 string;
+    waistCm:                  string,
     sex:                      string;
     race:                     string[];
     region:                   string;
@@ -50,9 +53,9 @@ type StringField = Exclude<keyof FormData, "diagnosedConditions" | "race">;
 type FieldErrors = Partial<Record<StringField | "race", string>>;
 
 const initialForm: FormData = {
-    heightFeet:               "",
-    heightInches:             "",
-    weight:                   "",
+    heightCm:                 "",
+    weightKg:                 "",
+    waistCm:                  "",
     sex:                      "",
     race:                     [],
     region:                   "",
@@ -427,17 +430,23 @@ export default function App() {
     const [submitted, setSubmitted]                 = useState(false);
     const [fieldErrors, setFieldErrors]             = useState<FieldErrors>({});
     const [measurementSystem, setMeasurementSystem] = useState<"customary" | "metric">("customary");
+    const [heightFeet, setHeightFeet]               = useState("");
+    const [heightInches, setHeightInches]           = useState("");
+    const [heightCmInput, setHeightCmInput]         = useState("");
+    const [waistInput, setWaistInput]               = useState("");
     const scrollRef                                 = useRef<ScrollView>(null);
 
     const update = (field: StringField, value: string) => {
         setFieldErrors((current) => {
             const remaining = { ...current };
             delete remaining[field];
-            if (field === "heightFeet")   delete remaining.heightInches;
-            if (field === "heightInches") delete remaining.heightFeet;
             return remaining;
         });
-        setForm((current) => ({ ...current, [field]: value }));
+
+        setForm((current) => ({
+            ...current,
+            [field]: value,
+        }));
     };
 
     const toggleCondition = (condition: string) => {
@@ -484,68 +493,104 @@ export default function App() {
         });
     };
 
-    const changeMeasurementSystem = (system: "customary" | "metric") => {
-        if (system === measurementSystem) return;
+    const updateHeight = (unit: "feet" | "inches" | "cm", value: string) => {
+        // Update the input the user is currently editing.
+        if (unit === "feet") {
+            setHeightFeet(value);
+        } else if (unit === "inches") {
+            setHeightInches(value);
+        } else {
+            setHeightCmInput(value);
+        }
 
+        // Clear any previous height validation error.
         setFieldErrors((current) => {
-            const {
-                heightFeet: _heightFeet,
-                heightInches: _heightInches,
-                weight: _weight,
-                ...remaining
-            } = current;
+            const remaining = { ...current };
+            delete remaining.heightCm;
             return remaining;
         });
 
-        setForm((current) => {
-            // convert the current height to total centimeters
-            const first = Number(current.heightFeet);
-            const second = Number(current.heightInches);
+        // Convert the entered height to centimeters for storage.
+        let heightCm = "";
 
-            const totalCm =
-                current.heightFeet.trim() === "" &&
-                current.heightInches.trim() === ""
-                    ? 0
-                    : measurementSystem === "customary"
-                        ? (first * 12 + second) * 2.54
-                        : first * 100 + second;
+        if (unit === "cm") {
+            heightCm = value.trim() === "" ? "" : value;
+        } else {
+            const feet = Number(unit === "feet" ? value : heightFeet);
+            const inches = Number(unit === "inches" ? value : heightInches);
 
-            // convert weight based on the current unit system
-            const weightValue = Number(current.weight);
-            const weight = current.weight.trim() === ""
-                ? ""
-                : system === "metric"
-                    ? String(Math.round(weightValue * 0.45359237 * 10) / 10)
-                    : String(Math.round(weightValue / 0.45359237 * 10) / 10);
+            const feetEmpty = unit === "feet"
+            ? value.trim() === ""
+            : heightFeet.trim() === "";
 
-            if (system === "metric") {
-                const roundedCm = Math.round(totalCm);
+            const inchesEmpty = unit === "inches"
+            ? value.trim() === ""
+            : heightInches.trim() === "";
 
-                return {
-                    ...current,
-                    heightFeet: totalCm === 0
-                        ? ""
-                        : String(Math.floor(roundedCm / 100)),
-                    heightInches: totalCm === 0
-                        ? ""
-                        : String(roundedCm % 100),
-                    weight,
-                };
+            if (!feetEmpty || !inchesEmpty) {
+            heightCm = String((feet * 12 + inches) * 2.54);
             }
+        }
 
-            const totalInches = Math.round(totalCm / 2.54);
+        update("heightCm", heightCm);
+    };
 
-            return {
-                ...current,
-                heightFeet: totalCm === 0
-                    ? ""
-                    : String(Math.floor(totalInches / 12)),
-                heightInches: totalCm === 0
-                    ? ""
-                    : String(totalInches % 12),
-                weight,
-            };
+    const getDisplayedWeight = () => {
+        if (form.weightKg === "") {
+            return "";
+        }
+
+        const weightKg = Number(form.weightKg);
+
+        if (!Number.isFinite(weightKg)) {
+            return "";
+        }
+
+        if (measurementSystem === "customary") {
+            // Convert kilograms to pounds for display
+            return String(Math.round(weightKg / 0.45359237 * 10) / 10);
+        }
+
+        // Display kilograms in metric mode
+        return form.weightKg;
+    };
+
+    const changeMeasurementSystem = (
+        system: "customary" | "metric"
+    ) => {
+        if (system === measurementSystem) return;
+
+        const heightCm = Number(form.heightCm);
+
+        if (system === "metric") {
+            setHeightCmInput(form.heightCm);
+        } else if (form.heightCm !== "" && Number.isFinite(heightCm)) {
+            const totalInches = Math.round(heightCm / 2.54);
+
+            setHeightFeet(String(Math.floor(totalInches / 12)));
+            setHeightInches(String(totalInches % 12));
+        }
+
+        setFieldErrors((current) => {
+            const remaining = { ...current };
+            delete remaining.heightCm;
+            delete remaining.weightKg;
+            delete remaining.waistCm;
+            return remaining;
         });
+
+        // Keep the displayed waist value in sync with the selected unit.
+        const waistCm = Number(form.waistCm);
+
+        if (form.waistCm.trim() === "") {
+            setWaistInput("");
+        } else if (system === "metric") {
+            setWaistInput(String(waistCm));
+        } else {
+            setWaistInput(
+                String(Math.round((waistCm / 2.54) * 10) / 10)
+            );
+        }
 
         setMeasurementSystem(system);
     };
@@ -557,7 +602,7 @@ export default function App() {
 
     const getSectionErrors = (sectionIndex: number): FieldErrors => {
         const required: StringField[][] = [
-            ["heightFeet", "heightInches", "weight", "sex", "region"],
+            ["heightCm", "weightKg", "sex", "region"],
             [],
             ["bloodPressureMedication", "cholesterolMedication"],
             ["smoking", "alcohol", "recreationalDrugs", "exerciseHours", "sleepHours"],
@@ -575,32 +620,30 @@ export default function App() {
             errors.race = "Select at least one option.";
         }
 
-        if (sectionIndex === 0) {
-            const first = Number(form.heightFeet);
-            const second = Number(form.heightInches);
-            const weight = Number(form.weight);
-            const heightLimit = measurementSystem === "metric" ? 100 : 12;
+        const height = Number(form.heightCm);
+        const weight = Number(form.weightKg);
+        const waist = form.waistCm.trim();
 
-            if (!errors.heightFeet && (!Number.isFinite(first) || first < 0)) {
-                errors.heightFeet = "Enter a valid height.";
-            }
-            if (!errors.heightInches && (
-                !Number.isFinite(second) || second < 0 || second >= heightLimit
-            )) {
-                errors.heightInches = measurementSystem === "metric"
-                    ? "Enter a value from 0 to 99 cm."
-                    : "Enter a value from 0 to 11 in.";
-            }
-            if (
-                !errors.heightFeet &&
-                !errors.heightInches &&
-                first === 0 &&
-                second === 0
-            ) {
-                errors.heightFeet = "Height must be greater than zero.";
-            }
-            if (!errors.weight && (!Number.isFinite(weight) || weight <= 0)) {
-                errors.weight = "Enter a weight greater than zero.";
+        if (
+            !errors.heightCm &&
+            (!Number.isFinite(height) || height <= 0)
+        ) {
+            errors.heightCm = "Enter a valid height greater than zero.";
+        }
+
+        if (
+            !errors.weightKg &&
+            (!Number.isFinite(weight) || weight <= 0)
+        ) {
+            errors.weightKg = "Enter a weight greater than zero.";
+        }
+
+        if (waist !== "") {
+            const waistValue = Number(waist);
+
+            if (!Number.isFinite(waistValue) || waistValue <= 0) {
+                errors.waistCm =
+                    "Enter a waist circumference greater than zero.";
             }
         }
 
@@ -626,8 +669,8 @@ export default function App() {
     const validateCurrentSection = () => {
         const errors = getSectionErrors(activeSection);
         setFieldErrors(errors);
-        if (Object.keys(errors).length > 0) return false;
-        return true;
+
+        return Object.keys(errors).length === 0;
     };
 
     const continueForm = () => {
@@ -777,48 +820,76 @@ export default function App() {
                                         <View style={styles.heightField}>
                                             <FieldLabel>Height</FieldLabel>
                                             <View style={styles.heightInputs}>
-                                                {/* feet/meters */}
+                                            {measurementSystem === "customary" ? (
+                                                // customary
+                                                <>
+                                                    {/* Height in feet */}
+                                                    <View style={styles.heightInputWrap}>
+                                                        <TextInput
+                                                            accessibilityLabel="Height in feet"
+                                                            keyboardType="numeric"
+                                                            onChangeText={(value) => updateHeight("feet", value)}
+                                                            placeholder="5"
+                                                            placeholderTextColor="#A4B3AF"
+                                                            style={styles.heightInput}
+                                                            value={heightFeet}
+                                                        />
+                                                        <Text style={styles.suffix}>ft</Text>
+                                                    </View>
+
+                                                    {/* Height in inches */}
+                                                    <View style={styles.heightInputWrap}>
+                                                        <TextInput
+                                                            accessibilityLabel="Height in inches"
+                                                            keyboardType="numeric"
+                                                            onChangeText={(value) => updateHeight("inches", value)}
+                                                            placeholder="8"
+                                                            placeholderTextColor="#A4B3AF"
+                                                            style={styles.heightInput}
+                                                            value={heightInches}
+                                                        />
+                                                        <Text style={styles.suffix}>in</Text>
+                                                    </View>
+                                                </>
+                                            ) : ( // metric
+                                                /* Height in centimeters */
                                                 <View style={styles.heightInputWrap}>
                                                     <TextInput
-                                                        accessibilityLabel={measurementSystem === "customary" ? "Height in feet" : "Height in meters"}
+                                                        accessibilityLabel="Height in centimeters"
                                                         keyboardType="numeric"
-                                                        onChangeText={(value) => update("heightFeet", value)}
-                                                        placeholder={measurementSystem === "customary" ? "5" : "1"}
+                                                        onChangeText={(value) => updateHeight("cm", value)}
+                                                        placeholder="173"
                                                         placeholderTextColor="#A4B3AF"
                                                         style={styles.heightInput}
-                                                        value={form.heightFeet}
+                                                        value={heightCmInput}
                                                     />
-                                                    <Text style={styles.suffix}>{measurementSystem === "customary" ? "ft" : "m"}</Text>
-                                                    <FieldError message={fieldErrors.heightFeet} />
+                                                    <Text style={styles.suffix}>cm</Text>
                                                 </View>
-                                                {/* inches/cm */}
-                                                <View style={styles.heightInputWrap}>
-                                                    <TextInput
-                                                        accessibilityLabel={measurementSystem === "customary" ? "Additional height in inches" : "Additional height in centimeters"}
-                                                        keyboardType="numeric"
-                                                        onChangeText={(value) => update("heightInches", value)}
-                                                        placeholder={measurementSystem === "customary" ? "8" : "73"}
-                                                        placeholderTextColor="#A4B3AF"
-                                                        style={styles.heightInput}
-                                                        value={form.heightInches}
-                                                    />
-                                                    <Text style={styles.suffix}>{measurementSystem === "customary" ? "in" : "cm"}</Text>
-                                                    <FieldError message={fieldErrors.heightInches} />
-                                                </View>
-                                            </View>
+                                            )}
+                                        </View>
+
+                                        <FieldError message={fieldErrors.heightCm} />
                                         </View>
 
                                         {/* -- weight -- */}
-                                        <View style={{ flex: 2, paddingStart: 20 }}>
-                                            <Input
-                                                keyboardType="numeric"
-                                                label="Weight"
-                                                onChangeText={(value) => update("weight", value)}
-                                                placeholder={measurementSystem === "customary" ? "165" : "75"}
-                                                suffix={measurementSystem === "customary" ? "lbs" : "kg"}
-                                                error={fieldErrors.weight}
-                                                value={form.weight}
-                                            />
+                                        <View style={styles.heightField}>
+                                            <View style={styles.heightInputs}>
+                                                <View style={styles.heightInputWrap}>
+                                                    <Input
+                                                        keyboardType="numeric"
+                                                        label="Weight"
+                                                        onChangeText={(value) => {
+                                                            const enteredWeight = Number(value);
+                                                            update("weightKg", value.trim() === "" ? "" 
+                                                            : String( measurementSystem === "customary" ? enteredWeight * 0.45359237 : enteredWeight ) );
+                                                        }}
+                                                        placeholder="165"
+                                                        value={getDisplayedWeight()}
+                                                        error={fieldErrors.weightKg}
+                                                    />
+                                                    <Text style={styles.suffix}> {measurementSystem === "metric" ? "kg" : "lbs"} </Text>
+                                                </View>
+                                            </View>
                                         </View>
 
                                         {/* -- sex -- */}
@@ -831,6 +902,27 @@ export default function App() {
                                                 error={fieldErrors.sex}
                                             />
                                         </View>
+                                    </View>
+
+                                    {/* -- waist -- */}
+                                    <View style={[styles.measurementField]}>
+                                        <Input
+                                            label={`Waist circumference (${measurementSystem === "metric" ? "cm" : "in"})`}
+                                            value={waistInput}
+                                            onChangeText={(value) => {
+                                                setWaistInput(value);
+                                                const enteredWaist = Number(value);
+
+                                                update( "waistCm",
+                                                    value.trim() === "" ? "" 
+                                                        : String( measurementSystem === "customary" ? enteredWaist * 2.54 : enteredWaist )
+                                                );
+                                            }}
+                                            placeholder="30"
+                                            keyboardType="numeric"
+                                            optional
+                                            error={fieldErrors.waistCm}
+                                        />
                                     </View>
 
                                     {/* -- race  & geographic region -- */}
@@ -1053,6 +1145,7 @@ const styles = StyleSheet.create({
 
     // measurement row & unit toggle
     measurementTitle: { color: "#34534F", fontSize: 12, fontWeight: "700" },
+    measurementField: { flex: 2, paddingStart: 20 },
     unitToggle: { backgroundColor: "#EDF3F1", borderRadius: 8, flexDirection: "row", padding: 3 },
     unitToggleButton: {
         borderRadius: 6,
