@@ -11,9 +11,11 @@ import {
   View,
 } from "react-native";
 import MetricCard from "../../components/MetricCard";
+import Navbar from "../../components/Navbar";
+import Header from "../../components/Header";
 import { colors } from "../../theme/color";
 import { fonts, fontsize } from "../../theme/typography";
-import { getBiomarkers, type Biomarker, getPatientProfile, type PatientProfile } from "@/services/api"
+import { getBiomarkers, type Biomarker } from "@/services/api"
 import { useEffect, useState } from "react";
 
 export default function Dashboard() {
@@ -25,94 +27,36 @@ export default function Dashboard() {
   ];
 
   // get patient data from database
-    const [rhr, setRhr]             = useState<Biomarker | null>(null);
-    const [firstName, setFirstName] = useState("");
-    const [lastName, setLastName]   = useState("");
-    
-    useEffect(() => {
-        // load biomarkers from backend
-        async function loadBiomarkers() {
-            try {
-            const data = await getBiomarkers();
+  const [rhr, setRhr]             = useState<Biomarker | null>(null);
+  
+  useEffect(() => {
+    // load biomarkers from backend
+    async function loadBiomarkers() {
+        try {
+        const data = await getBiomarkers();
 
-            // find resting heart rate in the biomarker data
-            const restingHeartRate = data.find(
-                (item) => item.biomarker_abbr === "RHR"
-            );
+        // find resting heart rate in the biomarker data
+        const restingHeartRate = data.find(
+            (item) => item.biomarker_abbr === "RHR"
+        );
 
-            setRhr(restingHeartRate ?? null);
-          } catch (err) {
-            console.error("Failed to load biomarkers:", err);
-          }
-        }
+        setRhr(restingHeartRate ?? null);
+      } catch (err) {
+        console.error("Failed to load biomarkers:", err);
+      }
+    }
 
-        async function loadPatientName(){
-          // get first name
-          try {
-            const data = await getPatientProfile();
-            setFirstName(data[0]?.user.first_name ?? "");
-          } catch (err) {
-            console.error("Failed to load patient's first name:", err);
-          }
-          // get last name
-          try {
-            const data = await getPatientProfile();
-            setLastName(data[0]?.user.last_name ?? "");
-          } catch (err) {
-            console.error("Failed to load patient's last name:", err);
-          }
-        }
-
-        loadBiomarkers();
-        loadPatientName();
-        }, []);
+    loadBiomarkers();
+  }, []);
+  
   return (
     <View style={styles.container}>
       {/* ----- NAVBAR ----- */}
-      <View style={styles.navbar}>
-        {/* logo */}
-        <View style={styles.logoContainer}>
-          <Image
-            source={require("../../../assets/images/me2-logo.png")}
-            style={styles.logo}
-          />
-        </View>
-
-        {/* nav items */}
-        <View style={styles.navItems}>
-          {/* dashboard */}
-          <Pressable style={[styles.navItem, styles.activeNavItem]}>
-            <Ionicons name="grid" size={25} color="#FFFFFF" />
-          </Pressable>
-
-          {/* data log */}
-          <Pressable style={styles.navItem}>
-            <Ionicons name="analytics-outline" size={22} color={colors.gray3} />
-          </Pressable>
-
-          {/* forecasting */}
-          <Pressable style={styles.navItem}>
-            <Ionicons name="bar-chart-outline" size={22} color={colors.gray3} />
-          </Pressable>
-
-          {/* account settings */}
-          <Pressable style={styles.navItem}>
-            <Ionicons name="settings-outline" size={22} color={colors.gray3} />
-          </Pressable>
-        </View>
-      </View>
+      <Navbar />
 
       <View style={styles.nonNavContent}>
         {/* ---- HEADER ---- */}
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Dashboard</Text>
-
-          {/* user profile */}
-          <View style={styles.profileContainer}>
-            <Text style={styles.profileName}>{firstName || "Patient"} {lastName}</Text>
-            <Ionicons name="person-circle-outline" size={30} color="#666666" />
-          </View>
-        </View>
+        <Header />
 
         {/* ---- MAIN CONTENT ---- */}
         <View style={styles.mainContent}>
