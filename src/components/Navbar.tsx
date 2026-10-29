@@ -23,7 +23,7 @@ export default function Navbar() {
                   <Pressable style={[styles.navItem, pathname === "/pages/dashboard" && styles.activeNavItem]}
                              onPress={() => router.push("../pages/dashboard")}
                              accessibilityLabel="Dashboard">
-                    <Ionicons name="grid" size={25} color={pathname === "/pages/dashboard" ? "#FFFFFF" : colors.gray3} />
+                    <Ionicons name="grid" size={22} color={pathname === "/pages/dashboard" ? "#FFFFFF" : colors.gray3} />
                   </Pressable>
         
                   {/* data upload */}
@@ -62,8 +62,8 @@ const styles = StyleSheet.create({
       paddingTop: 20,
     },
     logoContainer: {
-      width: Dimensions.get("window").width * 0.05,
-      height: Dimensions.get("window").width * 0.05,
+      width: Dimensions.get("window").width * 0.04,
+      height: Dimensions.get("window").width * 0.04,
       borderWidth: 1,
       borderColor: colors.gray5,
       borderRadius: 12,
