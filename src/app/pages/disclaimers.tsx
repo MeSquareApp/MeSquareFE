@@ -19,8 +19,8 @@ export default function disclaimers(){
             <Navbar />
 
             <View style={styles.nonNavContent}>
-                {/* ---- HEADER ---- */}
-                <Header />
+              {/* ---- HEADER ---- */}
+              <Header />
             </View>
         </View>
     )

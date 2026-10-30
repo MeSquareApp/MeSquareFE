@@ -22,8 +22,8 @@ export default function Footer(){
           <Pressable>
             <Text style={styles.footerLink}>PRIVACY POLICY</Text>
           </Pressable>
-          <Pressable>
-            <Text style={styles.footerLink}>DISCLAIMER</Text>
+          <Pressable onPress={() => router.push("../pages/disclaimers")} accessibilityLabel="Disclaimers">
+            <Text style={styles.footerLink}>DISCLAIMERS</Text>
           </Pressable>
         </View>
 
