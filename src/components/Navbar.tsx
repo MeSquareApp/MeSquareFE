@@ -34,14 +34,14 @@ export default function Navbar() {
                   </Pressable>
         
                   {/* forecasting */}
-                  <Pressable style={styles.navItem}
+                  <Pressable style={[styles.navItem, pathname === "/pages/forecasting" && styles.activeNavItem]}
                              onPress={() => router.push("../pages/forecasting")}
                              accessibilityLabel="Forecasting">
                     <Ionicons name="bar-chart-outline" size={22} color={pathname === "/pages/forecasting" ? "#FFFFFF" : colors.gray3} />
                   </Pressable>
         
                   {/* account settings */}
-                  <Pressable style={styles.navItem}
+                  <Pressable style={[styles.navItem, pathname === "/pages/account" && styles.activeNavItem]}
                              onPress={() => router.push("../pages/account")}
                              accessibilityLabel="Account Settings">
                     <Ionicons name="settings-outline" size={22} color={pathname === "/pages/account" ? "#FFFFFF" : colors.gray3} />

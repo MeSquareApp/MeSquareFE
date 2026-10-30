@@ -53,7 +53,8 @@ const styles = StyleSheet.create ({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        paddingHorizontal: Dimensions.get("window").width * 0.05,
+        paddingRight: Dimensions.get("window").width * 0.05,
+        paddingHorizontal: Dimensions.get("window").width * 0.01,
       },
       headerTitle: {
         fontFamily: fonts.bold,
