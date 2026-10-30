@@ -9,13 +9,14 @@ import {
   Text,
   View,
 } from "react-native";
-import MetricCard from "../../components/MetricCard";
-import Navbar from "../../components/Navbar";
-import Header from "../../components/Header";
-import { colors } from "../../theme/color";
-import { fonts, fontsize } from "../../theme/typography";
+import { colors }                        from "../../theme/color";
+import { fonts, fontsize }               from "../../theme/typography";
 import { getBiomarkers, type Biomarker } from "@/services/api"
-import { useEffect, useState } from "react";
+import { useEffect, useState }           from "react";
+import MetricCard from "../../components/MetricCard";
+import Navbar     from "../../components/Navbar";
+import Header     from "../../components/Header";
+import Footer     from "../../components/Footer"
 
 export default function Dashboard() {
   const twinStats = [
@@ -257,29 +258,7 @@ export default function Dashboard() {
         </View>
 
         {/* ---- FOOTER ---- */}
-        <View style={styles.footer}>
-          <View style={styles.footerLinks}>
-            <Pressable>
-              <Text style={styles.footerLink}>ABOUT US</Text>
-            </Pressable>
-            <Pressable>
-              <Text style={styles.footerLink}>CONTACT US</Text>
-            </Pressable>
-            <Pressable>
-              <Text style={styles.footerLink}>HELP</Text>
-            </Pressable>
-            <Pressable>
-              <Text style={styles.footerLink}>PRIVACY POLICY</Text>
-            </Pressable>
-            <Pressable>
-              <Text style={styles.footerLink}>DISCLAIMER</Text>
-            </Pressable>
-          </View>
-
-          <Text style={styles.copyright}>
-            Copyright © 2024 Me². All rights reserved.
-          </Text>
-        </View>
+        <Footer/>
       </View>
     </View>
   );
@@ -502,31 +481,5 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     backgroundColor: colors.background,
     padding: 16,
-  },
-
-  // ---- FOOTER ----
-  footer: {
-    height: Dimensions.get("window").height * 0.05,
-    borderTopWidth: 1,
-    borderTopColor: colors.gray5,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: Dimensions.get("window").width * 0.05,
-  },
-  footerLinks: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: Dimensions.get("window").width * 0.02,
-  },
-  footerLink: {
-    fontFamily: fonts.regular,
-    fontSize: 12,
-    color: "#202840",
-  },
-  copyright: {
-    fontFamily: fonts.regular,
-    fontSize: 12,
-    color: "#9699A5",
   },
 });
