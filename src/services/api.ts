@@ -6,8 +6,8 @@ export const TEST_USER_ID = "550e8400-e29b-41d4-a716-446655440000";
 export type PatientProfile = {
     date_of_birth: string;
     biological_sex: string;
-    baseline_height_ft: number;
-    baseline_weight_lbs: number;
+    baseline_height_cm: number;
+    baseline_weight_kg: number;
     allergies: string;
     medical_conditions: string;
     user: {
@@ -43,9 +43,9 @@ export async function getBiomarkers(
 
 export async function getPatientProfile(
     userId: string = TEST_USER_ID
-): Promise<PatientProfile[]> {
+): Promise<PatientProfile> {
     const response = await fetch(
-        `${API_BASE_URL}/users/${userId}/profile`
+        `${API_BASE_URL}/patients/${userId}/profile`
     );
 
     if (!response.ok) {
