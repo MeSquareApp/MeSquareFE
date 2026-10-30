@@ -14,23 +14,18 @@ export default function Header(){
     const [lastName, setLastName]   = useState("");
 
     useEffect(() => {
-        async function loadPatientName(){
-            // get first name
+        async function loadPatientName() {
             try {
-            const data = await getPatientProfile();
-            setFirstName(data[0]?.user.first_name ?? "");
+                const data = await getPatientProfile();
+
+                setFirstName(data.user.first_name ?? "");
+                setLastName(data.user.last_name ?? "");
+
             } catch (err) {
-            console.error("Failed to load patient's first name:", err);
-            }
-            // get last name
-            try {
-            const data = await getPatientProfile();
-            setLastName(data[0]?.user.last_name ?? "");
-            } catch (err) {
-            console.error("Failed to load patient's last name:", err);
+                console.error("Failed to load patient name:", err);
             }
         }
-    
+
         loadPatientName();
     }, []);
 
