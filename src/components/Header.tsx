@@ -9,6 +9,7 @@ import { useRouter, usePathname } from "expo-router";
 export default function Header(){
 
     const router = useRouter();
+    const pathname = usePathname();
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName]   = useState("");
 
@@ -35,7 +36,7 @@ export default function Header(){
 
     return (
         <View style={styles.header}>
-            <Text style={styles.headerTitle}>Dashboard</Text>
+            <Text style={styles.headerTitle}>{pathname.substring(pathname.lastIndexOf('/')+1).toUpperCase()}</Text>
         
             {/* user profile */}
             <Pressable onPress={() => router.push("../pages/account")} accessibilityLabel="Account">
@@ -57,7 +58,8 @@ const styles = StyleSheet.create ({
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "space-between",
-        paddingHorizontal: Dimensions.get("window").width * 0.05,
+        paddingRight: Dimensions.get("window").width * 0.05,
+        paddingHorizontal: Dimensions.get("window").width * 0.01,
       },
       headerTitle: {
         fontFamily: fonts.bold,

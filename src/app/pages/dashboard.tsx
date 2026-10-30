@@ -1,6 +1,5 @@
 import TrendCard from "@/components/TrendCard";
 import TwinStatBox from "@/components/TwinStatBox";
-import { Ionicons } from "@react-native-vector-icons/ionicons";
 import {
   Dimensions,
   Image,
@@ -27,7 +26,7 @@ export default function Dashboard() {
   ];
 
   // get patient data from database
-  const [rhr, setRhr]             = useState<Biomarker | null>(null);
+  const [rhr, setRhr] = useState<Biomarker | null>(null);
   
   useEffect(() => {
     // load biomarkers from backend
@@ -292,6 +291,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     backgroundColor: colors.background,
   },
+  nonNavContent: {
+    flex: 1,
+  },
 
   // ---- NAVBAR ----
   navbar: {
@@ -329,10 +331,6 @@ const styles = StyleSheet.create({
   },
   activeNavItem: {
     backgroundColor: colors.primary,
-  },
-
-  nonNavContent: {
-    flex: 1,
   },
 
   // ---- HEADER ----
