@@ -28,7 +28,7 @@ export default function Footer(){
         </View>
 
         <Text style={styles.copyright}>
-          Copyright © 2024 Me². All rights reserved.
+          Copyright © 2026 Me². All rights reserved.
         </Text>
       </View>
     )
