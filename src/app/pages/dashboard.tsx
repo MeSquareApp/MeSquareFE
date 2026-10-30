@@ -1,6 +1,5 @@
 import TrendCard from "@/components/TrendCard";
 import TwinStatBox from "@/components/TwinStatBox";
-import { Ionicons } from "@react-native-vector-icons/ionicons";
 import {
   Dimensions,
   Image,
@@ -10,11 +9,14 @@ import {
   Text,
   View,
 } from "react-native";
+import { colors }                        from "../../theme/color";
+import { fonts, fontsize }               from "../../theme/typography";
+import { getBiomarkers, type Biomarker } from "@/services/api"
+import { useEffect, useState }           from "react";
 import MetricCard from "../../components/MetricCard";
-import { colors } from "../../theme/color";
-import { fonts, fontsize } from "../../theme/typography";
-import { getBiomarkers, type Biomarker, getPatientProfile, type PatientProfile } from "@/services/api"
-import { useEffect, useState } from "react";
+import Navbar     from "../../components/Navbar";
+import Header     from "../../components/Header";
+import Footer     from "../../components/Footer"
 
 export default function Dashboard() {
   const twinStats = [
@@ -25,87 +27,36 @@ export default function Dashboard() {
   ];
 
   // get patient data from database
-    const [rhr, setRhr]                       = useState<Biomarker      | null>(null);
-    const [patientProfile, setPatientProfile] = useState<PatientProfile | null>(null);
+  const [rhr, setRhr] = useState<Biomarker | null>(null);
+  
+  useEffect(() => {
+    // load biomarkers from backend
+    async function loadBiomarkers() {
+        try {
+        const data = await getBiomarkers();
 
-    useEffect(() => {
-        // load biomarkers from backend
-        async function loadBiomarkers() {
-          try {
-            const data = await getBiomarkers();
+        // find resting heart rate in the biomarker data
+        const restingHeartRate = data.find(
+            (item) => item.biomarker_abbr === "RHR"
+        );
 
-            // find resting heart rate in the biomarker data
-            const restingHeartRate = data.find(
-              (item) => item.biomarker_abbr === "hdl"
-            );
+        setRhr(restingHeartRate ?? null);
+      } catch (err) {
+        console.error("Failed to load biomarkers:", err);
+      }
+    }
 
-            setRhr(restingHeartRate ?? null);
-          } catch (err) {
-            console.error("Failed to load biomarkers:", err);
-          }
-        }
-
-        async function loadPatientProfile() {
-            try {
-              const data = await getPatientProfile();
-              setPatientProfile(data);
-            } catch (err) {
-              console.error("Failed to load patient profile:", err);
-            }
-        }
-
-        loadBiomarkers();
-        loadPatientProfile();
-        }, []);
+    loadBiomarkers();
+  }, []);
+  
   return (
     <View style={styles.container}>
       {/* ----- NAVBAR ----- */}
-      <View style={styles.navbar}>
-        {/* logo */}
-        <View style={styles.logoContainer}>
-          <Image
-            source={require("../../../assets/images/me2-logo.png")}
-            style={styles.logo}
-          />
-        </View>
-
-        {/* nav items */}
-        <View style={styles.navItems}>
-          {/* dashboard */}
-          <Pressable style={[styles.navItem, styles.activeNavItem]}>
-            <Ionicons name="grid" size={25} color="#FFFFFF" />
-          </Pressable>
-
-          {/* data log */}
-          <Pressable style={styles.navItem}>
-            <Ionicons name="analytics-outline" size={22} color={colors.gray3} />
-          </Pressable>
-
-          {/* forecasting */}
-          <Pressable style={styles.navItem}>
-            <Ionicons name="bar-chart-outline" size={22} color={colors.gray3} />
-          </Pressable>
-
-          {/* account settings */}
-          <Pressable style={styles.navItem}>
-            <Ionicons name="settings-outline" size={22} color={colors.gray3} />
-          </Pressable>
-        </View>
-      </View>
+      <Navbar />
 
       <View style={styles.nonNavContent}>
         {/* ---- HEADER ---- */}
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Dashboard</Text>
-
-          {/* user profile */}
-          <View style={styles.profileContainer}>
-            <Text style={styles.profileName}>
-               {patientProfile ? `${patientProfile.user.first_name} ${patientProfile.user.last_name}` : "Loading..."}
-            </Text>
-            <Ionicons name="person-circle-outline" size={30} color="#666666" />
-          </View>
-        </View>
+        <Header />
 
         {/* ---- MAIN CONTENT ---- */}
         <View style={styles.mainContent}>
@@ -307,29 +258,7 @@ export default function Dashboard() {
         </View>
 
         {/* ---- FOOTER ---- */}
-        <View style={styles.footer}>
-          <View style={styles.footerLinks}>
-            <Pressable>
-              <Text style={styles.footerLink}>ABOUT US</Text>
-            </Pressable>
-            <Pressable>
-              <Text style={styles.footerLink}>CONTACT US</Text>
-            </Pressable>
-            <Pressable>
-              <Text style={styles.footerLink}>HELP</Text>
-            </Pressable>
-            <Pressable>
-              <Text style={styles.footerLink}>PRIVACY POLICY</Text>
-            </Pressable>
-            <Pressable>
-              <Text style={styles.footerLink}>DISCLAIMER</Text>
-            </Pressable>
-          </View>
-
-          <Text style={styles.copyright}>
-            Copyright © 2024 Me². All rights reserved.
-          </Text>
-        </View>
+        <Footer/>
       </View>
     </View>
   );
@@ -340,6 +269,9 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     backgroundColor: colors.background,
+  },
+  nonNavContent: {
+    flex: 1,
   },
 
   // ---- NAVBAR ----
@@ -378,10 +310,6 @@ const styles = StyleSheet.create({
   },
   activeNavItem: {
     backgroundColor: colors.primary,
-  },
-
-  nonNavContent: {
-    flex: 1,
   },
 
   // ---- HEADER ----
@@ -553,31 +481,5 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     backgroundColor: colors.background,
     padding: 16,
-  },
-
-  // ---- FOOTER ----
-  footer: {
-    height: Dimensions.get("window").height * 0.05,
-    borderTopWidth: 1,
-    borderTopColor: colors.gray5,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: Dimensions.get("window").width * 0.05,
-  },
-  footerLinks: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: Dimensions.get("window").width * 0.02,
-  },
-  footerLink: {
-    fontFamily: fonts.regular,
-    fontSize: 12,
-    color: "#202840",
-  },
-  copyright: {
-    fontFamily: fonts.regular,
-    fontSize: 12,
-    color: "#9699A5",
   },
 });
