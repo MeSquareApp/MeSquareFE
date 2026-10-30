@@ -7,21 +7,23 @@ import {
   Text,
   View,
 } from "react-native";
-import Navbar from "../../components/Navbar";
-import Header from "../../components/Header";
 import { colors } from "../../theme/color";
-import { fonts, fontsize } from "../../theme/typography";
+import Header from "../../components/Header";
+import Navbar from "../../components/Navbar";
+import Footer from "../../components/Footer";
 
 export default function forecasting(){
     return(
         <View style={styles.container}>
-            {/* ----- NAVBAR ----- */}
-            <Navbar />
+          {/* ----- NAVBAR ----- */}
+          <Navbar />
 
-            <View style={styles.nonNavContent}>
-                {/* ---- HEADER ---- */}
-                <Header />
-            </View>
+          <View style={styles.nonNavContent}>
+            {/* ---- HEADER ---- */}
+            <Header />
+          </View>
+          {/* ---- FOOTER ---- */}
+          <Footer/>
         </View>
     )
 }
