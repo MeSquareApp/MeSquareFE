@@ -2,7 +2,6 @@
 export const fonts = {
     regular: 'AtkinsonHyperlegible_400Regular',
     bold: 'AtkinsonHyperlegible_700Bold',
-    semiBold: 'AtkinsonHyperlegible_700Bold',
 } as const;
 
 export const fontsize = {
