@@ -20,8 +20,8 @@ export default function privacys(){
         {/* ---- HEADER ---- */}
         <Header />
         <ScrollView style={styles.mainContent}>
-          <Text style={styles.privacyHeader}>privacy</Text>
-          <Text style={styles.dateUpdated}>Last Updated 10/31/2026</Text>
+          <Text style={styles.privacyHeader}>PRIVACY POLICY</Text>
+          <Text style={styles.dateUpdated}>Last Updated 11/01/2026</Text>
 
           {/* ---- WEBSITE ---- */}
           {/* created using Termly */}
