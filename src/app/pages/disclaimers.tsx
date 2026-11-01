@@ -1,15 +1,14 @@
 import {
   Dimensions,
-  Image,
-  Pressable,
   ScrollView,
   StyleSheet,
   Text,
   View,
 } from "react-native";
-import Navbar from "../../components/Navbar";
 import Header from "../../components/Header";
-import { colors } from "../../theme/color";
+import Navbar from "../../components/Navbar";
+import Footer from "../../components/Footer";
+import { colors }          from "../../theme/color";
 import { fonts, fontsize } from "../../theme/typography";
 
 export default function disclaimers(){
@@ -57,6 +56,8 @@ export default function disclaimers(){
             emergency services disclaimer goes here
           </Text>
         </ScrollView>
+        {/* ---- FOOTER ---- */}
+        <Footer/>
       </View>
     </View>
   )

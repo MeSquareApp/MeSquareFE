@@ -5,8 +5,9 @@ import {
   Text,
   View,
 } from "react-native";
-import Navbar from "../../components/Navbar";
 import Header from "../../components/Header";
+import Navbar from "../../components/Navbar";
+import Footer from "../../components/Footer";
 import { colors } from "../../theme/color";
 import { fonts, fontsize } from "../../theme/typography";
 
@@ -30,6 +31,8 @@ export default function privacys(){
             
           </Text>
         </ScrollView>
+        {/* ---- FOOTER ---- */}
+        <Footer/>
       </View>
     </View>
   )
