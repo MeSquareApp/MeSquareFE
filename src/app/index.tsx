@@ -1,21 +1,80 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
-  StyleSheet, 
-  Text, 
-  View, 
-  TouchableOpacity, 
-  ActivityIndicator, 
-  Image 
+  StyleSheet,
+  Pressable,
+  Text,
+  View,
+  ActivityIndicator,
+  Image,
+  Platform,
 } from "react-native";
 import { colors } from "../theme/color";
 import { useAuth0 } from 'react-native-auth0';
 import { useRouter } from 'expo-router';
+import {
+  LogoutConfirmation,
+  useLogoutConfirmation,
+} from "../components/LogoutConfirmation";
+
+type AuthDestination = '/user/dashboard' | '/user/signUp';
+
+const AUTH_DESTINATION_KEY = 'mesquared.authDestination';
 
 export default function Index() {
-  const { authorize, user, isLoading } = useAuth0();
+  const {
+    authorize,
+    clearSession,
+    user,
+    isLoading,
+    error,
+  } = useAuth0();
+  const {
+    isVisible: isLogoutConfirmationVisible,
+    startLogout,
+    confirmLogout,
+    cancelLogout,
+  } = useLogoutConfirmation();
   const router = useRouter();
+  const [authDestination, setAuthDestination] =
+    useState<AuthDestination | null>(null);
+  const [activeAction, setActiveAction] = useState<
+    'login' | 'signup' | 'logout' | null
+  >(null);
+  const [message, setMessage] = useState('');
 
-  // If the user is loading, show a loading indicator
+  useEffect(() => {
+    if (isLoading) {
+      return;
+    }
+
+    let destination = authDestination;
+    if (Platform.OS === 'web') {
+      const storedDestination = window.sessionStorage.getItem(
+        AUTH_DESTINATION_KEY,
+      );
+      if (
+        storedDestination === '/user/dashboard' ||
+        storedDestination === '/user/signUp'
+      ) {
+        destination = storedDestination;
+      }
+    }
+
+    if (user && destination) {
+      if (Platform.OS === 'web') {
+        window.sessionStorage.removeItem(AUTH_DESTINATION_KEY);
+      }
+      router.replace(destination);
+      return;
+    }
+
+  }, [
+    authDestination,
+    isLoading,
+    router,
+    user,
+  ]);
+
   if (isLoading) {
     return (
       <View style={styles.center}>
@@ -26,23 +85,68 @@ export default function Index() {
 
   // Auth0 Trigger Handlers
   const handleLogin = async () => {
+    setActiveAction('login');
+    setMessage('');
+    cancelLogout();
+    setAuthDestination('/user/dashboard');
+    if (Platform.OS === 'web') {
+      window.sessionStorage.setItem(
+        AUTH_DESTINATION_KEY,
+        '/user/dashboard',
+      );
+    }
     try {
-      await authorize({ scope: 'openid profile email offline_access' });
-      router.replace("/user/dashboard");
+      await authorize({ scope: 'openid profile email' });
     } catch (e) {
+      if (Platform.OS === 'web') {
+        window.sessionStorage.removeItem(AUTH_DESTINATION_KEY);
+      }
+      setAuthDestination(null);
       console.error('Login Error:', e);
+      setMessage('Login failed. Please try again.');
+    } finally {
+      setActiveAction(null);
     }
   };
 
   const handleSignUp = async () => {
+    setActiveAction('signup');
+    setMessage('');
+    cancelLogout();
+    setAuthDestination('/user/signUp');
+    if (Platform.OS === 'web') {
+      window.sessionStorage.setItem(AUTH_DESTINATION_KEY, '/user/signUp');
+    }
     try {
       await authorize({
-        screen_hint: 'signup',
-        scope: 'openid profile email offline_access'
-      } as Parameters<typeof authorize>[0] & { screen_hint: string });
-      router.replace("/user/dashboard");
+        scope: 'openid profile email',
+        additionalParameters: { screen_hint: 'signup' },
+      });
     } catch (e) {
+      if (Platform.OS === 'web') {
+        window.sessionStorage.removeItem(AUTH_DESTINATION_KEY);
+      }
+      setAuthDestination(null);
       console.error('Sign Up Error:', e);
+      setMessage('Account sign-up failed. Please try again.');
+    } finally {
+      setActiveAction(null);
+    }
+  };
+
+  const handleLogout = async () => {
+    setActiveAction('logout');
+    setMessage('');
+    startLogout();
+    try {
+      await clearSession();
+      confirmLogout();
+    } catch (e) {
+      cancelLogout();
+      console.error('Logout Error:', e);
+      setMessage('Logout failed. Please try again.');
+    } finally {
+      setActiveAction(null);
     }
   };
 
@@ -55,35 +159,105 @@ export default function Index() {
           style={styles.logo}
           resizeMode="contain"
         />
-        <Text style={styles.appTitle}>Welcome</Text>
+        {!isLogoutConfirmationVisible && (
+          <Text style={styles.appTitle}>Welcome</Text>
+        )}
       </View>
 
       {/* 2. ACTION BUTTONS */}
       <View style={styles.buttonContainer}>
-        {user ? (
-          // If a session is active, let them choose to go back to their dashboard
-          <TouchableOpacity 
-            style={styles.loginButton} 
-            onPress={() => router.replace("/user/dashboard")}
-          >
-            <Text style={styles.loginButtonText}>Go to Dashboard</Text>
-          </TouchableOpacity>
+        {activeAction === 'logout' ? (
+          <View style={styles.logoutStatus}>
+            <ActivityIndicator color={colors.error} />
+            <Text style={styles.message}>Logging out...</Text>
+          </View>
+        ) : isLogoutConfirmationVisible ? (
+          <LogoutConfirmation />
         ) : (
           <>
-            {/* Log In Button */}
-            <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-              <Text style={styles.loginButtonText}>Log In</Text>
-            </TouchableOpacity>
-
-            {/* Sign Up Button */}
-            <TouchableOpacity style={styles.signUpButton} onPress={handleSignUp}>
-              <Text style={styles.signUpButtonText}>Create Account</Text>
-            </TouchableOpacity>
+            {message ? (
+              <Text style={styles.message}>{message}</Text>
+            ) : error &&
+              !activeAction &&
+              !user &&
+              hasPendingAuthDestination() ? (
+              <Text style={styles.message}>
+                Authentication failed. Please try again.
+              </Text>
+            ) : null}
+            {user ? (
+              <>
+                <Pressable
+                  style={({ hovered, pressed }) => [
+                    styles.loginButton,
+                    hovered && styles.loginButtonHover,
+                    pressed && styles.loginButtonPressed,
+                  ]}
+                  onPress={() => router.replace("/user/dashboard")}
+                  disabled={activeAction !== null}
+                >
+                  <Text style={styles.loginButtonText}>Go to Dashboard</Text>
+                </Pressable>
+                <Pressable
+                  style={({ hovered, pressed }) => [
+                    styles.logoutButton,
+                    hovered && styles.logoutButtonHover,
+                    pressed && styles.logoutButtonPressed,
+                  ]}
+                  onPress={handleLogout}
+                  disabled={activeAction !== null}
+                >
+                  <Text style={styles.logoutButtonText}>Log Out</Text>
+                </Pressable>
+              </>
+            ) : (
+              <>
+                <Pressable
+                  style={({ hovered, pressed }) => [
+                    styles.loginButton,
+                    hovered && styles.loginButtonHover,
+                    pressed && styles.loginButtonPressed,
+                  ]}    
+                  onPress={handleLogin}
+                  disabled={activeAction !== null}
+                >
+                  {activeAction === 'login' ? (
+                    <ActivityIndicator color="#FFFFFF" />
+                  ) : (
+                    <Text style={styles.loginButtonText}>Log In</Text>
+                  )}
+                </Pressable>
+                <Pressable
+                  style={({ hovered, pressed }) => [
+                    styles.signUpButton,
+                    hovered && styles.signUpButtonHover,
+                    pressed && styles.signUpButtonPressed,
+                  ]}
+                  onPress={handleSignUp}
+                  disabled={activeAction !== null}
+                >
+                  {activeAction === 'signup' ? (
+                    <ActivityIndicator color={colors.primary} />
+                  ) : (
+                    <Text style={styles.signUpButtonText}>Create Account</Text>
+                  )}
+                </Pressable>
+              </>
+            )}
           </>
         )}
       </View>
     </View>
   );
+}
+
+function hasPendingAuthDestination(): boolean {
+  if (Platform.OS !== 'web' || typeof window === 'undefined') {
+    return false;
+  }
+
+  const destination = window.sessionStorage.getItem(AUTH_DESTINATION_KEY);
+  return destination === '/user/dashboard' || destination === '/user/signUp';
 }
 
 const styles = StyleSheet.create({
@@ -120,28 +294,75 @@ const styles = StyleSheet.create({
     maxWidth: 320,
     gap: 12,
   },
+  message: {
+    color: colors.primary,
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  logoutStatus: {
+    alignItems: 'center',
+    gap: 12,
+  },
+
+  /* Login Button */
   loginButton: {
     backgroundColor: colors.primary,
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
   },
-  loginButtonText: {
+  loginButtonHover: {
+    backgroundColor: colors.secondary,
+  },
+  loginButtonPressed: {
+    opacity: 0.8,
+  },
+    loginButtonText: {
     color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
   },
+
+  /* Logout Button */
+  logoutButton: {
+    backgroundColor: '#E8F6FA',
+    paddingVertical: 14,
+    borderRadius: 8,
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: colors.error,
+  },
+  logoutButtonText: {
+    color: colors.error,
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  logoutButtonHover: {
+    backgroundColor: '#D1E7F0',
+  },
+  logoutButtonPressed: {
+    opacity: 0.5,
+  },
+
+  /* Sign Up Button */
   signUpButton: {
     backgroundColor: '#E8F6FA',
     paddingVertical: 14,
     borderRadius: 8,
     alignItems: 'center',
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: colors.primary,
   },
   signUpButtonText: {
     color: colors.primary,
     fontSize: 16,
     fontWeight: '600',
+    opacity: 1
+  },
+  signUpButtonHover: {
+    backgroundColor: '#D1E7F0',
+  },
+  signUpButtonPressed: {
+    opacity: 0.5,
   },
 });

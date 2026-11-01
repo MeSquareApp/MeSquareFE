@@ -1,7 +1,19 @@
-const API_BASE_URL = "http://localhost:8000";
+const requiredEnv = (name: string, value: string | undefined): string => {
+    if (!value) {
+        throw new Error(`Missing ${name}. Add it to the frontend .env.local file.`);
+    }
+    return value;
+};
 
-// test user jane doe for initial data integration
-export const TEST_USER_ID = "550e8400-e29b-41d4-a716-446655440000";
+const API_BASE_URL = requiredEnv(
+    "EXPO_PUBLIC_API_BASE_URL",
+    process.env.EXPO_PUBLIC_API_BASE_URL
+);
+
+export const API_AUDIENCE = requiredEnv(
+    "EXPO_PUBLIC_AUTH0_AUDIENCE",
+    process.env.EXPO_PUBLIC_AUTH0_AUDIENCE
+);
 
 export type Biomarker = {
     id: string;
@@ -12,12 +24,12 @@ export type Biomarker = {
     measured_at: string;
 };
 
-export async function getBiomarkers(
-    userId: string = TEST_USER_ID
-): Promise<Biomarker[]> {
-    const response = await fetch(
-        `${API_BASE_URL}/patients/${userId}/biomarkers`
-    );
+export async function getBiomarkers(accessToken: string): Promise<Biomarker[]> {
+    const response = await fetch(`${API_BASE_URL}/patients/me/biomarkers`, {
+        headers: {
+            Authorization: `Bearer ${accessToken}`,
+        },
+    });
 
     if (!response.ok) {
         throw new Error(`Failed to fetch biomarker data: ${response.status}`);

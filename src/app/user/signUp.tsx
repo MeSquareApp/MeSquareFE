@@ -114,7 +114,7 @@ export default function SignUp() {
     }
     Alert.alert("Account created", "Welcome!");
     showAlert("Account created", "Welcome!");
-    router.replace("../pages/dashboard");
+    router.replace("/user/dashboard");
   }
 
   return (

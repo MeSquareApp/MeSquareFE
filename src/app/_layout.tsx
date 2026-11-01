@@ -5,7 +5,28 @@ import {
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import { Auth0Provider } from 'react-native-auth0';
-import { Slot } from 'expo-router';
+import { Platform } from "react-native";
+import { LogoutConfirmationProvider } from "../components/LogoutConfirmation";
+
+const auth0Domain = process.env.EXPO_PUBLIC_AUTH0_DOMAIN;
+const auth0ClientId = process.env.EXPO_PUBLIC_AUTH0_CLIENT_ID;
+
+if (!auth0Domain || !auth0ClientId) {
+  throw new Error(
+    "Set EXPO_PUBLIC_AUTH0_DOMAIN and EXPO_PUBLIC_AUTH0_CLIENT_ID in MeSquareFE/.env.local.",
+  );
+}
+
+const auth0Options = {
+  domain: auth0Domain,
+  clientId: auth0ClientId,
+  useDPoP: false,
+  ...(Platform.OS === "web"
+    ? {
+        cacheLocation: "localstorage" as const,
+      }
+    : {}),
+};
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
@@ -22,11 +43,10 @@ export default function RootLayout() {
   }
 
   return (
-    <Auth0Provider 
-      domain="dev-tk23yhyc2e62i1a5.us.auth0.com" 
-      clientId="Y74WzKfMPGoPgePKQvPgVYZmpAeKfVyP"
-    >
-      <Stack screenOptions={{ headerShown: false }} />
+    <Auth0Provider {...auth0Options}>
+      <LogoutConfirmationProvider>
+        <Stack screenOptions={{ headerShown: false }} />
+      </LogoutConfirmationProvider>
     </Auth0Provider>
   );
 }

@@ -6,6 +6,7 @@ import {
   Image,
   Pressable,
   ScrollView,
+  Platform,
   StyleSheet,
   Text,
   View,
@@ -13,10 +14,15 @@ import {
 import MetricCard from "../../components/MetricCard";
 import { colors } from "../../theme/color";
 import { fonts, fontsize } from "../../theme/typography";
-import { getBiomarkers, type Biomarker } from "@/services/api"
+import {
+  API_AUDIENCE,
+  getBiomarkers,
+  type Biomarker,
+} from "@/services/api";
 import { useEffect, useState } from "react";
 import { useAuth0 } from 'react-native-auth0';
 import { useRouter } from 'expo-router';
+import { useLogoutConfirmation } from "../../components/LogoutConfirmation";
 
 export default function Dashboard() {
   const twinStats = [
@@ -27,41 +33,60 @@ export default function Dashboard() {
   ];
 
   // Logout constants
-  const { clearSession } = useAuth0();
+  const { clearSession, getApiCredentials } = useAuth0();
+  const { startLogout, confirmLogout, cancelLogout } = useLogoutConfirmation();
   const router = useRouter();
 
   // get patient data from database
   const [rhr, setRhr] = useState<Biomarker | null>(null);
+  const [apiConnectionStatus, setApiConnectionStatus] = useState<
+    "checking" | "connected" | "failed"
+  >("checking");
 
 // Logout function for Web & Native
   const handleLogout = async () => {
+    startLogout();
     try {
-      // Pass returnTo on web so Auth0 knows exactly where to drop the browser back
-      await clearSession({ returnTo: window.location.origin } as any);
+      await clearSession(
+        Platform.OS === "web"
+          ? { returnToUrl: window.location.origin }
+          : undefined,
+      );
+      confirmLogout();
+      router.replace("/");
     } catch (error) {
+      cancelLogout();
       console.error('Logout failed:', error);
     }
   };
 
     useEffect(() => {
-        // load biomarkers from backend
+        let isCurrent = true;
+
         async function loadBiomarkers() {
             try {
-            const data = await getBiomarkers();
-
-            // find resting heart rate in the biomarker data
-            const restingHeartRate = data.find(
-                (item) => item.biomarker_abbr === "RHR"
-            );
-
-            setRhr(restingHeartRate ?? null);
-            } catch (err) {
-            console.error("Failed to load biomarkers:", err);
+                const credentials = await getApiCredentials(API_AUDIENCE);
+                const data = await getBiomarkers(credentials.accessToken);
+                if (isCurrent) {
+                    setApiConnectionStatus("connected");
+                    const restingHeartRate = data.find(
+                      (item) => item.biomarker_abbr === "RHR"
+                    );
+                    setRhr(restingHeartRate ?? null);
+                }
+            } catch (error) {
+                console.error("Failed to load authenticated patient biomarkers:", error);
+                if (isCurrent) {
+                    setApiConnectionStatus("failed");
+                }
             }
         }
 
-        loadBiomarkers();
-        }, []);
+        void loadBiomarkers();
+        return () => {
+          isCurrent = false;
+        };
+        }, [getApiCredentials]);
   return (
     <View style={styles.container}>
       {/* ----- NAVBAR ----- */}
@@ -109,7 +134,13 @@ export default function Dashboard() {
 
           {/* user profile */}
           <View style={styles.profileContainer}>
-            <Text style={styles.profileName}>John Doe</Text>
+            <Text style={styles.profileName}>
+              {apiConnectionStatus === "checking"
+                ? "Checking API..."
+                : apiConnectionStatus === "connected"
+                  ? "API connected"
+                  : "API connection failed"}
+            </Text>
             <Ionicons name="person-circle-outline" size={30} color="#666666" />
           </View>
         </View>

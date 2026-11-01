@@ -10,8 +10,21 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
    npm install
    npx expo install react-native-auth0
    ```
+2. Create an .env.local file in project root with the following inside:
 
-2. Start the app
+EXPO_PUBLIC_AUTH0_DOMAIN=dev-tk23yhyc2e62i1a5.us.auth0.com
+EXPO_PUBLIC_AUTH0_CLIENT_ID=Y74WzKfMPGoPgePKQvPgVYZmpAeKfVyP
+EXPO_PUBLIC_AUTH0_AUDIENCE=https://mesquared-api-endpoint
+EXPO_PUBLIC_API_BASE_URL=http://localhost:8000
+
+The audience must match `AUTH0_AUDIENCE` in the backend configuration. The
+dashboard requests an API access token and fetches `/patients/me/biomarkers`;
+the API resolves the patient from the verified token rather than accepting a
+user ID from the app. Before this works, the backend database must have the
+Auth0 mapping columns and the signed-in Auth0 issuer/subject must be linked to
+an existing MeSquared patient account.
+
+3. Start the app
 
    ```bash
    npx expo start
