@@ -26,6 +26,7 @@ export default function disclaimers(){
           <Text style={styles.dateUpdated}>Last Updated 10/31/2026</Text>
 
           {/* ---- WEBSITE ---- */}
+          {/* created using Termly */}
           <Text style={styles.disclaimerSubHeader}>WEBSITE DISCLAIMER</Text>
           <Text style={styles.disclaimerBody}>
             The information provided by [REPLACE WITH COMPANY NAME] ("we," "us," or "our") on http://mesquared.com 
@@ -39,34 +40,21 @@ export default function disclaimers(){
 
 
           {/* ---- USER SERVICE ---- */}
-          <Text style={styles.disclaimerSubHeader}>USER SERVICE DISCLAIMER</Text>
+          <Text style={styles.disclaimerSubHeader}>USER-SERVICE DISCLAIMER</Text>
           <Text style={styles.disclaimerBody}>
-            Me² is a health information and digital twin platform designed
-            to help users better understand and monitor their health through personalized
-            data analysis, health trends, and predictive insights. By using this service, you
-            acknowledge that Me² does not establish a physician-patient relationship between you
-            and the platform or its developers.
-            {"\n"}
-            The information, forecasts, and recommendations provided by Me² are intended for informational
-            and educational purposes only and should not be considered medical advice, diagnosis, or treatment.
-            The platform is not a substitute for consultation with a qualified healthcare professional.
-            Users should consult their healthcare provider before making medical decisions or changes
-            to their health routines, medications, or treatment plans.
-            {"\n"}
-            By continuing to use Me², you acknowledge that health predictions and projections are estimates
-            based on available data and may not accurately reflect future health outcomes.
-            You remain responsible for decisions regarding your health and medical care.
+           user-service disclaimer goes here
           </Text>
 
-          {/* ---- PROFESSIONAL ---- */}
-          <Text style={styles.disclaimerSubHeader}>PROFESSIONAL DISCLAIMER</Text>
+          {/* ---- MEDICAL ADVICE ---- */}
+          <Text style={styles.disclaimerSubHeader}>MEDICAL ADVICE DISCLAIMER</Text>
           <Text style={styles.disclaimerBody}>
-            The Site cannot and does not contain medical/health advice. The medical/health 
-            information is provided for general informational and educational purposes only 
-            and is not a substitute for professional advice. Accordingly, before taking any 
-            actions based upon such information, we encourage you to consult with the appropriate 
-            professionals. We do not provide any kind of medical/health advice. THE USE OR 
-            RELIANCE OF ANY INFORMATION CONTAINED ON THE SITE IS SOLELY AT YOUR OWN RISK.
+            medical advice disclaimer goes here
+          </Text>
+
+          {/* ---- EMERGENCY SERVICES ---- */}
+          <Text style={styles.disclaimerSubHeader}>EMERGENCY SERVICES DISCLAIMER</Text>
+          <Text style={styles.disclaimerBody}>
+            emergency services disclaimer goes here
           </Text>
         </ScrollView>
       </View>
@@ -91,8 +79,9 @@ const styles = StyleSheet.create({
   },
   disclaimerHeader:{
     fontFamily: fonts.bold,
-    fontSize: fontsize.xl,
+    fontSize: fontsize.xxl,
     paddingBottom: 10,
+    letterSpacing: 1,
   },
   dateUpdated: {
     color: colors.gray3,
@@ -100,12 +89,12 @@ const styles = StyleSheet.create({
   },
   disclaimerSubHeader:{
     fontFamily: fonts.bold,
-    fontSize: fontsize.xl,
+    fontSize: fontsize.lg,
     paddingBottom: 5,
   },
   disclaimerBody:{
     fontFamily: fonts.regular,
-    fontSize: fontsize.lg,
+    fontSize: fontsize.md,
     paddingBottom: 10,
     color: colors.gray2,
   },
