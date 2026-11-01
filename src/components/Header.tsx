@@ -58,10 +58,10 @@ const styles = StyleSheet.create ({
         paddingHorizontal: Dimensions.get("window").width * 0.01,
       },
       headerTitle: {
-        fontFamily: fonts.bold,
+        fontFamily: fonts.regular,
         fontSize: fontsize.lg,
         fontWeight: "700",
-        color: colors.black1,
+        color: colors.black2,
       },
       profileContainer: {
         flexDirection: "row",
