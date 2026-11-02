@@ -10,10 +10,17 @@ import { LogoutConfirmationProvider } from "../components/LogoutConfirmation";
 
 const auth0Domain = process.env.EXPO_PUBLIC_AUTH0_DOMAIN;
 const auth0ClientId = process.env.EXPO_PUBLIC_AUTH0_CLIENT_ID;
+const auth0Audience = process.env.EXPO_PUBLIC_AUTH0_AUDIENCE;
 
 if (!auth0Domain || !auth0ClientId) {
   throw new Error(
     "Set EXPO_PUBLIC_AUTH0_DOMAIN and EXPO_PUBLIC_AUTH0_CLIENT_ID in MeSquareFE/.env.local.",
+  );
+}
+
+if (Platform.OS === "web" && !auth0Audience) {
+  throw new Error(
+    "Set EXPO_PUBLIC_AUTH0_AUDIENCE in MeSquareFE/.env.local.",
   );
 }
 
@@ -24,6 +31,8 @@ const auth0Options = {
   ...(Platform.OS === "web"
     ? {
         cacheLocation: "localstorage" as const,
+        audience: auth0Audience,
+        scope: "openid profile email",
       }
     : {}),
 };

@@ -16,8 +16,10 @@ import { colors } from "../../theme/color";
 import { fonts, fontsize } from "../../theme/typography";
 import {
   API_AUDIENCE,
+  getCurrentUser,
   getBiomarkers,
   type Biomarker,
+  type UserProfile,
 } from "@/services/api";
 import { useEffect, useState } from "react";
 import { useAuth0 } from 'react-native-auth0';
@@ -39,9 +41,18 @@ export default function Dashboard() {
 
   // get patient data from database
   const [rhr, setRhr] = useState<Biomarker | null>(null);
-  const [apiConnectionStatus, setApiConnectionStatus] = useState<
-    "checking" | "connected" | "failed"
-  >("checking");
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
+  const [profileStatus, setProfileStatus] = useState<
+    "loading" | "ready" | "failed"
+  >("loading");
+  const profileName =
+    profileStatus === "loading"
+      ? "Loading profile..."
+      : profileStatus === "failed"
+        ? "Profile unavailable"
+        : [currentUser?.first_name, currentUser?.last_name]
+            .filter(Boolean)
+            .join(" ") || "User";
 
 // Logout function for Web & Native
   const handleLogout = async () => {
@@ -63,26 +74,49 @@ export default function Dashboard() {
     useEffect(() => {
         let isCurrent = true;
 
-        async function loadBiomarkers() {
+        async function loadDashboardData() {
+            let accessToken: string;
             try {
                 const credentials = await getApiCredentials(API_AUDIENCE);
-                const data = await getBiomarkers(credentials.accessToken);
-                if (isCurrent) {
-                    setApiConnectionStatus("connected");
-                    const restingHeartRate = data.find(
-                      (item) => item.biomarker_abbr === "RHR"
-                    );
-                    setRhr(restingHeartRate ?? null);
-                }
+                accessToken = credentials.accessToken;
             } catch (error) {
-                console.error("Failed to load authenticated patient biomarkers:", error);
                 if (isCurrent) {
-                    setApiConnectionStatus("failed");
+                    setProfileStatus("failed");
                 }
+                console.error("Failed to get an API token for dashboard data:", error);
+                return;
+            }
+
+            const [userResult, biomarkerResult] = await Promise.allSettled([
+                getCurrentUser(accessToken),
+                getBiomarkers(accessToken),
+            ]);
+            if (!isCurrent) {
+                return;
+            }
+
+            if (userResult.status === "fulfilled") {
+                setCurrentUser(userResult.value);
+                setProfileStatus("ready");
+            } else {
+                setProfileStatus("failed");
+                console.error("Failed to load authenticated MeSquared user:", userResult.reason);
+            }
+
+            if (biomarkerResult.status === "fulfilled") {
+                const restingHeartRate = biomarkerResult.value.find(
+                  (item) => item.biomarker_abbr === "RHR"
+                );
+                setRhr(restingHeartRate ?? null);
+            } else {
+                console.error(
+                  "Failed to load authenticated patient biomarkers:",
+                  biomarkerResult.reason,
+                );
             }
         }
 
-        void loadBiomarkers();
+        void loadDashboardData();
         return () => {
           isCurrent = false;
         };
@@ -134,13 +168,7 @@ export default function Dashboard() {
 
           {/* user profile */}
           <View style={styles.profileContainer}>
-            <Text style={styles.profileName}>
-              {apiConnectionStatus === "checking"
-                ? "Checking API..."
-                : apiConnectionStatus === "connected"
-                  ? "API connected"
-                  : "API connection failed"}
-            </Text>
+            <Text style={styles.profileName}>{profileName}</Text>
             <Ionicons name="person-circle-outline" size={30} color="#666666" />
           </View>
         </View>

@@ -15,6 +15,7 @@ import {
   LogoutConfirmation,
   useLogoutConfirmation,
 } from "../components/LogoutConfirmation";
+import { API_AUDIENCE } from "@/services/api";
 
 type AuthDestination = '/user/dashboard' | '/user/signUp';
 
@@ -96,7 +97,10 @@ export default function Index() {
       );
     }
     try {
-      await authorize({ scope: 'openid profile email' });
+      await authorize({
+        audience: API_AUDIENCE,
+        scope: 'openid profile email',
+      });
     } catch (e) {
       if (Platform.OS === 'web') {
         window.sessionStorage.removeItem(AUTH_DESTINATION_KEY);
@@ -118,10 +122,14 @@ export default function Index() {
       window.sessionStorage.setItem(AUTH_DESTINATION_KEY, '/user/signUp');
     }
     try {
-      await authorize({
+      const signupParameters = {
+        audience: API_AUDIENCE,
         scope: 'openid profile email',
-        additionalParameters: { screen_hint: 'signup' },
-      });
+        ...(Platform.OS === 'web'
+          ? { screen_hint: 'signup' }
+          : { additionalParameters: { screen_hint: 'signup' } }),
+      };
+      await authorize(signupParameters);
     } catch (e) {
       if (Platform.OS === 'web') {
         window.sessionStorage.removeItem(AUTH_DESTINATION_KEY);

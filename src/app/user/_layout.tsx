@@ -4,6 +4,12 @@ import { Stack, useRouter } from 'expo-router';
 import { useAuth0 } from 'react-native-auth0';
 import { colors } from "../../theme/color";
 
+/* 
+  If Khanh or Sy see this: yes this method of kicking out non-auth'd users
+  is still safe as for any private user data to appear, they must be called
+  using jwt's anyways. Using 'user' from Auth0 is fine to handle page guarding.
+*/
+
 export default function UserLayout() {
   const { user, isLoading } = useAuth0();
   const router = useRouter();
