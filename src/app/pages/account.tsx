@@ -115,13 +115,15 @@ export default function AccountInfo() {
           <Footer />
 
           {/* Floating Action Button (Chat) */}
-          <TouchableOpacity
-            style={styles.fab}
-            activeOpacity={0.8}
-            onPress={() => setIsChatOpen(true)}
-          >
-            <MessageCircle size={28} color={colors.background} />
-          </TouchableOpacity>
+          {!isChatOpen && (
+            <TouchableOpacity
+              style={styles.fab}
+              activeOpacity={0.8}
+              onPress={() => setIsChatOpen(true)}
+            >
+              <MessageCircle size={28} color={colors.background} />
+            </TouchableOpacity>
+          )}
         </View>
       </View>
 
@@ -292,8 +294,10 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)", // Semi-transparent backdrop
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: "transparent",
+    justifyContent: "flex-end",
+    alignItems: "flex-end",
+    paddingBottom: 24,
+    paddingRight: 24,
   },
 });

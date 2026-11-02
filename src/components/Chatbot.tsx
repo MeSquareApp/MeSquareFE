@@ -169,24 +169,22 @@ export default function Chatbot({ onClose }: { onClose: () => void }) {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    alignItems: "flex-end",
     width: "100%",
   },
   outerFrame: {
-    width: "90%",
-    maxWidth: 400,
-    height: "75%", // Changed to % to fit better in modals on different screens
-    maxHeight: 650,
+    // width: 350,
+    // height: 500,
+    width: "26%",
+    height: "100%",
     backgroundColor: colors.primary,
     borderRadius: 30,
     padding: 16,
     shadowColor: colors.black1,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.4,
+    shadowRadius: 10,
+    elevation: 10,
   },
   headerRow: {
     flexDirection: "row",
