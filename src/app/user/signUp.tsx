@@ -2,6 +2,7 @@ import { Picker } from "@react-native-picker/picker";
 import { Stack, useRouter } from "expo-router";
 import { useState } from "react";
 import {
+  Alert,
   Image,
   Platform,
   Pressable,
@@ -42,6 +43,16 @@ export default function SignUp() {
   const maxDobString = `${maxDob.getFullYear()}-${String(maxDob.getMonth() + 1).padStart(2, "0")}-${String(maxDob.getDate()).padStart(2, "0")}`;
 
   const isPatient = role === "Patient";
+
+    //helper function to show alerts for web and iOS/Android platforms
+  function showAlert(title: string, message?: string) {
+    if (Platform.OS === "web") {
+      // Browser's native dialog — blocking, but it works
+      window.alert(message ? `${title}\n\n${message}` : title);
+    } else {
+      Alert.alert(title, message);
+    }
+  }
 
   async function handleSignUp(): Promise<void> {
     const normalizedFirstName = firstName.trim();

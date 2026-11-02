@@ -3,21 +3,17 @@ import TwinStatBox from "@/components/TwinStatBox";
 import {
   Dimensions,
   Image,
-  Pressable,
   ScrollView,
-  Platform,
   StyleSheet,
   Text,
   View,
 } from "react-native";
 import { colors } from "../../theme/color";
-import { fonts, fontsize } from "../../theme/typography";
+import { fonts } from "../../theme/typography";
 import {
   API_AUDIENCE,
-  getCurrentUser,
   getBiomarkers,
   type Biomarker,
-  type UserProfile,
 } from "@/services/api";
 import { useEffect, useState } from "react";
 import MetricCard from "../../components/MetricCard";
@@ -25,8 +21,6 @@ import Navbar     from "../../components/Navbar";
 import Header     from "../../components/Header";
 import Footer     from "../../components/Footer"
 import { useAuth0 } from 'react-native-auth0';
-import { useRouter } from 'expo-router';
-import { useLogoutConfirmation } from "../../components/LogoutConfirmation";
 
 export default function Dashboard() {
   const twinStats = [
@@ -36,89 +30,30 @@ export default function Dashboard() {
     { label: "Weight", value: 180, color: colors.secondary },
   ];
 
-  // Logout constants
-  const { clearSession, getApiCredentials } = useAuth0();
-  const { startLogout, confirmLogout, cancelLogout } = useLogoutConfirmation();
-  const router = useRouter();
+  const { getApiCredentials } = useAuth0();
 
   // get patient data from database
   const [rhr, setRhr] = useState<Biomarker | null>(null);
-  const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
-  const [profileStatus, setProfileStatus] = useState<
-    "loading" | "ready" | "failed"
-  >("loading");
-  const profileName =
-    profileStatus === "loading"
-      ? "Loading profile..."
-      : profileStatus === "failed"
-        ? "Profile unavailable"
-        : [currentUser?.first_name, currentUser?.last_name]
-            .filter(Boolean)
-            .join(" ") || "User";
-
-// Logout function for Web & Native
-  const handleLogout = async () => {
-    startLogout();
-    try {
-      await clearSession(
-        Platform.OS === "web"
-          ? { returnToUrl: window.location.origin }
-          : undefined,
-      );
-      confirmLogout();
-      router.replace("/");
-    } catch (error) {
-      cancelLogout();
-      console.error('Logout failed:', error);
-    }
-  };
 
     useEffect(() => {
         let isCurrent = true;
 
-        async function loadDashboardData() {
-            let accessToken: string;
+        async function loadBiomarkers() {
             try {
                 const credentials = await getApiCredentials(API_AUDIENCE);
-                accessToken = credentials.accessToken;
-            } catch (error) {
+                const data = await getBiomarkers(credentials.accessToken);
                 if (isCurrent) {
-                    setProfileStatus("failed");
+                    const restingHeartRate = data.find(
+                      (item) => item.biomarker_abbr === "RHR"
+                    );
+                    setRhr(restingHeartRate ?? null);
                 }
-                console.error("Failed to get an API token for dashboard data:", error);
-                return;
-            }
-
-            const [userResult, biomarkerResult] = await Promise.allSettled([
-                getCurrentUser(accessToken),
-                getBiomarkers(accessToken),
-            ]);
-            if (!isCurrent) {
-                return;
-            }
-
-            if (userResult.status === "fulfilled") {
-                setCurrentUser(userResult.value);
-                setProfileStatus("ready");
-            } else {
-                setProfileStatus("failed");
-                console.error("Failed to load authenticated MeSquared user:", userResult.reason);
-            }
-
-            if (biomarkerResult.status === "fulfilled") {
-                const restingHeartRate = biomarkerResult.value.find(
-                  (item) => item.biomarker_abbr === "RHR"
-                );
-                setRhr(restingHeartRate ?? null);
-            } else {
-                console.error(
-                  "Failed to load authenticated patient biomarkers:",
-                  biomarkerResult.reason,
-                );
+            } catch (error) {
+                console.error("Failed to load authenticated patient biomarkers:", error);
             }
         }
 
-        void loadDashboardData();
+        void loadBiomarkers();
         return () => {
           isCurrent = false;
         };
@@ -127,59 +62,10 @@ export default function Dashboard() {
     <View style={styles.container}>
       {/* ----- NAVBAR ----- */}
       <Navbar />
-      /*
-      <View style={styles.navbar}>
-        {/* logo */}
-        <View style={styles.logoContainer}>
-          <Image
-            source={require("../../../assets/images/me2-logo.png")}
-            style={styles.logo}
-          />
-        </View>
-
-        {/* nav items */}
-        <View style={styles.navItems}>
-          {/* dashboard */}
-          <Pressable style={[styles.navItem, styles.activeNavItem]}>
-            <Ionicons name="grid" size={25} color="#FFFFFF" />
-          </Pressable>
-
-          {/* data log */}
-          <Pressable style={styles.navItem}>
-            <Ionicons name="analytics-outline" size={22} color={colors.gray3} />
-          </Pressable>
-
-          {/* forecasting */}
-          <Pressable style={styles.navItem}>
-            <Ionicons name="bar-chart-outline" size={22} color={colors.gray3} />
-          </Pressable>
-
-          {/* account settings */}
-          <Pressable style={styles.navItem}>
-            <Ionicons name="settings-outline" size={22} color={colors.gray3} />
-          </Pressable>
-          {/* sign out */}
-          <Pressable style={styles.navItem} onPress={handleLogout}>
-            <Ionicons name="log-out-outline" size={22} color={colors.error} />
-          </Pressable>
-          */
-        </View>
-      </View>
 
       <View style={styles.nonNavContent}>
         {/* ---- HEADER ---- */}
         <Header />
-        /*
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Dashboard</Text>
-
-          {/* user profile */}
-          <View style={styles.profileContainer}>
-            <Text style={styles.profileName}>{profileName}</Text>
-            <Ionicons name="person-circle-outline" size={30} color="#666666" />
-          </View>
-        </View>
-        */
 
         {/* ---- MAIN CONTENT ---- */}
         <View style={styles.mainContent}>
@@ -395,71 +281,6 @@ const styles = StyleSheet.create({
   },
   nonNavContent: {
     flex: 1,
-  },
-
-  // ---- NAVBAR ----
-  navbar: {
-    width: Dimensions.get("window").width * 0.07,
-    backgroundColor: colors.background,
-    borderRightWidth: 1,
-    borderRightColor: colors.gray5,
-    alignItems: "center",
-    paddingTop: 20,
-  },
-  logoContainer: {
-    width: Dimensions.get("window").width * 0.05,
-    height: Dimensions.get("window").width * 0.05,
-    borderWidth: 1,
-    borderColor: colors.gray5,
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  logo: {
-    width: Dimensions.get("window").width * 0.03,
-    height: Dimensions.get("window").width * 0.03,
-  },
-  navItems: {
-    marginTop: 80,
-    alignItems: "center",
-    gap: 25,
-  },
-  navItem: {
-    width: Dimensions.get("window").width * 0.03,
-    height: Dimensions.get("window").width * 0.03,
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  activeNavItem: {
-    backgroundColor: colors.primary,
-  },
-
-  // ---- HEADER ----
-  header: {
-    height: Dimensions.get("window").height * 0.1,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.gray5,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: Dimensions.get("window").width * 0.05,
-  },
-  headerTitle: {
-    fontFamily: fonts.bold,
-    fontSize: fontsize.lg,
-    fontWeight: "700",
-    color: colors.black1,
-  },
-  profileContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: Dimensions.get("window").width * 0.01,
-  },
-  profileName: {
-    fontFamily: fonts.regular,
-    fontSize: fontsize.md,
-    color: colors.black1,
   },
 
   // ---- MAIN CONTENT ----

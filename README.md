@@ -8,7 +8,6 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
 
    ```bash
    npm install
-   npx expo install react-native-auth0
    ```
 2. Create an .env.local file in project root with the following inside:
 

@@ -6,10 +6,13 @@ import {
     StyleSheet,
     Dimensions,
     Image,
-    Pressable
+    Pressable,
+    Platform,
 } from "react-native";
 import { Ionicons } from "@react-native-vector-icons/ionicons";
 import { useRouter, usePathname } from "expo-router";
+import { useAuth0 } from "react-native-auth0";
+import { useLogoutConfirmation } from "@/components/LogoutConfirmation";
 
 interface NavItemProps {
     label: string;
@@ -55,6 +58,24 @@ function NavItem({ label, iconName, active, onPress } : NavItemProps) {
 export default function Navbar() {
     const router = useRouter();
     const pathname = usePathname();
+    const { clearSession } = useAuth0();
+    const { startLogout, confirmLogout, cancelLogout } = useLogoutConfirmation();
+
+    async function handleLogout() {
+      startLogout();
+      try {
+        await clearSession(
+          Platform.OS === "web"
+            ? { returnToUrl: window.location.origin }
+            : undefined,
+        );
+        confirmLogout();
+        router.replace("/");
+      } catch (error) {
+        cancelLogout();
+        console.error("Logout failed:", error);
+      }
+    }
 
     return (
       <View style={styles.navbar}>
@@ -72,29 +93,36 @@ export default function Navbar() {
           <NavItem
             label=    "Dashboard"
             iconName= "grid"
-            active=   {pathname === "/pages/dashboard"}
-            onPress=  {() => router.push("../pages/dashboard")}
+            active=   {pathname === "/user/dashboard"}
+            onPress=  {() => router.push("/user/dashboard")}
           />
 
           <NavItem
             label=    "Data Upload"
             iconName= "analytics-outline"
-            active=   {pathname === "/pages/dataUpload"}
-            onPress=  {() => router.push("../pages/dataUpload")}
+            active=   {pathname === "/user/dataUpload"}
+            onPress=  {() => router.push("/user/dataUpload")}
           />
 
           <NavItem
             label=    "Forecasting"
             iconName= "bar-chart-outline"
-            active=   {pathname === "/pages/forecasting"}
-            onPress=  {() => router.push("../pages/forecasting")}
+            active=   {pathname === "/user/forecasting"}
+            onPress=  {() => router.push("/user/forecasting")}
           />
 
           <NavItem
             label=    "Account Settings"
             iconName= "settings-outline"
-            active=   {pathname === "/pages/account"}
-            onPress=  {() => router.push("../pages/account")}
+            active=   {pathname === "/user/account"}
+            onPress=  {() => router.push("/user/account")}
+          />
+
+          <NavItem
+            label="Sign out"
+            iconName="log-out-outline"
+            active={false}
+            onPress={handleLogout}
           />
 
         </View>

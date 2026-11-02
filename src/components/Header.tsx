@@ -1,49 +1,65 @@
 import { colors } from "@/theme/color";
 import { fonts, fontsize } from "@/theme/typography";
-import { View, Text, StyleSheet, Dimensions, Image, Pressable } from "react-native";
+import { View, Text, StyleSheet, Dimensions, Pressable } from "react-native";
 import { Ionicons } from "@react-native-vector-icons/ionicons";
 import { useEffect, useState } from "react";
-import { getPatientProfile, type PatientProfile } from "@/services/api"
+import { API_AUDIENCE, getCurrentUser } from "@/services/api";
+import { useAuth0 } from "react-native-auth0";
 import { useRouter, usePathname } from "expo-router";
 
-export default function Header(){
-
-    const router   = useRouter();
+export default function Header() {
+    const router = useRouter();
     const pathname = usePathname();
-    const cleanPathname = pathname.substring(pathname.lastIndexOf('/') + 1).toUpperCase().replace('-', ' ')
-    const [firstName, setFirstName] = useState("");
-    const [lastName, setLastName]   = useState("");
+    const { getApiCredentials } = useAuth0();
+    const cleanPathname = pathname
+        .substring(pathname.lastIndexOf("/") + 1)
+        .toUpperCase()
+        .replace("-", " ");
+    const [profileName, setProfileName] = useState("Loading profile...");
 
     useEffect(() => {
-        async function loadPatientName() {
+        let isCurrent = true;
+
+        async function loadCurrentUser() {
             try {
-                const data = await getPatientProfile();
-
-                setFirstName(data.user.first_name ?? "");
-                setLastName(data.user.last_name ?? "");
-
-            } catch (err) {
-                console.error("Failed to load patient name:", err);
+                const credentials = await getApiCredentials(API_AUDIENCE);
+                const user = await getCurrentUser(credentials.accessToken);
+                if (isCurrent) {
+                    setProfileName(
+                        [user.first_name, user.last_name].filter(Boolean).join(" ") ||
+                            "User",
+                    );
+                }
+            } catch (error) {
+                console.error("Failed to load authenticated MeSquared user:", error);
+                if (isCurrent) {
+                    setProfileName("Profile unavailable");
+                }
             }
         }
 
-        loadPatientName();
-    }, []);
+        void loadCurrentUser();
+        return () => {
+            isCurrent = false;
+        };
+    }, [getApiCredentials]);
 
     return (
         <View style={styles.header}>
             <Text style={styles.headerTitle}>{cleanPathname}</Text>
-        
+
             {/* user profile */}
-            <Pressable onPress={() => router.push("../pages/account")} accessibilityLabel="Account">
+            <Pressable
+                onPress={() => router.push("/user/account")}
+                accessibilityLabel="Account"
+            >
                 <View style={styles.profileContainer}>
-                    <Text style={styles.profileName}>{firstName || "Patient"} {lastName}</Text>
+                    <Text style={styles.profileName}>{profileName}</Text>
                     <Ionicons name="person-circle-outline" size={30} color="#666666" />
                 </View>
             </Pressable>
         </View>
     );
-
 }
 
 const styles = StyleSheet.create ({
