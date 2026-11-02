@@ -10,7 +10,7 @@ export default function Header(){
 
     const router   = useRouter();
     const pathname = usePathname();
-    const cleanPathname = pathname.substring(pathname.lastIndexOf('/') + 1).toUpperCase().replace('-', ' ')
+    const cleanPathname = pathname.substring(pathname.lastIndexOf('/') + 1).toUpperCase().replaceAll('-', ' ')
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName]   = useState("");
 
