@@ -15,7 +15,6 @@ import Chatbot from "../../components/Chatbot";
 import Footer from "../../components/Footer";
 import Header from "../../components/Header";
 import Navbar from "../../components/Navbar";
-import Footer from "../../components/Footer";
 
 export default function AccountInfo() {
   const [isSyncEnabled, setIsSyncEnabled] = useState(false);
@@ -43,7 +42,7 @@ export default function AccountInfo() {
         <Navbar />
 
         <View style={styles.contentColumn}>
-          <Header/>
+          <Header />
 
           <ScrollView
             style={styles.scroll}
@@ -110,11 +109,10 @@ export default function AccountInfo() {
                 </View>
               </View>
             </View>
-
           </ScrollView>
 
           {/* Footer */}
-          <Footer/>
+          <Footer />
 
           {/* Floating Action Button (Chat) */}
           {!isChatOpen && (
