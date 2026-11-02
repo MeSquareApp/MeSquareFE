@@ -19,7 +19,7 @@ export default function Footer(){
           <Pressable>
             <Text style={styles.footerLink}>HELP</Text>
           </Pressable>
-          <Pressable>
+          <Pressable onPress={() => router.push("../pages/privacy-policy")} accessibilityLabel="Privacy Policy">
             <Text style={styles.footerLink}>PRIVACY POLICY</Text>
           </Pressable>
           <Pressable onPress={() => router.push("../pages/disclaimers")} accessibilityLabel="Disclaimers">

@@ -12,6 +12,7 @@ import {
 } from "react-native";
 import Header from "../../components/Header";
 import Navbar from "../../components/Navbar";
+import Footer from "../../components/Footer";
 
 export default function AccountInfo() {
   const [isSyncEnabled, setIsSyncEnabled] = useState(false);
@@ -38,7 +39,7 @@ export default function AccountInfo() {
         <Navbar />
 
         <View style={styles.contentColumn}>
-          <Header title="Account Details" />
+          <Header/>
 
           <ScrollView
             style={styles.scroll}
@@ -106,20 +107,10 @@ export default function AccountInfo() {
               </View>
             </View>
 
-            {/* Footer */}
-            <View style={styles.footer}>
-              <View style={styles.footerLinks}>
-                <Text style={styles.footerLink}>ABOUT US</Text>
-                <Text style={styles.footerLink}>CONTACT US</Text>
-                <Text style={styles.footerLink}>HELP</Text>
-                <Text style={styles.footerLink}>PRIVACY POLICY</Text>
-                <Text style={styles.footerLink}>DISCLAIMER</Text>
-              </View>
-              <Text style={styles.copyrightText}>
-                Copyright © 2026 • VT Digital Twin
-              </Text>
-            </View>
           </ScrollView>
+
+          {/* Footer */}
+          <Footer/>
 
           {/* Floating Action Button (Chat) */}
           <TouchableOpacity style={styles.fab} activeOpacity={0.8}>
