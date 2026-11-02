@@ -1,3 +1,4 @@
+// I think we can delete this
 const API_BASE_URL = "http://localhost:8000";
 
 // test user jane doe for initial data integration

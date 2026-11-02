@@ -12,6 +12,7 @@
       "bundleIdentifier": "com.anonymous.MeSquareFE"
     },
     "android": {
+      "package": "com.example.mesquarefe",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -26,16 +27,19 @@
     },
     "plugins": [
       "expo-router",
-      [
-        "expo-splash-screen",
-        {
-          "backgroundColor": "#208AEF",
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 76
-        }
-      ],
+      ["expo-splash-screen", {
+        "backgroundColor": "#208AEF",
+        "image": "./assets/images/splash-icon.png",
+        "imageWidth": 76
+      }],
       "@react-native-vector-icons/ionicons",
-      "expo-font"
+      "expo-font",
+      [
+        "react-native-auth0",
+        {
+          "customScheme": "mesquarefe"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

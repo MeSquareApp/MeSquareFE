@@ -8,9 +8,26 @@ This is an [Expo](https://expo.dev) project created with [`create-expo-app`](htt
 
    ```bash
    npm install
+   npx expo install react-native-auth0
    ```
+2. Create an .env.local file in project root with the following inside:
 
-2. Start the app
+EXPO_PUBLIC_AUTH0_DOMAIN=dev-tk23yhyc2e62i1a5.us.auth0.com
+EXPO_PUBLIC_AUTH0_CLIENT_ID=Y74WzKfMPGoPgePKQvPgVYZmpAeKfVyP
+EXPO_PUBLIC_AUTH0_AUDIENCE=https://mesquared-api-endpoint
+EXPO_PUBLIC_API_BASE_URL=http://localhost:8000
+
+The audience must match `AUTH0_AUDIENCE` in the backend configuration. The
+dashboard requests an API access token and fetches `/patients/me/biomarkers`;
+the API resolves the patient from the verified token rather than accepting a
+user ID from the app. Before this works, the backend database must have the
+Auth0 mapping columns and the signed-in Auth0 issuer/subject must be linked to
+an existing MeSquared patient account. Basically the user must have a record
+in the 'users' table on Supabase. This can be done upon initial signup after
+auth0 account creation, when you're taken to the 
+http://localhost:8081/user/signUp page.
+
+3. Start the app
 
    ```bash
    npx expo start
@@ -24,6 +41,99 @@ In the output, you'll find options to open the app in a
 - [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
 
 You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+
+## Important Note on Authentication-Required Pages
+
+Web pages that require the user to be logged in should be placed in the src/app/user directory. Only pages placed in here will be checked for authentication and will
+redirect those that try to access it without authentication. 
+
+## Reading and Writing Database Data Through Protected API Calls
+
+Web pages must use the FastAPI backend for MeSquared user data. Do not use
+Auth0 profile fields as the source of database data, and do not connect to
+Supabase directly from the frontend. The backend verifies the access token and
+uses the authenticated identity to determine which database record the request
+can access.
+
+### The protected-call pattern
+
+1. Use `useAuth0()` to get an API access token for `API_AUDIENCE`. Do not send
+   the ID token or the Auth0 SDK's `user` object as proof of authorization.
+2. Call a helper in `src/services/api.ts`, passing its access token.
+   The helper sends it as `Authorization: Bearer <access-token>` and reports
+   unsuccessful responses as errors.
+3. Use the returned database data in the page, and handle loading and error
+   states. Never put access tokens in logs, URLs, or persistent app state.
+
+The audience in `API_AUDIENCE` must match the backend's `AUTH0_AUDIENCE`.
+`EXPO_PUBLIC_API_BASE_URL` must point to the running API. Add new protected
+read/write helpers to `src/services/api.ts` and keep authorization and response
+handling there instead of duplicating `fetch` logic in screens.
+
+### GET example: show the current user's database name
+
+`GET /users/me` is a protected endpoint. The dashboard gets an API token,
+requests the current MeSquared user, and renders the database's
+`first_name`/`last_name`:
+
+```tsx
+import { useAuth0 } from "react-native-auth0";
+import { API_AUDIENCE, getCurrentUser } from "@/services/api";
+
+// Inside an authenticated React component:
+const { getApiCredentials } = useAuth0();
+
+async function loadProfile() {
+  const credentials = await getApiCredentials(API_AUDIENCE);
+  return getCurrentUser(credentials.accessToken);
+}
+```
+
+In a component, put asynchronous loading in an effect or event handler, save the
+result in state, and render a loading/error state while the request is pending
+or fails. See `src/app/user/dashboard.tsx` for the working implementation.
+The backend identifies the record from the verified token; the frontend does
+not pass a user ID.
+
+### POST example: create the MeSquared user during onboarding
+
+The Auth0 signup flow authenticates the person; the onboarding form then creates
+their MeSquared `users` row with a protected `POST` request:
+
+```tsx
+import { useAuth0 } from "react-native-auth0";
+import {
+  API_AUDIENCE,
+  createUserAccount,
+  type MeSquaredRole,
+} from "@/services/api";
+
+// Inside the onboarding component:
+const { getApiCredentials } = useAuth0();
+const roleValues: Record<string, MeSquaredRole> = {
+  Patient: "patient",
+  "Medical Professional": "physician",
+  Admin: "admin",
+};
+
+async function submitAccount() {
+  const roleValue = roleValues[selectedRole];
+  if (!roleValue) throw new Error("Select an account type.");
+
+  const credentials = await getApiCredentials(API_AUDIENCE);
+  return createUserAccount(credentials.accessToken, {
+    first_name: firstName.trim(),
+    last_name: lastName.trim(),
+    role: roleValue,
+  });
+}
+```
+
+Validate form input before the call and catch errors to show an appropriate
+message. The backend derives the Auth0 identity and verified email from the
+validated token, not from caller-supplied identity fields; it also prevents
+self-registration as an admin. See `src/app/user/signUp.tsx` for the working
+form and `src/services/api.ts` for both request helpers.
 
 ## Get a fresh project
 
