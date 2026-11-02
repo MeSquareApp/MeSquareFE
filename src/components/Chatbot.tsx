@@ -81,7 +81,7 @@ export default function Chatbot({ onClose }: { onClose: () => void }) {
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={styles.keyboardWrapper}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <View style={styles.outerFrame}>
@@ -97,11 +97,13 @@ export default function Chatbot({ onClose }: { onClose: () => void }) {
 
         <View style={styles.innerChatArea}>
           <ScrollView
+            style={{ flex: 1 }}
             ref={scrollViewRef}
             onContentSizeChange={() =>
               scrollViewRef.current?.scrollToEnd({ animated: true })
             }
             contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={true} // Force scrollbar on web
           >
             {messages.map((msg) => (
               <View
@@ -168,31 +170,31 @@ export default function Chatbot({ onClose }: { onClose: () => void }) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    width: "100%",
+  keyboardWrapper: {
+    // This ensures the KeyboardAvoidingView takes up the full screen area of the modal so percentages calculate properly
+    width: "28%",
+    height: "70%",
+    justifyContent: "flex-end", // Aligns to bottom
+    alignItems: "flex-end", // Aligns to right
   },
   outerFrame: {
-    width: "90%",
-    maxWidth: 400,
-    height: "75%", // Changed to % to fit better in modals on different screens
-    maxHeight: 650,
-    backgroundColor: colors.primary,
+    flex: 1,
+    backgroundColor: colors.secondary,
     borderRadius: 30,
     padding: 16,
     shadowColor: colors.black1,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.4,
+    shadowRadius: 10,
+    elevation: 10,
+    overflow: "hidden",
   },
   headerRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
     marginBottom: 16,
+    flexShrink: 0,
   },
   headerSpacer: {
     width: 24, // Matches the width of the close icon
@@ -238,7 +240,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 4,
   },
   botBubble: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.secondary,
     borderTopLeftRadius: 4,
   },
   userText: {
@@ -274,7 +276,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: colors.gray5,
     paddingTop: 10,
-    marginTop: "auto",
+    flexShrink: 0,
   },
   textInput: {
     flex: 1,
@@ -283,7 +285,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   sendButton: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.secondary,
     width: 36,
     height: 36,
     borderRadius: 18,

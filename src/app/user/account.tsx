@@ -2,6 +2,7 @@ import { colors } from "@/theme/color";
 import { ChevronDown, MessageCircle } from "lucide-react-native";
 import { useState } from "react";
 import {
+  Modal,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -10,12 +11,15 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import Chatbot from "../../components/Chatbot";
+import Footer from "../../components/Footer";
 import Header from "../../components/Header";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 
 export default function AccountInfo() {
   const [isSyncEnabled, setIsSyncEnabled] = useState(false);
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   const keyUserData = [
     { label: "First Name", value: "Jane" },
@@ -113,11 +117,28 @@ export default function AccountInfo() {
           <Footer/>
 
           {/* Floating Action Button (Chat) */}
-          <TouchableOpacity style={styles.fab} activeOpacity={0.8}>
-            <MessageCircle size={28} color={colors.background} />
-          </TouchableOpacity>
+          {!isChatOpen && (
+            <TouchableOpacity
+              style={styles.fab}
+              activeOpacity={0.8}
+              onPress={() => setIsChatOpen(true)}
+            >
+              <MessageCircle size={28} color={colors.background} />
+            </TouchableOpacity>
+          )}
         </View>
       </View>
+
+      <Modal
+        visible={isChatOpen}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setIsChatOpen(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <Chatbot onClose={() => setIsChatOpen(false)} />
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -272,5 +293,13 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 8,
     elevation: 6,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "transparent",
+    justifyContent: "flex-end",
+    alignItems: "flex-end",
+    paddingBottom: 24,
+    paddingRight: 24,
   },
 });
