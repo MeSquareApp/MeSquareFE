@@ -5,13 +5,20 @@ import {
   Text,
   View,
 } from "react-native";
+import { Link } from "expo-router";
 import Header from "../../components/Header";
 import Navbar from "../../components/Navbar";
 import Footer from "../../components/Footer";
 import { colors }          from "../../theme/color";
 import { fonts, fontsize } from "../../theme/typography";
 
-export default function disclaimers(){
+const DISCLAIMER_LINKS = [
+  { title: "Medical Advice Disclaimer",              href: "../pages/disclaimers/medical-advice-disclaimer" },
+  { title: "Emergency Services Disclaimer",          href: "../pages/disclaimers/emergency-services-disclaimer" },
+  { title: "User-Service Relationship Disclaimer",   href: "../pages/disclaimers/user-service-disclaimer" },
+] as const;
+
+export default function Disclaimers(){
   return(
     <View style={styles.container}>
       {/* ----- NAVBAR ----- */}
@@ -21,40 +28,13 @@ export default function disclaimers(){
         {/* ---- HEADER ---- */}
         <Header />
         <ScrollView style={styles.mainContent}>
-          <Text style={styles.disclaimerHeader}>DISCLAIMER</Text>
-          <Text style={styles.dateUpdated}>Last Updated 10/31/2026</Text>
+          <Text style={styles.disclaimerHeader}>DISCLAIMERS</Text>
 
-          {/* ---- WEBSITE ---- */}
-          {/* created using Termly */}
-          <Text style={styles.disclaimerSubHeader}>WEBSITE DISCLAIMER</Text>
-          <Text style={styles.disclaimerBody}>
-            The information provided by [REPLACE WITH COMPANY NAME] ("we," "us," or "our") on http://mesquared.com 
-            (the "Site") is for general informational purposes only. All information on the Site is provided in 
-            good faith, however we make no representation or warranty of any kind, express or implied, regarding 
-            the accuracy, adequacy, validity, reliability, availability, or completeness of any information on the Site. 
-            UNDER NO CIRCUMSTANCE SHALL WE HAVE ANY LIABILITY TO YOU FOR ANY LOSS OR DAMAGE OF ANY KIND INCURRED AS A 
-            RESULT OF THE USE OF THE SITE OR RELIANCE ON ANY INFORMATION PROVIDED ON THE SITE. YOUR USE OF THE SITE AND 
-            YOUR RELIANCE ON ANY INFORMATION ON THE SITE IS SOLELY AT YOUR OWN RISK.
-          </Text>
-
-
-          {/* ---- USER SERVICE ---- */}
-          <Text style={styles.disclaimerSubHeader}>USER-SERVICE DISCLAIMER</Text>
-          <Text style={styles.disclaimerBody}>
-           user-service disclaimer goes here
-          </Text>
-
-          {/* ---- MEDICAL ADVICE ---- */}
-          <Text style={styles.disclaimerSubHeader}>MEDICAL ADVICE DISCLAIMER</Text>
-          <Text style={styles.disclaimerBody}>
-            medical advice disclaimer goes here
-          </Text>
-
-          {/* ---- EMERGENCY SERVICES ---- */}
-          <Text style={styles.disclaimerSubHeader}>EMERGENCY SERVICES DISCLAIMER</Text>
-          <Text style={styles.disclaimerBody}>
-            emergency services disclaimer goes here
-          </Text>
+          {DISCLAIMER_LINKS.map((item) => (
+            <Link key={item.href} href={item.href} style={styles.link}>
+              {item.title}
+            </Link>
+          ))}
         </ScrollView>
         {/* ---- FOOTER ---- */}
         <Footer/>
@@ -81,22 +61,13 @@ const styles = StyleSheet.create({
   disclaimerHeader:{
     fontFamily: fonts.bold,
     fontSize: fontsize.xxl,
-    paddingBottom: 10,
+    paddingBottom: 30,
     letterSpacing: 1,
   },
-  dateUpdated: {
-    color: colors.gray3,
-    paddingBottom: 30,
-  },
-  disclaimerSubHeader:{
-    fontFamily: fonts.bold,
-    fontSize: fontsize.lg,
-    paddingBottom: 5,
-  },
-  disclaimerBody:{
+  link: {
     fontFamily: fonts.regular,
-    fontSize: fontsize.md,
-    paddingBottom: 10,
-    color: colors.gray2,
+    fontSize: fontsize.lg,
+    textDecorationLine: "underline",
+    paddingBottom: 16,
   },
 })
