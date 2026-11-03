@@ -12,11 +12,6 @@ import Footer from "@/components/Footer";
 import { colors }          from "@/theme/color";
 import { fonts, fontsize } from "@/theme/typography";
 
-// bold formatting for text
-function Strong({ children }: {children: ReactNode}) {
-  return <Text style={styles.bold}>{children}</Text>
-}
-
 // section title
 function SubHeader({ children }: {children: ReactNode}) {
   return <Text style={styles.disclaimerSubHeader}>{children}</Text>
@@ -41,7 +36,7 @@ function Bullets({ items }: { items: string[] }) {
   );
 }
 
-export default function medicalAdviceDisclaimer(){
+export default function emergencyServicesDisclaimer(){
   return(
     <View style={styles.container}>
       {/* ----- NAVBAR ----- */}
