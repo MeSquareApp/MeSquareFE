@@ -3,20 +3,24 @@ import TwinStatBox from "@/components/TwinStatBox";
 import {
   Dimensions,
   Image,
-  Pressable,
   ScrollView,
   StyleSheet,
   Text,
   View,
 } from "react-native";
-import { colors }                        from "../../theme/color";
-import { fonts, fontsize }               from "../../theme/typography";
-import { getBiomarkers, type Biomarker } from "@/services/api"
-import { useEffect, useState }           from "react";
+import { colors } from "../../theme/color";
+import { fonts } from "../../theme/typography";
+import {
+  API_AUDIENCE,
+  getBiomarkers,
+  type Biomarker,
+} from "@/services/api";
+import { useEffect, useState } from "react";
 import MetricCard from "../../components/MetricCard";
 import Navbar     from "../../components/Navbar";
 import Header     from "../../components/Header";
 import Footer     from "../../components/Footer"
+import { useAuth0 } from 'react-native-auth0';
 
 export default function Dashboard() {
   const twinStats = [
@@ -26,29 +30,34 @@ export default function Dashboard() {
     { label: "Weight", value: 180, color: colors.secondary },
   ];
 
+  const { getApiCredentials } = useAuth0();
+
   // get patient data from database
   const [rhr, setRhr] = useState<Biomarker | null>(null);
-  
-  useEffect(() => {
-    // load biomarkers from backend
-    async function loadBiomarkers() {
-        try {
-        const data = await getBiomarkers();
 
-        // find resting heart rate in the biomarker data
-        const restingHeartRate = data.find(
-            (item) => item.biomarker_abbr === "RHR"
-        );
+    useEffect(() => {
+        let isCurrent = true;
 
-        setRhr(restingHeartRate ?? null);
-      } catch (err) {
-        console.error("Failed to load biomarkers:", err);
-      }
-    }
+        async function loadBiomarkers() {
+            try {
+                const credentials = await getApiCredentials(API_AUDIENCE);
+                const data = await getBiomarkers(credentials.accessToken);
+                if (isCurrent) {
+                    const restingHeartRate = data.find(
+                      (item) => item.biomarker_abbr === "RHR"
+                    );
+                    setRhr(restingHeartRate ?? null);
+                }
+            } catch (error) {
+                console.error("Failed to load authenticated patient biomarkers:", error);
+            }
+        }
 
-    loadBiomarkers();
-  }, []);
-  
+        void loadBiomarkers();
+        return () => {
+          isCurrent = false;
+        };
+        }, [getApiCredentials]);
   return (
     <View style={styles.container}>
       {/* ----- NAVBAR ----- */}
@@ -272,71 +281,6 @@ const styles = StyleSheet.create({
   },
   nonNavContent: {
     flex: 1,
-  },
-
-  // ---- NAVBAR ----
-  navbar: {
-    width: Dimensions.get("window").width * 0.07,
-    backgroundColor: colors.background,
-    borderRightWidth: 1,
-    borderRightColor: colors.gray5,
-    alignItems: "center",
-    paddingTop: 20,
-  },
-  logoContainer: {
-    width: Dimensions.get("window").width * 0.05,
-    height: Dimensions.get("window").width * 0.05,
-    borderWidth: 1,
-    borderColor: colors.gray5,
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  logo: {
-    width: Dimensions.get("window").width * 0.03,
-    height: Dimensions.get("window").width * 0.03,
-  },
-  navItems: {
-    marginTop: 80,
-    alignItems: "center",
-    gap: 25,
-  },
-  navItem: {
-    width: Dimensions.get("window").width * 0.03,
-    height: Dimensions.get("window").width * 0.03,
-    borderRadius: 12,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  activeNavItem: {
-    backgroundColor: colors.primary,
-  },
-
-  // ---- HEADER ----
-  header: {
-    height: Dimensions.get("window").height * 0.1,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.gray5,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: Dimensions.get("window").width * 0.05,
-  },
-  headerTitle: {
-    fontFamily: fonts.bold,
-    fontSize: fontsize.lg,
-    fontWeight: "700",
-    color: colors.black1,
-  },
-  profileContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: Dimensions.get("window").width * 0.01,
-  },
-  profileName: {
-    fontFamily: fonts.regular,
-    fontSize: fontsize.md,
-    color: colors.black1,
   },
 
   // ---- MAIN CONTENT ----

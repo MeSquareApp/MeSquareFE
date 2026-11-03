@@ -1,5 +1,5 @@
 import { Picker } from "@react-native-picker/picker";
-import { Stack } from "expo-router";
+import { Stack, useRouter } from "expo-router";
 import { useState } from "react";
 import {
   Alert,
@@ -14,12 +14,24 @@ import {
   View,
 } from "react-native";
 import DateTimePicker from "react-native-ui-datepicker";
+import { useAuth0 } from "react-native-auth0";
+import {
+  API_AUDIENCE,
+  createUserAccount,
+  type MeSquaredRole,
+} from "@/services/api";
 
 export default function SignUp() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
   const [role, setRole] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [notification, setNotification] = useState<{
+    type: "success" | "error";
+    message: string;
+  } | null>(null);
+  const { getApiCredentials } = useAuth0();
+  const router = useRouter();
 
   // Patient-only fields
   const [sex, setSex] = useState("");
@@ -32,7 +44,7 @@ export default function SignUp() {
 
   const isPatient = role === "Patient";
 
-  //helper function to show alerts for web and iOS/Android platforms
+    //helper function to show alerts for web and iOS/Android platforms
   function showAlert(title: string, message?: string) {
     if (Platform.OS === "web") {
       // Browser's native dialog — blocking, but it works
@@ -42,25 +54,51 @@ export default function SignUp() {
     }
   }
 
-  async function handleSignUp() {
-    // TODO: replace with backend API call once the sign-up endpoint is ready.
-    // Expected payload shape:
-    //   { first_name, last_name, email, role, date_of_birth?, biological_sex? }
-    // Date of birth and sex are only sent when role === "Patient".
-    // Age for forecasting can be derived server-side from date_of_birth.
-    const payload = {
-      first_name: firstName,
-      last_name: lastName,
-      email: email.trim().toLowerCase(),
-      role,
-      ...(isPatient && {
-        biological_sex: sex,
-        date_of_birth: dateOfBirth,
-      }),
+  async function handleSignUp(): Promise<void> {
+    const normalizedFirstName = firstName.trim();
+    const normalizedLastName = lastName.trim();
+    const roleValues: Record<string, MeSquaredRole> = {
+      Patient: "patient",
+      "Medical Professional": "physician",
+      Admin: "admin",
     };
+    const roleValue = roleValues[role];
 
-    console.log("sign-up payload:", payload);
-    showAlert("Sign-up submitted", "Backend endpoint not yet connected.");
+    if (!normalizedFirstName || !normalizedLastName || !roleValue) {
+      setNotification({
+        type: "error",
+        message: "Enter your first and last name and select an account type.",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+    setNotification(null);
+    try {
+      const credentials = await getApiCredentials(API_AUDIENCE);
+      await createUserAccount(credentials.accessToken, {
+        first_name: normalizedFirstName,
+        last_name: normalizedLastName,
+        role: roleValue,
+      });
+      setNotification({
+        type: "success",
+        message: "Account created. Taking you to your dashboard...",
+      });
+      await new Promise((resolve) => setTimeout(resolve, 1200));
+      router.replace("/user/dashboard");
+    } catch (error) {
+      console.error("MeSquared account creation failed:", error);
+      setNotification({
+        type: "error",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Account creation failed. Please try again.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -104,16 +142,6 @@ export default function SignUp() {
               autoCapitalize="none"
             />
 
-            <TextInput
-              placeholder="Email"
-              placeholderTextColor="#9CA3AF"
-              onChangeText={setEmail}
-              value={email}
-              style={styles.input}
-              autoCapitalize="none"
-              keyboardType="email-address"
-            />
-
             {/* User type dropdown list, using picker library */}
             <Picker
               selectedValue={role}
@@ -132,6 +160,10 @@ export default function SignUp() {
             {/* Patient-only fields: sex + DOB (used for basic forecasting) */}
             {isPatient && (
               <>
+                <Text style={styles.profileNote}>
+                  These patient details are for a later profile-setup step. This
+                  signup currently creates only your user record.
+                </Text>
                 <Picker
                   selectedValue={sex}
                   onValueChange={(value) => setSex(value)}
@@ -212,8 +244,37 @@ export default function SignUp() {
               </>
             )}
 
-            <Pressable style={styles.button} onPress={handleSignUp}>
-              <Text style={styles.buttonText}>Create Account</Text>
+            {notification ? (
+              <View
+                accessibilityRole="alert"
+                style={[
+                  styles.notification,
+                  notification.type === "success"
+                    ? styles.successNotification
+                    : styles.errorNotification,
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.notificationText,
+                    notification.type === "success"
+                      ? styles.successText
+                      : styles.errorText,
+                  ]}
+                >
+                  {notification.message}
+                </Text>
+              </View>
+            ) : null}
+
+            <Pressable
+              style={[styles.button, isSubmitting && styles.buttonDisabled]}
+              onPress={handleSignUp}
+              disabled={isSubmitting}
+            >
+              <Text style={styles.buttonText}>
+                {isSubmitting ? "Creating Account..." : "Create Account"}
+              </Text>
             </Pressable>
           </View>
         </ScrollView>
@@ -291,5 +352,44 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     fontFamily: "Atkinson Hyperlegible",
+  },
+  profileNote: {
+    color: "#6B7280",
+    fontFamily: "Atkinson Hyperlegible",
+    textAlign: "center",
+    marginBottom: 12,
+    lineHeight: 20,
+  },
+  notification: {
+    width: "80%",
+    alignSelf: "center",
+    borderRadius: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    marginTop: 12,
+  },
+  successNotification: {
+    backgroundColor: "#ECFDF5",
+    borderColor: "#A7F3D0",
+    borderWidth: 1,
+  },
+  errorNotification: {
+    backgroundColor: "#FEF2F2",
+    borderColor: "#FECACA",
+    borderWidth: 1,
+  },
+  notificationText: {
+    fontFamily: "Atkinson Hyperlegible",
+    textAlign: "center",
+    lineHeight: 20,
+  },
+  successText: {
+    color: "#047857",
+  },
+  errorText: {
+    color: "#B91C1C",
+  },
+  buttonDisabled: {
+    opacity: 0.6,
   },
 });

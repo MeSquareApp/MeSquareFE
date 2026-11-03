@@ -1,14 +1,14 @@
 
 export const fonts = {
     regular: 'AtkinsonHyperlegible_400Regular',
-    bold: 'AtkinsonHyperlegible_700Bold',
-    semiBold: 'AtkinsonHyperlegible_700Bold',
+    bold:    'AtkinsonHyperlegible_700Bold',
 } as const;
 
 export const fontsize = {
-    xs: 10,
-    sm: 12,
-    md: 14,
-    lg: 16,
-    xl: 18,
+    xs:  12,
+    sm:  14,
+    md:  16,
+    lg:  18,
+    xl:  22,
+    xxl: 25,
 } as const;

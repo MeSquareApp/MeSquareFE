@@ -1,96 +1,209 @@
 import { colors } from "@/theme/color";
-import { View, StyleSheet, Dimensions, Image, Pressable } from "react-native";
+import { useState } from "react";
+import {
+    View,
+    Text,
+    StyleSheet,
+    Dimensions,
+    Image,
+    Pressable,
+    Platform,
+} from "react-native";
 import { Ionicons } from "@react-native-vector-icons/ionicons";
 import { useRouter, usePathname } from "expo-router";
+import { useAuth0 } from "react-native-auth0";
+import { useLogoutConfirmation } from "@/components/LogoutConfirmation";
+
+interface NavItemProps {
+    label: string;
+    iconName: React.ComponentProps<typeof Ionicons>["name"];
+    active: boolean;
+    onPress: () => void;
+}
+function NavItem({ label, iconName, active, onPress } : NavItemProps) {
+  const [isHovered, setIsHovered] = useState(false);
+
+  return (
+    <Pressable
+      style={[
+        styles.navItem,
+        active && styles.activeNavItem
+      ]}
+      onPress={onPress}
+      onHoverIn={() => setIsHovered(true)}
+      onHoverOut={() => setIsHovered(false)}
+      accessibilityLabel={label}
+    >
+      <Ionicons
+        name={iconName}
+        size={22}
+        color={active ? "#FFFFFF" : colors.gray3}
+      />
+
+      {/* hover label */}
+      {isHovered && (
+      <View style={styles.tooltip}>
+          {/* Triangle pointer */}
+          <View style={styles.hoverNavItem}/>
+          <View style={styles.tooltipArrow} />
+          <Text style={styles.tooltipText}>
+              {label}
+          </Text>
+      </View>
+  )}
+    </Pressable>
+  );
+}
 
 export default function Navbar() {
     const router = useRouter();
     const pathname = usePathname();
+    const { clearSession } = useAuth0();
+    const { startLogout, confirmLogout, cancelLogout } = useLogoutConfirmation();
+
+    async function handleLogout() {
+      startLogout();
+      try {
+        await clearSession(
+          Platform.OS === "web"
+            ? { returnToUrl: window.location.origin }
+            : undefined,
+        );
+        confirmLogout();
+        router.replace("/");
+      } catch (error) {
+        cancelLogout();
+        console.error("Logout failed:", error);
+      }
+    }
 
     return (
-              <View style={styles.navbar}>
-                {/* logo */}
-                <View style={styles.logoContainer}>
-                  <Image
-                    source={require("../../assets/images/me2-logo.png")}
-                    style={styles.logo}
-                  />
-                </View>
-        
-                {/* nav items */}
-                <View style={styles.navItems}>
-                  {/* dashboard */}
-                  <Pressable style={[styles.navItem, pathname === "/pages/dashboard" && styles.activeNavItem]}
-                             onPress={() => router.push("../pages/dashboard")}
-                             accessibilityLabel="Dashboard">
-                    <Ionicons name="grid" size={25} color={pathname === "/pages/dashboard" ? "#FFFFFF" : colors.gray3} />
-                  </Pressable>
-        
-                  {/* data upload */}
-                  <Pressable style={[styles.navItem, pathname === "/pages/dataUpload" && styles.activeNavItem]}
-                             onPress={() => router.push("../pages/dataUpload")}
-                             accessibilityLabel="Data Upload">
-                    <Ionicons name="analytics-outline" size={22} color={pathname === "/pages/dataUpload" ? "#FFFFFF" : colors.gray3} />
-                  </Pressable>
-        
-                  {/* forecasting */}
-                  <Pressable style={[styles.navItem, pathname === "/pages/forecasting" && styles.activeNavItem]}
-                             onPress={() => router.push("../pages/forecasting")}
-                             accessibilityLabel="Forecasting">
-                    <Ionicons name="bar-chart-outline" size={22} color={pathname === "/pages/forecasting" ? "#FFFFFF" : colors.gray3} />
-                  </Pressable>
-        
-                  {/* account settings */}
-                  <Pressable style={[styles.navItem, pathname === "/pages/account" && styles.activeNavItem]}
-                             onPress={() => router.push("../pages/account")}
-                             accessibilityLabel="Account Settings">
-                    <Ionicons name="settings-outline" size={22} color={pathname === "/pages/account" ? "#FFFFFF" : colors.gray3} />
-                  </Pressable>
-                </View>
-              </View>
-    );
+      <View style={styles.navbar}>
+        {/* logo */}
+        <View style={styles.logoContainer}>
+          <Image
+            source={require("../../assets/images/me2-logo.png")}
+            style={styles.logo}
+          />
+        </View>
 
+        {/* nav items */}
+        <View style={styles.navItems}>
+
+          <NavItem
+            label=    "Dashboard"
+            iconName= "grid"
+            active=   {pathname === "/user/dashboard"}
+            onPress=  {() => router.push("/user/dashboard")}
+          />
+
+          <NavItem
+            label=    "Data Upload"
+            iconName= "analytics-outline"
+            active=   {pathname === "/user/dataUpload"}
+            onPress=  {() => router.push("/user/dataUpload")}
+          />
+
+          <NavItem
+            label=    "Forecasting"
+            iconName= "bar-chart-outline"
+            active=   {pathname === "/user/forecasting"}
+            onPress=  {() => router.push("/user/forecasting")}
+          />
+
+          <NavItem
+            label=    "Account Settings"
+            iconName= "settings-outline"
+            active=   {pathname === "/user/account"}
+            onPress=  {() => router.push("/user/account")}
+          />
+
+          <NavItem
+            label="Sign out"
+            iconName="log-out-outline"
+            active={false}
+            onPress={handleLogout}
+          />
+
+        </View>
+      </View>
+    );
 }
 
 const styles = StyleSheet.create({
   navbar: {
-      width: Dimensions.get("window").width * 0.07,
-      backgroundColor: colors.background,
-      borderRightWidth: 1,
-      borderRightColor: colors.gray5,
-      alignItems: "center",
-      paddingTop: 20,
-    },
-    logoContainer: {
-      width: Dimensions.get("window").width * 0.05,
-      height: Dimensions.get("window").width * 0.05,
-      borderWidth: 1,
-      borderColor: colors.gray5,
-      borderRadius: 12,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    logo: {
-      width: Dimensions.get("window").width * 0.03,
-      height: Dimensions.get("window").width * 0.03,
-    },
-    navItems: {
-      marginTop: 80,
-      alignItems: "center",
-      gap: 25,
-    },
-    navItem: {
-      width: Dimensions.get("window").width * 0.03,
-      height: Dimensions.get("window").width * 0.03,
-      borderRadius: 12,
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    activeNavItem: {
-      backgroundColor: colors.primary,
-    },
-  
-    nonNavContent: {
-      flex: 1,
-    }
+    width: Dimensions.get("window").width * 0.07,
+    backgroundColor: colors.background,
+    borderRightWidth: 1,
+    borderRightColor: colors.gray5,
+    alignItems: "center",
+    paddingTop: 20,
+  },
+  logoContainer: {
+    width: Dimensions.get("window").width * 0.04,
+    height: Dimensions.get("window").width * 0.04,
+    borderWidth: 1,
+    borderColor: colors.gray5,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  logo: {
+    width: Dimensions.get("window").width * 0.03,
+    height: Dimensions.get("window").width * 0.03,
+  },
+  navItems: {
+    marginTop: 80,
+    alignItems: "center",
+    gap: 30,
+  },
+  navItem: {
+    width: Dimensions.get("window").width * 0.03,
+    height: Dimensions.get("window").width * 0.03,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  hoverNavItem: {
+    borderColor: colors.primary,
+  },
+  activeNavItem: {
+    backgroundColor: colors.primary,
+  },
+  tooltip: {
+    position: "absolute",
+    top: "100%",
+    marginTop: 5,
+    left: "50%",
+    width: 90,
+    transform: [{ translateX: -45 }],
+    backgroundColor: "#171717",
+    paddingHorizontal: 4,
+    paddingVertical: 4,
+    borderRadius: 6,
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 1000,
+    elevation: 8,
+  },
+  tooltipArrow: {
+    position: "absolute",
+    top: -4,
+    left: "50%",
+    marginLeft: -6,
+    width: 0,
+    height: 0,
+    borderLeftWidth: 6,
+    borderRightWidth: 6,
+    borderBottomWidth: 6,
+    borderLeftColor: "transparent",
+    borderRightColor: "transparent",
+    borderBottomColor: "#171717",
+  },
+  tooltipText: {
+    color: "#FFFFFF",
+    fontSize: 10,
+    fontWeight: "500",
+    textAlign: "center",
+  },
 });
