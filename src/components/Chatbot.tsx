@@ -10,7 +10,7 @@ import {
     TouchableOpacity,
     View,
 } from "react-native";
-import { colors } from "../theme/color";
+import { colors } from "@/theme/color";
 
 // Add onClose prop to the component signature
 export default function Chatbot({ onClose }: { onClose: () => void }) {

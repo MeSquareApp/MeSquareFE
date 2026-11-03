@@ -1,7 +1,12 @@
 import * as DocumentPicker from "expo-document-picker";
 import { useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
-import { colors } from "../../theme/color";
+import { 
+  Pressable, 
+  StyleSheet, 
+  Text, 
+  View 
+} from "react-native";
+import { colors } from "@/theme/color";
 
 export default function FileUpload() {
   const [files, setFiles] = useState<DocumentPicker.DocumentPickerAsset[]>([]);

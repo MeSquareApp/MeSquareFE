@@ -119,10 +119,10 @@ export default function Navbar() {
           />
 
           <NavItem
-            label="Sign out"
-            iconName="log-out-outline"
-            active={false}
-            onPress={handleLogout}
+            label=    "Sign out"
+            iconName= "log-out-outline"
+            active=    {false}
+            onPress=   {handleLogout}
           />
 
         </View>

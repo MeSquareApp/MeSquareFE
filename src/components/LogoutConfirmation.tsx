@@ -1,4 +1,4 @@
-import React, {
+import {
   createContext,
   useCallback,
   useContext,
@@ -7,8 +7,12 @@ import React, {
   useState,
   type PropsWithChildren,
 } from "react";
-import { Platform, StyleSheet, Text } from "react-native";
-import { colors } from "../theme/color";
+import { 
+  Platform, 
+  StyleSheet, 
+  Text 
+} from "react-native";
+import { colors } from "@/theme/color";
 
 const LOGOUT_PENDING_KEY = "mesquared.logoutPending";
 const LOGOUT_SUCCESS_MESSAGE = "You have been logged out successfully.";

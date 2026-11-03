@@ -1,11 +1,17 @@
-import { colors } from "@/theme/color";
-import { fonts, fontsize } from "@/theme/typography";
-import { View, Text, StyleSheet, Dimensions, Pressable } from "react-native";
-import { Ionicons } from "@react-native-vector-icons/ionicons";
-import { useEffect, useState } from "react";
+import { 
+    View, 
+    Text, 
+    StyleSheet, 
+    Dimensions, 
+    Pressable 
+} from "react-native";
+import { Ionicons }                     from "@react-native-vector-icons/ionicons";
+import { useEffect, useState }          from "react";
 import { API_AUDIENCE, getCurrentUser } from "@/services/api";
-import { useAuth0 } from "react-native-auth0";
-import { useRouter, usePathname } from "expo-router";
+import { useAuth0 }                     from "react-native-auth0";
+import { useRouter, usePathname }       from "expo-router";
+import { colors }          from "@/theme/color";
+import { fonts, fontsize } from "@/theme/typography";
 
 export default function Header() {
     const router = useRouter();

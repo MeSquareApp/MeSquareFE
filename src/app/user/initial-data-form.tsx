@@ -11,15 +11,14 @@ import {
     StyleSheet,
     Text,
     TextInput,
-    useWindowDimensions,
     View,
     Image,
     Dimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { colors } from "../../theme/color";
-import { fonts, fontsize } from "../../theme/typography"
-import { Ionicons } from "@react-native-vector-icons/ionicons";
+import { Ionicons }     from "@react-native-vector-icons/ionicons";
+import { colors }          from "@/theme/color";
+import { fonts, fontsize } from "@/theme/typography"
 
 type FormData = {
     heightFeet:               string;

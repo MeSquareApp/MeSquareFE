@@ -1,16 +1,13 @@
 import {
   Dimensions,
-  Image,
-  Pressable,
   ScrollView,
   StyleSheet,
-  Text,
   View,
 } from "react-native";
-import { colors } from "../../theme/color";
-import Header from "../../components/Header";
-import Navbar from "../../components/Navbar";
-import Footer from "../../components/Footer";
+import { colors } from "@/theme/color";
+import Header from "@/components/Header";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 export default function forecasting(){
   return(

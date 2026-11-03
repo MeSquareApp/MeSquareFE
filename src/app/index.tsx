@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { 
   StyleSheet,
   Pressable,
@@ -8,14 +8,14 @@ import {
   Image,
   Platform,
 } from "react-native";
-import { colors } from "../theme/color";
-import { useAuth0 } from 'react-native-auth0';
-import { useRouter } from 'expo-router';
+import { colors }       from "../theme/color";
+import { useAuth0 }     from 'react-native-auth0';
+import { useRouter }    from 'expo-router';
+import { API_AUDIENCE } from "@/services/api";
 import {
   LogoutConfirmation,
   useLogoutConfirmation,
 } from "../components/LogoutConfirmation";
-import { API_AUDIENCE } from "@/services/api";
 
 type AuthDestination = '/user/dashboard' | '/user/signUp';
 
