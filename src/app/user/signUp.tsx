@@ -6,7 +6,6 @@ import {
   Image,
   Platform,
   Pressable,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
@@ -14,6 +13,7 @@ import {
   View,
 } from "react-native";
 import DateTimePicker from "react-native-ui-datepicker";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth0 } from "react-native-auth0";
 import {
   API_AUDIENCE,

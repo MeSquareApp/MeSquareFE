@@ -889,8 +889,6 @@ export default function App() {
                                             </View>
                                         </View>
 
-                                        
-                                        </View>
 
                                     {/* -- waist -- */}
                                     <View style={[styles.measurementField]}>
@@ -912,6 +910,9 @@ export default function App() {
                                             error={fieldErrors.waistCm}
                                         />
                                     </View>
+                                    
+                                        
+                                    </View>
 
                                     {/* -- race  & geographic region -- */}
                                     <MultiSelectField label="Race" options={raceOptions} values={form.race} onToggle={toggleRace} error={fieldErrors.race} />
@@ -922,6 +923,7 @@ export default function App() {
                             {/* ----- MEDICAL HISTORY ----- */}
                             {activeSection === 1 ? (
                                 <>
+                                    {/*// TODO: make not optional*/}
                                     <Input label="Allergies"            value={form.allergies}      onChangeText={(value) => update("allergies", value)}      placeholder="List allergies and reactions, or enter “None”" multiline />
                                     <Input label="Past medical history" value={form.medicalHistory} onChangeText={(value) => update("medicalHistory", value)} placeholder="Previous illnesses, surgeries, or hospital stays" multiline />
                                     <View style={styles.field}>
