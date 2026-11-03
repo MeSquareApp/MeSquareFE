@@ -14,7 +14,6 @@ import {
     StyleSheet,
     Text,
     TextInput,
-    useWindowDimensions,
     View,
     Image,
     Dimensions,
@@ -27,8 +26,7 @@ import { Ionicons } from "@react-native-vector-icons/ionicons";
 type FormData = {
     heightCm:                 string;
     weightKg:                 string;
-    waistCm:                  string,
-    sex:                      string;
+    waistCm:                  string;
     race:                     string[];
     region:                   string;
     allergies:                string;
@@ -56,7 +54,6 @@ const initialForm: FormData = {
     heightCm:                 "",
     weightKg:                 "",
     waistCm:                  "",
-    sex:                      "",
     race:                     [],
     region:                   "",
     allergies:                "",
@@ -216,7 +213,7 @@ function ChoiceGroup({
 }
 
 /*** dropdown select field
- * used for: sex, geographical region 
+ * used for: geographical region 
  */
 function SelectField({
     label,
@@ -602,7 +599,7 @@ export default function App() {
 
     const getSectionErrors = (sectionIndex: number): FieldErrors => {
         const required: StringField[][] = [
-            ["heightCm", "weightKg", "sex", "region"],
+            ["heightCm", "weightKg", "region"],
             [],
             ["bloodPressureMedication", "cholesterolMedication"],
             ["smoking", "alcohol", "recreationalDrugs", "exerciseHours", "sleepHours"],
@@ -892,17 +889,8 @@ export default function App() {
                                             </View>
                                         </View>
 
-                                        {/* -- sex -- */}
-                                        <View style={{ flex: 2, paddingStart: 20 }}>
-                                            <SelectField
-                                                label="Sex"
-                                                options={["Female", "Male", "Other", "Prefer not to say"]}
-                                                value={form.sex}
-                                                onChange={(value) => update("sex", value)}
-                                                error={fieldErrors.sex}
-                                            />
+                                        
                                         </View>
-                                    </View>
 
                                     {/* -- waist -- */}
                                     <View style={[styles.measurementField]}>
