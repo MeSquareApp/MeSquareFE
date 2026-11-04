@@ -11,15 +11,15 @@ import {
   Image,
   Platform,
   Pressable,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
   View,
 } from "react-native";
-import { useAuth0 } from "react-native-auth0";
 import DateTimePicker from "react-native-ui-datepicker";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useAuth0 } from "react-native-auth0";
 
 export default function SignUp() {
   const [firstName, setFirstName] = useState("");
