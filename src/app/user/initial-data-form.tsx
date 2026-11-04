@@ -15,13 +15,16 @@ import {
     Text,
     TextInput,
     View,
-    Image,
+    Modal,
     Dimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { colors } from "../../theme/color";
-import { fonts, fontsize } from "../../theme/typography"
 import { Ionicons } from "@react-native-vector-icons/ionicons";
+import { colors }          from "@/theme/color";
+import { fonts, fontsize } from "@/theme/typography";
+import Header from "@/components/Header";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 type FormData = {
     heightCm:                 string;
@@ -96,6 +99,20 @@ const sections = [
         title:       "Cardiovascular health",
         description: "One last section about your heart health history.",
     },
+];
+
+// this is the text that appears when the user clicks on the "Why do we ask this?" link
+const whyContent = [
+    // Personal
+    "Your height, weight, waist circumference, race, and region help us set a baseline for your digital twin. Body measurements and background can affect how health indicators are interpreted, so this lets your twin reflect you rather than a generic average. Providing us with as much information as possible ensures that your twin is as accurate and personalized as it can be.",
+    // History
+    "Allergies, past medical history, and diagnosed conditions shape your overall health picture. Without them, your twin could miss factors that matter for you.",
+    // Medications
+    "Medications can change things like blood pressure and cholesterol. Knowing what you take helps us interpret your health data correctly.",
+    // Lifestyle
+    "Smoking, alcohol, exercise, and sleep are everyday habits that influence your long-term health. They give your twin context about how you live.",
+    // Heart health
+    "Your history with blood pressure and cholesterol is an important part of understanding cardiovascular health.",
 ];
 
 const raceOptions = [
@@ -421,6 +438,52 @@ function SectionNavigation({
     return <View style={styles.sidebarNav}>{steps}</View>;
 }
 
+/***
+ * popup modal that explains why we ask for this information
+ */
+function WhyModal({ visible, onClose, sectionText }: { visible: boolean; onClose: () => void; sectionText: string }) {
+    return (
+        <Modal
+            animationType="fade"
+            onRequestClose={onClose}   // Android back button
+            transparent
+            visible={visible}
+        >
+            <View style={styles.modalOverlay}>
+                {/* Tapping the dark backdrop closes the modal */}
+                <Pressable
+                    accessibilityLabel="Close"
+                    onPress={onClose}
+                    style={StyleSheet.absoluteFill}
+                />
+
+                <View style={styles.modalCard}>
+                    <Text style={styles.eyebrow}>WHY WE ASK</Text>
+                    <Text style={styles.modalTitle}>Why do we need this information?</Text>
+
+                    <Text style={styles.modalHeading}>For this section</Text>
+                    <Text style={styles.modalBody}>{sectionText}</Text>
+
+                    <Text style={styles.modalHeading}>Why accuracy matters</Text>
+                    <Text style={styles.modalBody}>
+                        Your digital twin is only as good as the information it’s built from.
+                        Accurate answers help it reflect you. If you’re unsure about
+                        something, your best estimate is fine, and you can come back and edit
+                        your responses at any time.
+                    </Text>
+
+                    <Pressable
+                        onPress={onClose}
+                        style={({ pressed }) => [styles.primaryButton, styles.modalButton, pressed && styles.buttonPressed]}
+                    >
+                        <Text style={styles.primaryButtonText}>Got it</Text>
+                    </Pressable>
+                </View>
+            </View>
+        </Modal>
+    );
+}
+
 export default function App() {
     const [activeSection, setActiveSection]         = useState(0);
     const [form, setForm]                           = useState<FormData>(initialForm);
@@ -431,6 +494,7 @@ export default function App() {
     const [heightInches, setHeightInches]           = useState("");
     const [heightCmInput, setHeightCmInput]         = useState("");
     const [waistInput, setWaistInput]               = useState("");
+    const [whyVisible, setWhyVisible]               = useState(false);
     const scrollRef                                 = useRef<ScrollView>(null);
 
     const update = (field: StringField, value: string) => {
@@ -600,7 +664,7 @@ export default function App() {
     const getSectionErrors = (sectionIndex: number): FieldErrors => {
         const required: StringField[][] = [
             ["heightCm", "weightKg", "region"],
-            [],
+            ["allergies"],
             ["bloodPressureMedication", "cholesterolMedication"],
             ["smoking", "alcohol", "recreationalDrugs", "exerciseHours", "sleepHours"],
             ["highBloodPressureHistory", "highCholesterolHistory"],
@@ -617,9 +681,9 @@ export default function App() {
             errors.race = "Select at least one option.";
         }
 
-        const height = Number(form.heightCm);
-        const weight = Number(form.weightKg);
-        const waist = form.waistCm.trim();
+        const height = Number(form.heightCm.trim());
+        const weight = Number(form.weightKg.trim());
+        const waist  = Number(form.waistCm.trim());
 
         if (
             !errors.heightCm &&
@@ -635,7 +699,10 @@ export default function App() {
             errors.weightKg = "Enter a weight greater than zero.";
         }
 
-        if (waist !== "") {
+        if (
+            !errors.waistCm &&
+            (!Number.isFinite(waist) || waist <= 0)
+        ) {
             const waistValue = Number(waist);
 
             if (!Number.isFinite(waistValue) || waistValue <= 0) {
@@ -726,293 +793,300 @@ export default function App() {
     const section = sections[activeSection];
 
     return (
-        <SafeAreaView style={styles.safeArea}>
+        
+        <View style={styles.container}>
+            {/* ===== NAVBAR ===== */}
+            <Navbar />
+            <WhyModal
+                visible={whyVisible}
+                onClose={() => setWhyVisible(false)}
+                sectionText={whyContent[activeSection]}
+            />
+            <View style={styles.nonNavContent}>
+                {/* ===== HEADER ===== */}
+                <Header />
+                <SafeAreaView style={styles.safeArea}>
+            
 
-            {/* ===== HEADER ===== */}
-            <StatusBar style="dark" />
-            <View style={styles.header}>
-                <View style={styles.brand}>
-                    <Image
-                        source={require("../../../assets/images/me2-logo.png")}
-                        style={{ width: 30, height: 30 }}
-                    />
-                    <Text style={styles.brandName}>Me<Text style={styles.brandAccent}>²</Text></Text>
-                </View>
-                {/* user profile */}
-                          <View style={styles.profileContainer}>
-                            <Text style={styles.profileName}>Patient</Text>
-                            <Ionicons name="person-circle-outline" size={30} color="#666666" />
-                          </View>
-            </View>
+                {/* ===== FORM NAVBAR ===== */}
+                <View style={styles.contentShell}>
+                    <View style={styles.sidebar}>
+                        <Text style={styles.sidebarEyebrow}>NEW PATIENT INTAKE</Text>
+                        <Text style={styles.sidebarTitle}>Help us get to know you.</Text>
+                        <Text style={styles.sidebarDescription}>
+                            Your answers will help build your digital twin.
+                        </Text>
+                        <SectionNavigation activeSection={activeSection} onSelect={goTo} />
+                    </View>
 
-            {/* ===== SIDE NAVBAR ===== */}
-            <View style={styles.contentShell}>
-                <View style={styles.sidebar}>
-                    <Text style={styles.sidebarEyebrow}>NEW PATIENT INTAKE</Text>
-                    <Text style={styles.sidebarTitle}>Help us get to know you.</Text>
-                    <Text style={styles.sidebarDescription}>
-                        Your answers will help build your digital twin.
-                    </Text>
-                    <SectionNavigation activeSection={activeSection} onSelect={goTo} />
-                </View>
+                        {/* main content */}
+                        <KeyboardAvoidingView
+                            behavior={Platform.OS === "ios" ? "padding" : undefined}
+                            keyboardVerticalOffset={Platform.OS === "ios" ? 8 : 0}
+                            style={styles.flex}
+                        >
+                            <ScrollView
+                                contentContainerStyle={[styles.scrollContent, styles.desktopScrollContent]}
+                                keyboardShouldPersistTaps="handled"
+                                ref={scrollRef}
+                                showsVerticalScrollIndicator={false}
+                            >
+                                {/* ===== PROGRESS BAR ===== */}
+                                <View style={styles.progressMeta}>
+                                    <Text style={styles.progressStep}>STEP {activeSection + 1} OF {sections.length}</Text>
+                                    <Text style={styles.progressLabel}>{section.short}</Text>
+                                </View>
+                                <View style={styles.progressTrack}>
+                                    <View style={[styles.progressFill, { width: `${((activeSection + 1) / sections.length) * 100}%` }]} />
+                                </View>
 
-                {/* main content */}
-                <KeyboardAvoidingView
-                    behavior={Platform.OS === "ios" ? "padding" : undefined}
-                    keyboardVerticalOffset={Platform.OS === "ios" ? 8 : 0}
-                    style={styles.flex}
-                >
-                    <ScrollView
-                        contentContainerStyle={[styles.scrollContent, styles.desktopScrollContent]}
-                        keyboardShouldPersistTaps="handled"
-                        ref={scrollRef}
-                        showsVerticalScrollIndicator={false}
-                    >
-                        {/* ===== PROGRESS BAR ===== */}
-                        <View style={styles.progressMeta}>
-                            <Text style={styles.progressStep}>STEP {activeSection + 1} OF {sections.length}</Text>
-                            <Text style={styles.progressLabel}>{section.short}</Text>
-                        </View>
-                        <View style={styles.progressTrack}>
-                            <View style={[styles.progressFill, { width: `${((activeSection + 1) / sections.length) * 100}%` }]} />
-                        </View>
+                                {/* ===== FORM ===== */}
+                                <View style={styles.card}>
+                                    <Text style={styles.eyebrow}>STEP 0{activeSection + 1}</Text>
+                                    <Text style={styles.title}>{section.title}</Text>
+                                    <Text style={styles.description}>{section.description}</Text>
+                                    <Pressable accessibilityRole="link" onPress={() => setWhyVisible(true)} style={({ pressed }) => [styles.whyLink, pressed && styles.pressed]}>
+                                        <Ionicons name="information-circle-outline" size={14} color={colors.primary} />
+                                        <Text style={styles.whyLinkText}>Why do we need this information?</Text>
+                                    </Pressable>
+                                    <View style={styles.divider} />
 
-                        {/* ===== FORM ===== */}
-                        <View style={styles.card}>
-                            <Text style={styles.eyebrow}>STEP 0{activeSection + 1}</Text>
-                            <Text style={styles.title}>{section.title}</Text>
-                            <Text style={styles.description}>{section.description}</Text>
-                            <View style={styles.divider} />
+                                    {/*---- PERSONAL INFORMATION -----*/}
+                                    {activeSection === 0 ? (
+                                        <>
+                                            <View style={styles.measurementHeader}>
+                                                <Text style={styles.measurementTitle}>Measurements</Text>
 
-                            {/*---- PERSONAL INFORMATION -----*/}
-                            {activeSection === 0 ? (
-                                <>
-                                    <View style={styles.measurementHeader}>
-                                        <Text style={styles.measurementTitle}>Measurements</Text>
-
-                                        {/* toggle between customary/metric units */}
-                                        <View style={styles.unitToggle}>
-                                            {(["customary", "metric"] as const).map((system) => {
-                                                const selected = measurementSystem === system;
-                                                return (
-                                                    <Pressable
-                                                        accessibilityRole="button"
-                                                        accessibilityState={{ selected }}
-                                                        key={system}
-                                                        onPress={() => changeMeasurementSystem(system)}
-                                                        style={[styles.unitToggleButton, selected && styles.unitToggleButtonActive]}
-                                                    >
-                                                        <Text style={[styles.unitToggleText, selected && styles.unitToggleTextActive]}>
-                                                            {system === "customary" ? "Customary" : "Metric"}
-                                                        </Text>
-                                                    </Pressable>
-                                                );
-                                            })}
-                                        </View>
-                                    </View>
-
-                                    <View style={styles.measurementRow}>
-
-                                        {/* -- height -- */}
-                                        <View style={styles.heightField}>
-                                            <FieldLabel>Height</FieldLabel>
-                                            <View style={styles.heightInputs}>
-                                            {measurementSystem === "customary" ? (
-                                                // customary
-                                                <>
-                                                    {/* Height in feet */}
-                                                    <View style={styles.heightInputWrap}>
-                                                        <TextInput
-                                                            accessibilityLabel="Height in feet"
-                                                            keyboardType="numeric"
-                                                            onChangeText={(value) => updateHeight("feet", value)}
-                                                            placeholder="5"
-                                                            placeholderTextColor="#A4B3AF"
-                                                            style={styles.heightInput}
-                                                            value={heightFeet}
-                                                        />
-                                                        <Text style={styles.suffix}>ft</Text>
-                                                    </View>
-
-                                                    {/* Height in inches */}
-                                                    <View style={styles.heightInputWrap}>
-                                                        <TextInput
-                                                            accessibilityLabel="Height in inches"
-                                                            keyboardType="numeric"
-                                                            onChangeText={(value) => updateHeight("inches", value)}
-                                                            placeholder="8"
-                                                            placeholderTextColor="#A4B3AF"
-                                                            style={styles.heightInput}
-                                                            value={heightInches}
-                                                        />
-                                                        <Text style={styles.suffix}>in</Text>
-                                                    </View>
-                                                </>
-                                            ) : ( // metric
-                                                /* Height in centimeters */
-                                                <View style={styles.heightInputWrap}>
-                                                    <TextInput
-                                                        accessibilityLabel="Height in centimeters"
-                                                        keyboardType="numeric"
-                                                        onChangeText={(value) => updateHeight("cm", value)}
-                                                        placeholder="173"
-                                                        placeholderTextColor="#A4B3AF"
-                                                        style={styles.heightInput}
-                                                        value={heightCmInput}
-                                                    />
-                                                    <Text style={styles.suffix}>cm</Text>
+                                                {/* toggle between customary/metric units */}
+                                                <View style={styles.unitToggle}>
+                                                    {(["customary", "metric"] as const).map((system) => {
+                                                        const selected = measurementSystem === system;
+                                                        return (
+                                                            <Pressable
+                                                                accessibilityRole="button"
+                                                                accessibilityState={{ selected }}
+                                                                key={system}
+                                                                onPress={() => changeMeasurementSystem(system)}
+                                                                style={[styles.unitToggleButton, selected && styles.unitToggleButtonActive]}
+                                                            >
+                                                                <Text style={[styles.unitToggleText, selected && styles.unitToggleTextActive]}>
+                                                                    {system === "customary" ? "Customary" : "Metric"}
+                                                                </Text>
+                                                            </Pressable>
+                                                        );
+                                                    })}
                                                 </View>
-                                            )}
-                                        </View>
+                                            </View>
 
-                                        <FieldError message={fieldErrors.heightCm} />
-                                        </View>
+                                            <View style={styles.measurementRow}>
 
-                                        {/* -- weight -- */}
-                                        <View style={styles.heightField}>
-                                            <View style={styles.heightInputs}>
-                                                <View style={styles.heightInputWrap}>
+                                                {/* -- height -- */}
+                                                <View style={styles.heightField}>
+                                                    <FieldLabel>Height</FieldLabel>
+                                                    <View style={styles.heightInputs}>
+                                                    {measurementSystem === "customary" ? (
+                                                        // customary
+                                                        <>
+                                                            {/* Height in feet */}
+                                                            <View style={styles.heightInputWrap}>
+                                                                <TextInput
+                                                                    accessibilityLabel="Height in feet"
+                                                                    keyboardType="numeric"
+                                                                    onChangeText={(value) => updateHeight("feet", value)}
+                                                                    placeholder="5"
+                                                                    placeholderTextColor="#A4B3AF"
+                                                                    style={styles.heightInput}
+                                                                    value={heightFeet}
+                                                                />
+                                                                <Text style={styles.suffix}>ft</Text>
+                                                            </View>
+
+                                                            {/* Height in inches */}
+                                                            <View style={styles.heightInputWrap}>
+                                                                <TextInput
+                                                                    accessibilityLabel="Height in inches"
+                                                                    keyboardType="numeric"
+                                                                    onChangeText={(value) => updateHeight("inches", value)}
+                                                                    placeholder="8"
+                                                                    placeholderTextColor="#A4B3AF"
+                                                                    style={styles.heightInput}
+                                                                    value={heightInches}
+                                                                />
+                                                                <Text style={styles.suffix}>in</Text>
+                                                            </View>
+                                                        </>
+                                                    ) : ( // metric
+                                                        /* Height in centimeters */
+                                                        <View style={styles.heightInputWrap}>
+                                                            <TextInput
+                                                                accessibilityLabel="Height in centimeters"
+                                                                keyboardType="numeric"
+                                                                onChangeText={(value) => updateHeight("cm", value)}
+                                                                placeholder="173"
+                                                                placeholderTextColor="#A4B3AF"
+                                                                style={styles.heightInput}
+                                                                value={heightCmInput}
+                                                            />
+                                                            <Text style={styles.suffix}>cm</Text>
+                                                        </View>
+                                                    )}
+                                                </View>
+
+                                                <FieldError message={fieldErrors.heightCm} />
+                                                </View>
+
+                                                {/* -- weight -- */}
+                                                <View style={styles.measurementField}>
                                                     <Input
                                                         keyboardType="numeric"
                                                         label="Weight"
                                                         onChangeText={(value) => {
                                                             const enteredWeight = Number(value);
                                                             update("weightKg", value.trim() === "" ? "" 
+                                                            // convert to kilograms if user entered in pounds
                                                             : String( measurementSystem === "customary" ? enteredWeight * 0.45359237 : enteredWeight ) );
                                                         }}
                                                         placeholder="165"
                                                         value={getDisplayedWeight()}
                                                         error={fieldErrors.weightKg}
+                                                        suffix={measurementSystem === "metric" ? "kg" : "lbs"}
                                                     />
-                                                    <Text style={styles.suffix}> {measurementSystem === "metric" ? "kg" : "lbs"} </Text>
+                                                </View>
+
+                                                {/* -- waist -- */}
+                                                <View style={[styles.measurementField]}>
+                                                    <Input
+                                                        label={`Waist circumference`}
+                                                        value={waistInput}
+                                                        onChangeText={(value) => {
+                                                            setWaistInput(value);
+                                                            const enteredWaist = Number(value);
+
+                                                            // store waist circumference in centimeters
+                                                            update( "waistCm",
+                                                                value.trim() === "" ? "" 
+                                                                    // convert to centimeters if user entered in inches
+                                                                    : String( measurementSystem === "customary" ? enteredWaist * 2.54 : enteredWaist )
+                                                            );
+                                                        }}
+                                                        placeholder="30"
+                                                        keyboardType="numeric"
+                                                        optional
+                                                        error={fieldErrors.waistCm}
+                                                        suffix={measurementSystem === "metric" ? "cm" : "in"}
+                                                    />
+                                                </View>
+                                                
+                                            </View>
+
+                                            {/* -- race  & geographic region -- */}
+                                            <MultiSelectField label="Race" options={raceOptions} values={form.race} onToggle={toggleRace} error={fieldErrors.race} />
+                                            <SelectField label="Geographical region" options={regionOptions} value={form.region} onChange={(value) => update("region", value)} error={fieldErrors.region} />
+                                        </>
+                                    ) : null}
+
+                                    {/* ----- MEDICAL HISTORY ----- */}
+                                    {activeSection === 1 ? (
+                                        <>
+                                            <Input label="Allergies"            value={form.allergies}      onChangeText={(value) => update("allergies", value)}      placeholder="List allergies and reactions, or enter “None”" multiline error={fieldErrors.allergies} />
+                                            <Input label="Past medical history" value={form.medicalHistory} onChangeText={(value) => update("medicalHistory", value)} placeholder="Previous illnesses, surgeries, or hospital stays" multiline />
+                                            <View style={styles.field}>
+                                                <FieldLabel>Diagnosed conditions</FieldLabel>
+                                                <Text style={styles.helperText}>Select all that apply</Text>
+                                                <View style={styles.conditionGrid}>
+                                                    {conditions.map((condition) => {
+                                                        const selected = form.diagnosedConditions.includes(condition);
+                                                        return (
+                                                            <Pressable
+                                                                key={condition}
+                                                                onPress={() => toggleCondition(condition)}
+                                                                style={({ pressed }) => [
+                                                                    styles.condition,
+                                                                    selected && styles.conditionSelected,
+                                                                    pressed && styles.pressed,
+                                                                ]}
+                                                            >
+                                                                <View style={[styles.checkbox, selected && styles.checkboxSelected]}>
+                                                                    {selected ? <Text style={styles.checkboxCheck}>✓</Text> : null}
+                                                                </View>
+                                                                <Text style={[styles.conditionText, selected && styles.conditionTextSelected]}>{condition}</Text>
+                                                            </Pressable>
+                                                        );
+                                                    })}
                                                 </View>
                                             </View>
-                                        </View>
+                                            <Input label="Other diagnosed conditions" value={form.otherCondition} onChangeText={(value) => update("otherCondition", value)} placeholder="Add another condition" optional />
+                                        </>
+                                    ) : null}
 
+                                    {/* ----- MEDICATIONS ----- */}
+                                    {activeSection === 2 ? (
+                                        <>
+                                            <Input label="Current medications. Separate with a comma." value={form.currentMedications} onChangeText={(value) => update("currentMedications", value)} placeholder="Example: Metformin, Bupropion" multiline />
+                                            <ChoiceGroup label="Do you take blood pressure medication?" options={["Yes", "No", "Not sure"]} value={form.bloodPressureMedication} onChange={(value) => update("bloodPressureMedication", value)} error={fieldErrors.bloodPressureMedication} />
+                                            <Input label="Blood pressure medication details" value={form.bloodPressureDetails} onChangeText={(value) => update("bloodPressureDetails", value)} placeholder="Medication name and dosage" optional />
+                                            <ChoiceGroup label="Do you take cholesterol-lowering medication?" options={["Yes", "No", "Not sure"]} value={form.cholesterolMedication} onChange={(value) => update("cholesterolMedication", value)} error={fieldErrors.cholesterolMedication} />
+                                            <Input label="Cholesterol medication details" value={form.cholesterolDetails} onChangeText={(value) => update("cholesterolDetails", value)} placeholder="Medication name and dosage" optional />
+                                        </>
+                                    ) : null}
 
-                                    {/* -- waist -- */}
-                                    <View style={[styles.measurementField]}>
-                                        <Input
-                                            label={`Waist circumference (${measurementSystem === "metric" ? "cm" : "in"})`}
-                                            value={waistInput}
-                                            onChangeText={(value) => {
-                                                setWaistInput(value);
-                                                const enteredWaist = Number(value);
+                                    {/* ----- LIFESTYLE FACTORS ----- */}
+                                    {activeSection === 3 ? (
+                                        <>
+                                            <ChoiceGroup label="Do you smoke?"                  options={["No", "Yes", "Previously"]}   value={form.smoking}           onChange={(value) => update("smoking", value)} error={fieldErrors.smoking} />
+                                            <ChoiceGroup label="Do you consume alcohol?"        options={["No", "Yes", "Occasionally"]} value={form.alcohol}           onChange={(value) => update("alcohol", value)} error={fieldErrors.alcohol} />
+                                            <ChoiceGroup label="Do you use recreational drugs?" options={["No", "Yes"]}                 value={form.recreationalDrugs} onChange={(value) => update("recreationalDrugs", value)} error={fieldErrors.recreationalDrugs} />
+                                            <Input label="How many hours per week do you exercise?" value={form.exerciseHours} onChangeText={(value) => update("exerciseHours", value)} placeholder="0" keyboardType="numeric" suffix="hours" error={fieldErrors.exerciseHours} />
+                                            <Input label="How much sleep do you get per night?"     value={form.sleepHours}    onChangeText={(value) => update("sleepHours", value)}    placeholder="0" keyboardType="numeric" suffix="hours" error={fieldErrors.sleepHours} />
+                                        </>
+                                    ) : null}
 
-                                                update( "waistCm",
-                                                    value.trim() === "" ? "" 
-                                                        : String( measurementSystem === "customary" ? enteredWaist * 2.54 : enteredWaist )
-                                                );
-                                            }}
-                                            placeholder="30"
-                                            keyboardType="numeric"
-                                            optional
-                                            error={fieldErrors.waistCm}
-                                        />
+                                    {/* ----- CARDIOVASCULAR HEALTH ----- */}
+                                    {activeSection === 4 ? (
+                                        <>
+                                            <ChoiceGroup label="History of high blood pressure?" options={["No", "Yes", "Not sure"]} value={form.highBloodPressureHistory} onChange={(value) => update("highBloodPressureHistory", value)} error={fieldErrors.highBloodPressureHistory} />
+                                            <ChoiceGroup label="History of high cholesterol?"    options={["No", "Yes", "Not sure"]} value={form.highCholesterolHistory} onChange={(value) => update("highCholesterolHistory", value)} error={fieldErrors.highCholesterolHistory} />
+                                            <View style={styles.reviewNote}>
+                                                <Text style={styles.reviewTitle}>You’re ready to submit.</Text>
+                                                <Text style={styles.reviewText}>Review your answers with the back button before completing your intake.</Text>
+                                            </View>
+                                        </>
+                                    ) : null}
+
+                                    {/* ----- SAVE & CONTINUE / SUBMIT BUTTON  ----- */}
+                                    <View style={styles.actions}>
+                                        {activeSection > 0 ? (
+                                            <Pressable onPress={() => goTo(activeSection - 1)} style={({ pressed }) => [styles.backButton, pressed && styles.pressed]}>
+                                                <Text style={styles.backText}>←  Back</Text>
+                                            </Pressable>
+                                        ) : <View />}
+                                        <Pressable onPress={continueForm} style={({ pressed }) => [styles.primaryButton, pressed && styles.buttonPressed]}>
+                                            <Text style={styles.primaryButtonText}>{activeSection === sections.length - 1 ? "Submit intake" : "Save & continue"}  →</Text>
+                                        </Pressable>
                                     </View>
-                                    
-                                        
-                                    </View>
-
-                                    {/* -- race  & geographic region -- */}
-                                    <MultiSelectField label="Race" options={raceOptions} values={form.race} onToggle={toggleRace} error={fieldErrors.race} />
-                                    <SelectField label="Geographical region" options={regionOptions} value={form.region} onChange={(value) => update("region", value)} error={fieldErrors.region} />
-                                </>
-                            ) : null}
-
-                            {/* ----- MEDICAL HISTORY ----- */}
-                            {activeSection === 1 ? (
-                                <>
-                                    {/*// TODO: make not optional*/}
-                                    <Input label="Allergies"            value={form.allergies}      onChangeText={(value) => update("allergies", value)}      placeholder="List allergies and reactions, or enter “None”" multiline />
-                                    <Input label="Past medical history" value={form.medicalHistory} onChangeText={(value) => update("medicalHistory", value)} placeholder="Previous illnesses, surgeries, or hospital stays" multiline />
-                                    <View style={styles.field}>
-                                        <FieldLabel>Diagnosed conditions</FieldLabel>
-                                        <Text style={styles.helperText}>Select all that apply</Text>
-                                        <View style={styles.conditionGrid}>
-                                            {conditions.map((condition) => {
-                                                const selected = form.diagnosedConditions.includes(condition);
-                                                return (
-                                                    <Pressable
-                                                        key={condition}
-                                                        onPress={() => toggleCondition(condition)}
-                                                        style={({ pressed }) => [
-                                                            styles.condition,
-                                                            selected && styles.conditionSelected,
-                                                            pressed && styles.pressed,
-                                                        ]}
-                                                    >
-                                                        <View style={[styles.checkbox, selected && styles.checkboxSelected]}>
-                                                            {selected ? <Text style={styles.checkboxCheck}>✓</Text> : null}
-                                                        </View>
-                                                        <Text style={[styles.conditionText, selected && styles.conditionTextSelected]}>{condition}</Text>
-                                                    </Pressable>
-                                                );
-                                            })}
-                                        </View>
-                                    </View>
-                                    <Input label="Other diagnosed conditions" value={form.otherCondition} onChangeText={(value) => update("otherCondition", value)} placeholder="Add another condition" optional />
-                                </>
-                            ) : null}
-
-                            {/* ----- MEDICATIONS ----- */}
-                            {activeSection === 2 ? (
-                                <>
-                                    <Input label="Current medications. Separate with a comma." value={form.currentMedications} onChangeText={(value) => update("currentMedications", value)} placeholder="Example: Metformin, Bupropion" multiline />
-                                    <ChoiceGroup label="Do you take blood pressure medication?" options={["Yes", "No", "Not sure"]} value={form.bloodPressureMedication} onChange={(value) => update("bloodPressureMedication", value)} error={fieldErrors.bloodPressureMedication} />
-                                    <Input label="Blood pressure medication details" value={form.bloodPressureDetails} onChangeText={(value) => update("bloodPressureDetails", value)} placeholder="Medication name and dosage" optional />
-                                    <ChoiceGroup label="Do you take cholesterol-lowering medication?" options={["Yes", "No", "Not sure"]} value={form.cholesterolMedication} onChange={(value) => update("cholesterolMedication", value)} error={fieldErrors.cholesterolMedication} />
-                                    <Input label="Cholesterol medication details" value={form.cholesterolDetails} onChangeText={(value) => update("cholesterolDetails", value)} placeholder="Medication name and dosage" optional />
-                                </>
-                            ) : null}
-
-                            {/* ----- LIFESTYLE FACTORS ----- */}
-                            {activeSection === 3 ? (
-                                <>
-                                    <ChoiceGroup label="Do you smoke?"                  options={["No", "Yes", "Previously"]}   value={form.smoking}           onChange={(value) => update("smoking", value)} error={fieldErrors.smoking} />
-                                    <ChoiceGroup label="Do you consume alcohol?"        options={["No", "Yes", "Occasionally"]} value={form.alcohol}           onChange={(value) => update("alcohol", value)} error={fieldErrors.alcohol} />
-                                    <ChoiceGroup label="Do you use recreational drugs?" options={["No", "Yes"]}                 value={form.recreationalDrugs} onChange={(value) => update("recreationalDrugs", value)} error={fieldErrors.recreationalDrugs} />
-                                    <Input label="How many hours per week do you exercise?" value={form.exerciseHours} onChangeText={(value) => update("exerciseHours", value)} placeholder="0" keyboardType="numeric" suffix="hours" error={fieldErrors.exerciseHours} />
-                                    <Input label="How much sleep do you get per night?"     value={form.sleepHours}    onChangeText={(value) => update("sleepHours", value)}    placeholder="0" keyboardType="numeric" suffix="hours" error={fieldErrors.sleepHours} />
-                                </>
-                            ) : null}
-
-                            {/* ----- CARDIOVASCULAR HEALTH ----- */}
-                            {activeSection === 4 ? (
-                                <>
-                                    <ChoiceGroup label="History of high blood pressure?" options={["No", "Yes", "Not sure"]} value={form.highBloodPressureHistory} onChange={(value) => update("highBloodPressureHistory", value)} error={fieldErrors.highBloodPressureHistory} />
-                                    <ChoiceGroup label="History of high cholesterol?"    options={["No", "Yes", "Not sure"]} value={form.highCholesterolHistory} onChange={(value) => update("highCholesterolHistory", value)} error={fieldErrors.highCholesterolHistory} />
-                                    <View style={styles.reviewNote}>
-                                        <Text style={styles.reviewTitle}>You’re ready to submit.</Text>
-                                        <Text style={styles.reviewText}>Review your answers with the back button before completing your intake.</Text>
-                                    </View>
-                                </>
-                            ) : null}
-
-                            {/* ----- SAVE & CONTINUE / SUBMIT BUTTON  ----- */}
-                            <View style={styles.actions}>
-                                {activeSection > 0 ? (
-                                    <Pressable onPress={() => goTo(activeSection - 1)} style={({ pressed }) => [styles.backButton, pressed && styles.pressed]}>
-                                        <Text style={styles.backText}>←  Back</Text>
-                                    </Pressable>
-                                ) : <View />}
-                                <Pressable onPress={continueForm} style={({ pressed }) => [styles.primaryButton, pressed && styles.buttonPressed]}>
-                                    <Text style={styles.primaryButtonText}>{activeSection === sections.length - 1 ? "Submit intake" : "Save & continue"}  →</Text>
-                                </Pressable>
-                            </View>
-                        </View>
-                        {/* ===== FOOTER ===== */}
-                        <Text style={styles.footer}>Your information is handled with care and used to create your digital twin.</Text>
-                    </ScrollView>
-                </KeyboardAvoidingView>
+                                </View>
+                                {/* ===== FORM FOOTER ===== */}
+                                <Text style={styles.footer}>Your information is handled with care and used to create your digital twin.</Text>
+                            </ScrollView>
+                        </KeyboardAvoidingView>
+                    </View>
+                </SafeAreaView>
+                {/* ===== FOOTER ===== */}
+                <Footer/>
             </View>
-        </SafeAreaView>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
     flex: { flex: 1 },
+    container: {
+        flex: 1,
+        flexDirection: "row",
+        backgroundColor: colors.background,
+    },
     safeArea: { backgroundColor: "#f4f7f8", flex: 1 },
+    nonNavContent: { flex: 1, },
     // ===== HEADER =====
     header: {
         alignItems: "center",
@@ -1132,6 +1206,29 @@ const styles = StyleSheet.create({
         marginBottom: 10,
         marginTop: 0,
     },
+
+    // why modal
+    whyLink: { alignItems: "center", alignSelf: "flex-start", flexDirection: "row", gap: 5, marginTop: 12 },
+    whyLinkText: { color: colors.primary, fontSize: 12, fontWeight: "600", textDecorationLine: "underline" },
+    modalOverlay: {
+        alignItems: "center",
+        backgroundColor: "rgba(15, 30, 35, 0.55)",
+        flex: 1,
+        justifyContent: "center",
+        padding: 20,
+    },
+    modalCard: {
+        backgroundColor: "#FFFFFF",
+        borderRadius: 18,
+        maxWidth: 480,
+        paddingHorizontal: 24,
+        paddingVertical: 28,
+        width: "100%",
+    },
+    modalTitle: { color: "#17393E", fontSize: 22, fontWeight: "700", letterSpacing: -0.5, lineHeight: 28, marginBottom: 16 },
+    modalHeading: { color: "#34534F", fontSize: 12, fontWeight: "700", marginBottom: 4, marginTop: 10 },
+    modalBody: { color: "#5E7772", fontSize: 13, lineHeight: 19 },
+    modalButton: { marginTop: 24 },
 
     // measurement row & unit toggle
     measurementTitle: { color: "#34534F", fontSize: 12, fontWeight: "700" },

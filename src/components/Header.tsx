@@ -1,20 +1,17 @@
-import { colors } from "@/theme/color";
-import { fonts, fontsize } from "@/theme/typography";
 import { View, Text, StyleSheet, Dimensions, Pressable } from "react-native";
 import { Ionicons } from "@react-native-vector-icons/ionicons";
 import { useEffect, useState } from "react";
 import { API_AUDIENCE, getCurrentUser } from "@/services/api";
-import { useAuth0 } from "react-native-auth0";
-import { useRouter, usePathname } from "expo-router";
+import { useAuth0 }                     from "react-native-auth0";
+import { useRouter, usePathname }   from "expo-router";
+import { colors } from "@/theme/color";
+import { fonts, fontsize } from "@/theme/typography";
 
 export default function Header() {
-    const router = useRouter();
+    const router   = useRouter();
     const pathname = usePathname();
     const { getApiCredentials } = useAuth0();
-    const cleanPathname = pathname
-        .substring(pathname.lastIndexOf("/") + 1)
-        .toUpperCase()
-        .replace("-", " ");
+    const cleanPathname = pathname.substring(pathname.lastIndexOf("/") + 1).toUpperCase().replaceAll("-", " ");
     const [profileName, setProfileName] = useState("Loading profile...");
 
     useEffect(() => {
@@ -25,10 +22,7 @@ export default function Header() {
                 const credentials = await getApiCredentials(API_AUDIENCE);
                 const user = await getCurrentUser(credentials.accessToken);
                 if (isCurrent) {
-                    setProfileName(
-                        [user.first_name, user.last_name].filter(Boolean).join(" ") ||
-                            "User",
-                    );
+                    setProfileName( [user.first_name, user.last_name].filter(Boolean).join(" ") || "User", );
                 }
             } catch (error) {
                 console.error("Failed to load authenticated MeSquared user:", error);
