@@ -1,6 +1,10 @@
+import {
+  API_AUDIENCE,
+  getPatientProfile
+} from "@/services/api";
 import { colors } from "@/theme/color";
 import { ChevronDown, MessageCircle } from "lucide-react-native";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Modal,
   SafeAreaView,
@@ -11,6 +15,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { useAuth0 } from "react-native-auth0";
 import Chatbot from "@/components/Chatbot";
 import Footer  from "@/components/Footer";
 import Header  from "@/components/Header";
@@ -20,20 +25,65 @@ export default function AccountInfo() {
   const [isSyncEnabled, setIsSyncEnabled] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
 
+  const { getApiCredentials } = useAuth0();
+
+  // get patient data from database
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [sex, setSex] = useState("");
+  const [age, setAge] = useState<number | undefined>();
+  const [height, setHeight] = useState<number | undefined>();
+  const [weight, setWeight] = useState<number | undefined>();
+  const [allergies, setAllergies] = useState("");
+  const [medicalCondition, setMedicalCondition] = useState("");
+  const [email, setEmail] = useState("");
+
+  useEffect(() => {
+    let isCurrent = true;
+
+    async function loadPatientData() {
+      try {
+        const credentials = await getApiCredentials(API_AUDIENCE);
+        const data = await getPatientProfile(credentials.accessToken);
+        if (isCurrent) {
+          setFirstName(data.user.first_name);
+          setLastName(data.user.last_name);
+          setSex(data.biological_sex);
+          setAge(new Date().getFullYear() - new Date(data.date_of_birth).getFullYear());
+          setHeight(data.baseline_height_cm);
+          setWeight(data.baseline_weight_kg);
+          setAllergies(data.allergies);
+          setMedicalCondition(data.medical_conditions);
+          setEmail(data.user.email);
+        }
+      } catch (error) {
+        console.error(
+          "Failed to load authenticated patient biomarkers:",
+          error,
+        );
+      }
+    }
+
+    void loadPatientData();
+    return () => {
+      isCurrent = false;
+    };
+  }, [getApiCredentials]);
+
   const keyUserData = [
-    { label: "First Name", value: "Jane" },
-    { label: "Last Name", value: "Doe" },
-    { label: "Sex", value: "Female" },
-    { label: "Age", value: "47" },
-    { label: "Height", value: "5 ft 10" },
-    { label: "Weight", value: "192 lbs" },
+    { label: "First Name", value: firstName },
+    { label: "Last Name", value: lastName },
+    { label: "Sex", value: sex },
+    { label: "Age", value: age },
   ];
 
   const detailedData = [
     { label: "Type of Tracking", value: "Cardiovascular", isLink: true },
-    { label: "Allergies", value: "Penicillin" },
-    { label: "Medical Condition", value: "N/A" },
-    { label: "Email", value: "test.patient@example.com" },
+    { label: "Height", value: height?.toString() ?? "" },
+    { label: "Weight", value: weight?.toString() ?? "" },
+    { label: "Allergies", value: allergies },
+    { label: "Medical Condition", value: medicalCondition },
+    { label: "Email", value: email },
   ];
 
   return (
