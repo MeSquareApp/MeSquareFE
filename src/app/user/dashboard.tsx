@@ -1,5 +1,4 @@
-import TrendCard from "@/components/TrendCard";
-import TwinStatBox from "@/components/TwinStatBox";
+import { useEffect, useState } from "react";
 import {
   Dimensions,
   Image,
@@ -8,19 +7,20 @@ import {
   Text,
   View,
 } from "react-native";
-import { colors } from "../../theme/color";
-import { fonts } from "../../theme/typography";
 import {
   API_AUDIENCE,
   getBiomarkers,
   type Biomarker,
 } from "@/services/api";
-import { useEffect, useState } from "react";
-import MetricCard from "../../components/MetricCard";
-import Navbar     from "../../components/Navbar";
-import Header     from "../../components/Header";
-import Footer     from "../../components/Footer"
+import { colors } from "@/theme/color";
+import { fonts }  from "@/theme/typography";
 import { useAuth0 } from 'react-native-auth0';
+import TrendCard   from "@/components/TrendCard";
+import TwinStatBox from "@/components/TwinStatBox";
+import MetricCard  from "@/components/MetricCard";
+import Navbar      from "@/components/Navbar";
+import Header      from "@/components/Header";
+import Footer      from "@/components/Footer";
 
 export default function Dashboard() {
   const twinStats = [
@@ -76,7 +76,7 @@ export default function Dashboard() {
             </View>
 
             <Image
-              source={require("../../../assets/images/female_medium.png")}
+              source={require("@/../assets/images/female_medium.png")}
               style={styles.twinImage}
               resizeMode="contain"
             />

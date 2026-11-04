@@ -1,8 +1,12 @@
 import { useEffect } from 'react';
-import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import { 
+  View,
+  ActivityIndicator, 
+  StyleSheet,
+} from 'react-native';
 import { Stack, useRouter } from 'expo-router';
 import { useAuth0 } from 'react-native-auth0';
-import { colors } from "../../theme/color";
+import { colors } from "@/theme/color";
 
 /* 
   If Khanh or Sy see this: yes this method of kicking out non-auth'd users

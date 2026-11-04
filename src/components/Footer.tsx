@@ -1,6 +1,6 @@
 import { colors } from "@/theme/color";
-import { fonts, fontsize } from "@/theme/typography";
-import { View, Text, StyleSheet, Dimensions, Image, Pressable } from "react-native";
+import { fonts }  from "@/theme/typography";
+import { View, Text, StyleSheet, Dimensions, Pressable } from "react-native";
 import { useRouter, usePathname } from "expo-router";
 
 export default function Footer(){

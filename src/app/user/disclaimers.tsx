@@ -5,11 +5,11 @@ import {
   Text,
   View,
 } from "react-native";
-import Header from "../../components/Header";
-import Navbar from "../../components/Navbar";
-import Footer from "../../components/Footer";
-import { colors }          from "../../theme/color";
-import { fonts, fontsize } from "../../theme/typography";
+import { colors }          from "@/theme/color";
+import { fonts, fontsize } from "@/theme/typography";
+import Header from "@/components/Header";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 export default function disclaimers(){
   return(

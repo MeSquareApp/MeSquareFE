@@ -1,6 +1,10 @@
+import { 
+    View, 
+    Text, 
+    StyleSheet 
+} from "react-native";
 import { colors } from "@/theme/color";
-import { fonts } from "@/theme/typography";
-import { View, Text, StyleSheet } from "react-native";
+import { fonts }  from "@/theme/typography";
 
 type MetricCardProps = {
   label: string;

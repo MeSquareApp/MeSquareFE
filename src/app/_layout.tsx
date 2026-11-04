@@ -2,14 +2,14 @@ import {
   AtkinsonHyperlegible_400Regular,
   AtkinsonHyperlegible_700Bold,
 } from "@expo-google-fonts/atkinson-hyperlegible";
-import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
-import { SafeAreaProvider } from "react-native-safe-area-context";
-import { Auth0Provider } from 'react-native-auth0';
-import { Platform } from "react-native";
-import { LogoutConfirmationProvider } from "../components/LogoutConfirmation";
+import { useFonts }                   from "expo-font";
+import { Stack }                      from "expo-router";
+import { SafeAreaProvider }           from "react-native-safe-area-context";
+import { Auth0Provider }              from 'react-native-auth0';
+import { Platform }                   from "react-native";
+import { LogoutConfirmationProvider } from "@/components/LogoutConfirmation";
 
-const auth0Domain = process.env.EXPO_PUBLIC_AUTH0_DOMAIN;
+const auth0Domain   = process.env.EXPO_PUBLIC_AUTH0_DOMAIN;
 const auth0ClientId = process.env.EXPO_PUBLIC_AUTH0_CLIENT_ID;
 const auth0Audience = process.env.EXPO_PUBLIC_AUTH0_AUDIENCE;
 
