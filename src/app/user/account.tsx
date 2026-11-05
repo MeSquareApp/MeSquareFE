@@ -1,7 +1,8 @@
-import {
-  API_AUDIENCE,
-  getPatientProfile
-} from "@/services/api";
+import Chatbot from "@/components/Chatbot";
+import Footer from "@/components/Footer";
+import Header from "@/components/Header";
+import Navbar from "@/components/Navbar";
+import { API_AUDIENCE, getPatientProfile } from "@/services/api";
 import { colors } from "@/theme/color";
 import { ChevronDown, MessageCircle } from "lucide-react-native";
 import { useEffect, useState } from "react";
@@ -16,10 +17,6 @@ import {
   View,
 } from "react-native";
 import { useAuth0 } from "react-native-auth0";
-import Chatbot from "@/components/Chatbot";
-import Footer  from "@/components/Footer";
-import Header  from "@/components/Header";
-import Navbar  from "@/components/Navbar";
 
 export default function AccountInfo() {
   const [isSyncEnabled, setIsSyncEnabled] = useState(false);
@@ -49,7 +46,10 @@ export default function AccountInfo() {
           setFirstName(data.user.first_name);
           setLastName(data.user.last_name);
           setSex(data.biological_sex);
-          setAge(new Date().getFullYear() - new Date(data.date_of_birth).getFullYear());
+          setAge(
+            new Date().getFullYear() -
+              new Date(data.date_of_birth).getFullYear(),
+          );
           setHeight(data.baseline_height_cm);
           setWeight(data.baseline_weight_kg);
           setAllergies(data.allergies);
@@ -79,8 +79,25 @@ export default function AccountInfo() {
 
   const detailedData = [
     { label: "Type of Tracking", value: "Cardiovascular", isLink: true },
-    { label: "Height", value: height?.toString() ?? "" },
-    { label: "Weight", value: weight?.toString() ?? "" },
+    {
+      label: "Height",
+      value:
+        (height?.toString() ?? "") +
+        " cm / " +
+        (height ? Math.floor(Math.round((height / 2.54) * 10) / 120) : "") +
+        " ft" +
+        (height
+          ? " " + ((((height / 2.54) * 10) / 10) % 12).toFixed(1) + " in"
+          : ""),
+    },
+    {
+      label: "Weight",
+      value:
+        (weight?.toString() ?? "") +
+        " kg / " +
+        (weight ? (weight * 2.2046226218).toFixed(2) : "") +
+        " lbs",
+    },
     { label: "Allergies", value: allergies },
     { label: "Medical Condition", value: medicalCondition },
     { label: "Email", value: email },
