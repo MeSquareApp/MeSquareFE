@@ -1,12 +1,10 @@
+import Footer from "@/components/Footer";
+import Header from "@/components/Header";
+import Navbar from "@/components/Navbar";
 import * as DocumentPicker from "expo-document-picker";
 import { useState } from "react";
-import { 
-  Pressable, 
-  StyleSheet, 
-  Text, 
-  View 
-} from "react-native";
-import { colors } from "@/theme/color";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { colors } from "../../theme/color";
 
 export default function FileUpload() {
   const [files, setFiles] = useState<DocumentPicker.DocumentPickerAsset[]>([]);
@@ -17,26 +15,40 @@ export default function FileUpload() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.heading}>File Upload</Text>
-      <Pressable onPress={pickFile} style={styles.button}>
-        <Text style={styles.buttonText}>Browse Files</Text>
-      </Pressable>
-      {files.length > 0 &&
-        files.map((f) => (
-          <Text key={f.uri} style={styles.fileName}>
-            {f.name}
+    <View style={{ flex: 1, flexDirection: "row" }}>
+      <Navbar />
+
+      <View style={{ flex: 1 }}>
+        <Header />
+
+        <ScrollView
+          style={styles.scroll}
+          contentContainerStyle={styles.container}
+          showsVerticalScrollIndicator={true}
+        >
+          <Text style={styles.heading}>File Upload</Text>
+          <Pressable onPress={pickFile} style={styles.button}>
+            <Text style={styles.buttonText}>Browse Files</Text>
+          </Pressable>
+          {files.length > 0 &&
+            files.map((f) => (
+              <Text key={f.uri} style={styles.fileName}>
+                {f.name}
+              </Text>
+            ))}
+          <Text style={styles.body}>
+            Data Logging UI to be implemented later on in Sprint 3...
           </Text>
-        ))}
-      <Text style={styles.body}>
-        Data Logging UI to be implemented later on in Sprint 3...
-      </Text>
+        </ScrollView>
+        <Footer />
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { alignItems: "center", marginTop: 20 },
+  scroll: { flex: 1 },
   heading: { fontSize: 38, fontWeight: "600", marginBottom: 8, marginTop: 50 },
   button: {
     backgroundColor: colors.primary,
