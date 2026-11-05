@@ -1,7 +1,7 @@
 
 import { View, Text, StyleSheet } from "react-native";
 import { colors } from "@/theme/color";
-import { fonts } from "@/theme/typography";
+import { fonts }  from "@/theme/typography";
 
 type TrendCardProps = {
   title: string;                    // name of the biomarker (eg. resting heart rate)

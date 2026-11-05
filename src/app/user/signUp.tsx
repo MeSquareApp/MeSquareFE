@@ -1,3 +1,8 @@
+import {
+  API_AUDIENCE,
+  createUserAccount,
+  type MeSquaredRole,
+} from "@/services/api";
 import { Picker } from "@react-native-picker/picker";
 import { Stack, useRouter } from "expo-router";
 import { useState } from "react";
@@ -15,11 +20,6 @@ import {
 import DateTimePicker from "react-native-ui-datepicker";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth0 } from "react-native-auth0";
-import {
-  API_AUDIENCE,
-  createUserAccount,
-  type MeSquaredRole,
-} from "@/services/api";
 
 export default function SignUp() {
   const [firstName, setFirstName] = useState("");
@@ -44,7 +44,7 @@ export default function SignUp() {
 
   const isPatient = role === "Patient";
 
-    //helper function to show alerts for web and iOS/Android platforms
+  //helper function to show alerts for web and iOS/Android platforms
   function showAlert(title: string, message?: string) {
     if (Platform.OS === "web") {
       // Browser's native dialog — blocking, but it works
@@ -161,8 +161,12 @@ export default function SignUp() {
             {isPatient && (
               <>
                 <Text style={styles.profileNote}>
-                  These patient details are for a later profile-setup step. This
-                  signup currently creates only your user record.
+                  These patient details are for a later profile-setup step.
+                  {"\n"}
+                  {"\n"}
+                  This signup currently creates your user record, with the
+                  minimum information required for forecasting if you opt out of
+                  providing full personal details later.
                 </Text>
                 <Picker
                   selectedValue={sex}
@@ -182,14 +186,14 @@ export default function SignUp() {
                     min="1900-01-01"
                     onChange={(e) => setDateOfBirth(e.target.value)}
                     style={{
-                      width: "45%",
+                      width: "44%",
                       alignSelf: "center",
                       backgroundColor: "#E5E7EB",
                       padding: 15,
                       borderRadius: 8,
                       borderWidth: 0,
-                      marginBottom: 50,
-                      marginTop: 25,
+                      marginBottom: 30,
+                      marginTop: 2,
                       fontFamily: "Atkinson Hyperlegible",
                       fontSize: 16,
                       color: dateOfBirth ? "#111827" : "#9CA3AF",
@@ -357,8 +361,8 @@ const styles = StyleSheet.create({
     color: "#6B7280",
     fontFamily: "Atkinson Hyperlegible",
     textAlign: "center",
-    marginBottom: 12,
-    lineHeight: 20,
+    marginBottom: 50,
+    marginTop: 25,
   },
   notification: {
     width: "80%",

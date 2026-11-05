@@ -1,6 +1,6 @@
 import { StyleSheet, Text, View } from "react-native";
 import { colors } from "../theme/color";
-import { fonts } from "../theme/typography";
+import { fonts }  from "../theme/typography";
 
 type Props = {
     value: string | number; // value of the stat (eg. 5'11")
