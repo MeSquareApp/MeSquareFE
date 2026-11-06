@@ -2,19 +2,97 @@
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
-## Get started
+## Create an .env.local file in project root with the following inside:
+
+EXPO_PUBLIC_AUTH0_DOMAIN=dev-tk23yhyc2e62i1a5.us.auth0.com
+EXPO_PUBLIC_AUTH0_CLIENT_ID=Y74WzKfMPGoPgePKQvPgVYZmpAeKfVyP
+EXPO_PUBLIC_AUTH0_AUDIENCE=https://mesquared-api-endpoint
+EXPO_PUBLIC_API_BASE_URL=http://localhost:8000
+
+## Run app with Docker
+
+The app ships with a multi-stage `Dockerfile` that can build both a
+production web image and a development environment.
+
+### Production (static web build + distroless): only for deployment images
+
+The production image runs `npx expo export --platform web` and serves the
+resulting `dist/` folder with a tiny Go static server
+(`docker/staticsrv/`) on a distroless [Chainguard](https://www.chainguard.dev/)
+runtime, as an unprivileged user, on port 8080:
+
+```bash
+cp .env.example .env   # adjust the EXPO_PUBLIC_* values
+docker compose up --build
+# open http://localhost:8080
+```
+
+**Why not nginx or Caddy?** Every currently published nginx and caddy
+image carries unpatched critical CVEs (measured with `docker scout cves`,
+2026-11-05): `nginx:1.27-alpine` has 16 critical / 66 high,
+`nginx:alpine` still has 1 critical (the zlib fix has not been released),
+and `caddy:2-alpine` has 1 critical plus highs compiled into the Caddy
+binary itself (`go-jose`, `x/net`). The Node-based build stages are
+likewise Chainguard images, because the official `node:22` Debian and
+Alpine images also carry unfixable highs. All base images in the
+`Dockerfile` are pinned by digest and scan with zero known
+vulnerabilities — re-check with `docker scout cves mesquarefe-web` when
+bumping them.
+
+The static server implements the same behaviour the nginx/Caddy configs
+would have: `try_files {path} {path}.html {path}/ /index.html` (so Expo
+Router client-side navigation works on deep links like
+`/user/dashboard`), `no-cache` for HTML, immutable caching for
+content-hashed `/_expo/static/` and `/assets/` files, and gzip.
+
+Important: `EXPO_PUBLIC_*` variables are **inlined into the JavaScript
+bundle at build time** (and `app.config.js` fails without
+`EXPO_PUBLIC_AUTH0_DOMAIN`), so they are passed as Docker **build args**.
+Changing them requires a rebuild: `docker compose build --no-cache web`.
+
+To build/run the image manually without Compose:
+
+```bash
+docker build \
+  --build-arg EXPO_PUBLIC_AUTH0_DOMAIN=dev-tk23yhyc2e62i1a5.us.auth0.com \
+  --build-arg EXPO_PUBLIC_AUTH0_CLIENT_ID=Y74WzKfMPGoPgePKQvPgVYZmpAeKfVyP \
+  --build-arg EXPO_PUBLIC_AUTH0_AUDIENCE=https://mesquared-api-endpoint \
+  --build-arg EXPO_PUBLIC_API_BASE_URL=http://localhost:8000 \
+  -t mesquarefe-web .
+docker run --rm -p 8080:8080 mesquarefe-web
+```
+
+When deploying, set `EXPO_PUBLIC_API_BASE_URL` to the public URL of the
+FastAPI backend — the value baked into the bundle must match where the
+browser can reach the API (e.g. `https://api.mesquared.example.com`).
+
+### Development container
+
+Run the Expo dev server in Docker with the source directory bind-mounted
+(profiles are additive, so naming the service keeps the production `web`
+service from also starting):
+
+```bash
+docker compose --profile dev up dev
+# open http://localhost:8081
+```
+
+`docker compose exec dev npx expo export --platform web` can be used to run
+a one-off web export inside the dev container.
+
+There is also a VS Code dev container (`.devcontainer/devcontainer.json`)
+built from the same Dockerfile `dev` target: open the project in VS Code and
+run **Dev Containers: Reopen in Container**. On first creation it runs
+`npm ci` and copies `.env.example` to `.env.local`.
+
+
+## Get started without docker
 
 1. Install dependencies
 
    ```bash
    npm install
    ```
-2. Create an .env.local file in project root with the following inside:
-
-EXPO_PUBLIC_AUTH0_DOMAIN=dev-tk23yhyc2e62i1a5.us.auth0.com
-EXPO_PUBLIC_AUTH0_CLIENT_ID=Y74WzKfMPGoPgePKQvPgVYZmpAeKfVyP
-EXPO_PUBLIC_AUTH0_AUDIENCE=https://mesquared-api-endpoint
-EXPO_PUBLIC_API_BASE_URL=http://localhost:8000
 
 The audience must match `AUTH0_AUDIENCE` in the backend configuration. The
 dashboard requests an API access token and fetches `/patients/me/biomarkers`;
@@ -26,7 +104,7 @@ in the 'users' table on Supabase. This can be done upon initial signup after
 auth0 account creation, when you're taken to the 
 http://localhost:8081/user/signUp page.
 
-3. Start the app
+2. Start the app
 
    ```bash
    npx expo start
