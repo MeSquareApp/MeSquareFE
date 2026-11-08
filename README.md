@@ -84,7 +84,7 @@ Tests live in `__tests__` folders next to the code they cover
 provides placeholder `EXPO_PUBLIC_*` values so the API service module
 loads without a local `.env.local` — no secrets are needed to run tests.
 
-## Continuous Integration
+## Continuous Integration (CI pipeline)
 
 GitHub Actions (`.github/workflows/ci.yml`) runs lint, typecheck and the
 unit tests on every push to `main`/`develop` and on every pull request
@@ -103,6 +103,55 @@ All three commands must pass before you push — the CI pipeline runs the
 same commands and will fail the build otherwise. Lint errors can also be
 flagged as you code by installing the
 [ESLint VS Code extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint).
+
+Both `main` and `develop` are protected by branch rules: pull requests
+cannot be merged until the CI checks pass, and direct pushes to these
+branches are rejected — all changes must go through a pull request.
+
+### If the CI pipeline fails on your pull request
+
+When the CI fails, the merge button on the PR stays disabled until it is
+green again. To fix it:
+
+1. **Find out what failed.** On the pull request page, click **Details**
+   next to the failed check (red ✗) to open the Actions log. Expand the
+   failed step — `Lint`, `Typecheck`, or `Run tests` — and read the error
+   messages. The failing file and line number are at the start of each
+   error.
+
+2. **Reproduce it locally.** Run the same three commands in your project
+   root so you can see the errors without waiting for CI:
+
+   ```bash
+   npm run lint          # lint errors (eslint output with file:line)
+   npx tsc --noEmit      # type errors (also file:line)
+   npm test              # failing tests
+   ```
+
+   To re-run a single test file while fixing it (command below is just an example):
+   `npm test -- src/components/__tests__/MetricCard.test.tsx`
+
+3. **Fix the errors on your PR branch.** If you pushed the branch from
+   your machine, commit and push the fixes to the same branch:
+
+   ```bash
+   git add <changed files>
+   git commit -m "Fix CI: <what you fixed>"
+   git push origin <your-branch-name>
+   ```
+
+   GitHub automatically re-runs the CI on the new commit. If you edited
+   the code through the GitHub web UI instead, commit the changes to the
+   PR branch there.
+
+4. **Wait for the checks to finish.** The PR conversation tab shows the
+   checks running. Once all checks pass, the merge button enables and the
+   PR can be merged.
+
+If you believe the failure is unrelated to your change (for example, a
+flaky test or an Actions outage), you can re-run the workflow from the
+failed run's page (**Re-run all jobs**). If a test is genuinely flaky,
+please fix or stabilize it rather than re-running repeatedly.
 
 
 ## Important Note on Authentication-Required Pages
