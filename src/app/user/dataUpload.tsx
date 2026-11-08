@@ -21,8 +21,26 @@ export default function FileUpload() {
 
   // State for sliders
   const [sleepHours, setSleepHours] = useState(7.5);
-  const [exerciseHours, setExerciseHours] = useState(1.0);
-  const [steps, setSteps] = useState(6850);
+  const [exerciseHours, setExerciseHours] = useState(0);
+  const [steps, setSteps] = useState(0);
+  const [waterIntake, setWaterIntake] = useState(0);
+
+  // State for Date (Starts at Nov 4, 2025 based on your design)
+  const [currentDate, setCurrentDate] = useState(new Date(2025, 10, 4)); // Month is 0-indexed (10 = Nov)
+
+  const changeDate = (days: number) => {
+    const newDate = new Date(currentDate);
+    newDate.setDate(newDate.getDate() + days);
+    setCurrentDate(newDate);
+  };
+
+  // Format: "Tue, Nov 4, 2025"
+  const formattedDate = currentDate.toLocaleDateString("en-US", {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
 
   const pickFile = async () => {
     const result = await DocumentPicker.getDocumentAsync({ multiple: true });
@@ -45,7 +63,10 @@ export default function FileUpload() {
           <View style={styles.topHeader}>
             <View style={styles.titleArea}>
               <View style={styles.heartIconContainer}>
-                <HeartPulse size={32} color={colors.primary || "#14B8A6"} />
+                <HeartPulse
+                  size={32}
+                  color={colors.primary || colors.secondary}
+                />
               </View>
               <View>
                 <Text style={styles.pageTitle}>Data Logging</Text>
@@ -56,25 +77,38 @@ export default function FileUpload() {
             </View>
           </View>
 
-          {/* Centered Date Picker */}
+          {/* Interactive Date Picker */}
           <View style={styles.datePickerContainer}>
             <View style={styles.datePicker}>
-              <Text style={styles.dateArrow}>{"<"}</Text>
-              <Text style={styles.dateText}>Tue, Nov 4, 2025</Text>
-              <Text style={styles.dateArrow}>{">"}</Text>
+              <Pressable
+                onPress={() => changeDate(-1)}
+                style={styles.arrowHitbox}
+              >
+                <Text style={styles.dateArrow}>{"<"}</Text>
+              </Pressable>
+
+              <Text style={styles.dateText}>{formattedDate}</Text>
+
+              <Pressable
+                onPress={() => changeDate(1)}
+                style={styles.arrowHitbox}
+              >
+                <Text style={styles.dateArrow}>{">"}</Text>
+              </Pressable>
             </View>
           </View>
 
           {/* 1. Daily Activity */}
           <View style={styles.card}>
             <View style={styles.cardHeader}>
-              <View style={styles.numberBadge}>
-                <Text style={styles.numberText}>1</Text>
-              </View>
               <View style={{ flex: 1 }}>
-                <Text style={styles.cardTitle}>Daily Activity</Text>
+                <Text style={styles.cardTitle}>
+                  Daily Activity Manual Logging
+                </Text>
                 <Text style={styles.cardSubtitle}>
-                  Log your sleep, exercise, and step count for today.
+                  Log your sleep, exercise, step count and water intake for
+                  today. If you don't have any wearable tech, no worries, you
+                  can manually enter your data.
                 </Text>
               </View>
             </View>
@@ -112,16 +146,16 @@ export default function FileUpload() {
                   style={styles.slider}
                   minimumValue={0}
                   maximumValue={6}
-                  step={0.1}
+                  step={0.25}
                   value={exerciseHours}
                   onValueChange={setExerciseHours}
-                  minimumTrackTintColor="#14B8A6"
+                  minimumTrackTintColor={colors.secondary}
                   maximumTrackTintColor="#D1D5DB"
-                  thumbTintColor="#14B8A6"
+                  thumbTintColor={colors.secondary}
                 />
                 <View style={styles.rangeLabels}>
                   <Text style={styles.rangeLabel}>0 h</Text>
-                  <Text style={styles.rangeLabel}>4 h</Text>
+                  <Text style={styles.rangeLabel}>6 h</Text>
                 </View>
               </View>
 
@@ -140,13 +174,38 @@ export default function FileUpload() {
                   step={50}
                   value={steps}
                   onValueChange={setSteps}
-                  minimumTrackTintColor="#8E24AA"
+                  minimumTrackTintColor="#d60808"
                   maximumTrackTintColor="#D1D5DB"
-                  thumbTintColor="#8E24AA"
+                  thumbTintColor="#d60808"
                 />
                 <View style={styles.rangeLabels}>
                   <Text style={styles.rangeLabel}>0</Text>
                   <Text style={styles.rangeLabel}>20k</Text>
+                </View>
+              </View>
+
+              {/* Water Intake Slider */}
+              <View style={styles.sliderCard}>
+                <Text style={styles.sliderTitle}>
+                  Water Intake:{" "}
+                  <Text style={styles.sliderValue}>
+                    {waterIntake.toLocaleString()}
+                  </Text>
+                </Text>
+                <Slider
+                  style={styles.slider}
+                  minimumValue={0}
+                  maximumValue={4}
+                  step={0.25}
+                  value={waterIntake}
+                  onValueChange={setWaterIntake}
+                  minimumTrackTintColor={colors.primary}
+                  maximumTrackTintColor="#D1D5DB"
+                  thumbTintColor={colors.primary}
+                />
+                <View style={styles.rangeLabels}>
+                  <Text style={styles.rangeLabel}>0</Text>
+                  <Text style={styles.rangeLabel}>4 L</Text>
                 </View>
               </View>
             </View>
@@ -155,14 +214,14 @@ export default function FileUpload() {
           {/* 2. Wearable Data */}
           <View style={styles.card}>
             <View style={styles.cardHeader}>
-              <View style={styles.numberBadge}>
-                <Text style={styles.numberText}>2</Text>
-              </View>
               <View style={{ flex: 1 }}>
-                <Text style={styles.cardTitle}>Wearable Data (Optional)</Text>
+                <Text style={styles.cardTitle}>
+                  Daily Wearable Data Logging
+                </Text>
                 <Text style={styles.cardSubtitle}>
                   Automatically sync RHR, HRV and VO₂ Max from your wearable
-                  device.
+                  device. Your step count, sleep, and other activity data will
+                  also be synced.
                 </Text>
               </View>
             </View>
@@ -202,9 +261,6 @@ export default function FileUpload() {
           {/* 3. Upload Medical Data */}
           <View style={styles.card}>
             <View style={styles.cardHeader}>
-              <View style={styles.numberBadge}>
-                <Text style={styles.numberText}>3</Text>
-              </View>
               <View style={{ flex: 1 }}>
                 <Text style={styles.cardTitle}>Upload Medical Data</Text>
                 <Text style={styles.cardSubtitle}>
@@ -240,9 +296,6 @@ export default function FileUpload() {
           {/* 4. Weekly Weigh-In */}
           <View style={styles.card}>
             <View style={styles.cardHeader}>
-              <View style={styles.numberBadge}>
-                <Text style={styles.numberText}>4</Text>
-              </View>
               <View style={{ flex: 1 }}>
                 <Text style={styles.cardTitle}>Weekly Weigh-In</Text>
                 <Text style={styles.cardSubtitle}>
@@ -320,7 +373,7 @@ const styles = StyleSheet.create({
     fontFamily: "Atkinson Hyperlegible",
   },
 
-  // Centered Date Picker
+  // Centered Interactive Date Picker
   datePickerContainer: {
     alignItems: "center",
     marginBottom: 24,
@@ -330,18 +383,24 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#FFFFFF",
     paddingVertical: 8,
-    paddingHorizontal: 24,
+    paddingHorizontal: 12,
     borderRadius: 20,
     borderWidth: 1,
     borderColor: "#E5E7EB",
   },
-  dateArrow: { fontSize: 16, color: "#111827", fontWeight: "bold" },
+  arrowHitbox: {
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+  },
+  dateArrow: { fontSize: 20, color: colors.secondary, fontWeight: "bold" },
   dateText: {
-    fontSize: 14,
-    fontWeight: "500",
-    color: "#111827",
-    marginHorizontal: 16,
+    fontSize: 16,
+    fontWeight: "bold",
+    color: colors.secondary,
+    marginHorizontal: 8,
     fontFamily: "Atkinson Hyperlegible",
+    width: 120,
+    textAlign: "center",
   },
 
   // Card Base
@@ -349,7 +408,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     borderRadius: 12,
     padding: 24,
-    marginBottom: 16,
+    marginBottom: 20,
     borderWidth: 1,
     borderColor: "#E5E7EB",
   },
@@ -358,16 +417,6 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
     marginBottom: 20,
   },
-  numberBadge: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: colors.primary || "#14B8A6",
-    justifyContent: "center",
-    alignItems: "center",
-    marginRight: 16,
-  },
-  numberText: { color: "white", fontWeight: "bold", fontSize: 16 },
   cardTitle: {
     fontSize: 18,
     fontWeight: "bold",
