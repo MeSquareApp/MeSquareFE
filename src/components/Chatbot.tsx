@@ -51,6 +51,7 @@ export default function Chatbot({ onClose }: { onClose: () => void }) {
     if (!textToSend.trim()) return;
 
     const userMessage = {
+      // eslint-disable-next-line react-hooks/purity -- handleSend only runs from onPress/onSubmitEditing event handlers; ids just need to be unique
       id: Date.now().toString(),
       sender: "user",
       text: textToSend,

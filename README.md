@@ -14,58 +14,6 @@ EXPO_PUBLIC_API_BASE_URL=http://localhost:8000
 The app ships with a multi-stage `Dockerfile` that can build both a
 production web image and a development environment.
 
-### Production (static web build + distroless): only for deployment images
-
-The production image runs `npx expo export --platform web` and serves the
-resulting `dist/` folder with a tiny Go static server
-(`docker/staticsrv/`) on a distroless [Chainguard](https://www.chainguard.dev/)
-runtime, as an unprivileged user, on port 8080:
-
-```bash
-cp .env.example .env   # adjust the EXPO_PUBLIC_* values
-docker compose up --build
-# open http://localhost:8080
-```
-
-**Why not nginx or Caddy?** Every currently published nginx and caddy
-image carries unpatched critical CVEs (measured with `docker scout cves`,
-2026-11-05): `nginx:1.27-alpine` has 16 critical / 66 high,
-`nginx:alpine` still has 1 critical (the zlib fix has not been released),
-and `caddy:2-alpine` has 1 critical plus highs compiled into the Caddy
-binary itself (`go-jose`, `x/net`). The Node-based build stages are
-likewise Chainguard images, because the official `node:22` Debian and
-Alpine images also carry unfixable highs. All base images in the
-`Dockerfile` are pinned by digest and scan with zero known
-vulnerabilities — re-check with `docker scout cves mesquarefe-web` when
-bumping them.
-
-The static server implements the same behaviour the nginx/Caddy configs
-would have: `try_files {path} {path}.html {path}/ /index.html` (so Expo
-Router client-side navigation works on deep links like
-`/user/dashboard`), `no-cache` for HTML, immutable caching for
-content-hashed `/_expo/static/` and `/assets/` files, and gzip.
-
-Important: `EXPO_PUBLIC_*` variables are **inlined into the JavaScript
-bundle at build time** (and `app.config.js` fails without
-`EXPO_PUBLIC_AUTH0_DOMAIN`), so they are passed as Docker **build args**.
-Changing them requires a rebuild: `docker compose build --no-cache web`.
-
-To build/run the image manually without Compose:
-
-```bash
-docker build \
-  --build-arg EXPO_PUBLIC_AUTH0_DOMAIN=dev-tk23yhyc2e62i1a5.us.auth0.com \
-  --build-arg EXPO_PUBLIC_AUTH0_CLIENT_ID=Y74WzKfMPGoPgePKQvPgVYZmpAeKfVyP \
-  --build-arg EXPO_PUBLIC_AUTH0_AUDIENCE=https://mesquared-api-endpoint \
-  --build-arg EXPO_PUBLIC_API_BASE_URL=http://localhost:8000 \
-  -t mesquarefe-web .
-docker run --rm -p 8080:8080 mesquarefe-web
-```
-
-When deploying, set `EXPO_PUBLIC_API_BASE_URL` to the public URL of the
-FastAPI backend — the value baked into the bundle must match where the
-browser can reach the API (e.g. `https://api.mesquared.example.com`).
-
 ### Development container
 
 Run the Expo dev server in Docker with the source directory bind-mounted
@@ -118,6 +66,44 @@ In the output, you'll find options to open the app in a
 - [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
 
 You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+
+## Testing
+
+Unit tests run with [Jest](https://jestjs.io/) via the
+[jest-expo](https://docs.expo.dev/develop/unit-testing/) preset and
+[@testing-library/react-native](https://callstack.github.io/react-native-testing-library/):
+
+```bash
+npm test              # run all tests once
+npm test -- --watch   # watch mode while developing
+```
+
+Tests live in `__tests__` folders next to the code they cover
+(e.g. `src/services/__tests__/api.test.ts`,
+`src/components/__tests__/MetricCard.test.tsx`). `jest.setup.js`
+provides placeholder `EXPO_PUBLIC_*` values so the API service module
+loads without a local `.env.local` — no secrets are needed to run tests.
+
+## Continuous Integration
+
+GitHub Actions (`.github/workflows/ci.yml`) runs lint, typecheck and the
+unit tests on every push to `main`/`develop` and on every pull request
+targeting `main`/`develop`.
+
+Before pushing code to either branch, run the same checks locally so the
+pipeline stays green:
+
+```bash
+npm run lint          # check for lint errors
+npx tsc --noEmit      # check for type errors
+npm test              # run the unit tests
+```
+
+All three commands must pass before you push — the CI pipeline runs the
+same commands and will fail the build otherwise. Lint errors can also be
+flagged as you code by installing the
+[ESLint VS Code extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint).
+
 
 ## Important Note on Authentication-Required Pages
 

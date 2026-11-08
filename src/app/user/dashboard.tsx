@@ -102,7 +102,7 @@ export default function Dashboard() {
           >
             {/* today's metrics */}
             <View style={styles.dashboardSection}>
-              <Text style={styles.sectionTitle}>Today's Metrics</Text>
+              <Text style={styles.sectionTitle}>Today&apos;s Metrics</Text>
 
               {/* grid */}
               <View style={styles.metricsGrid}>
@@ -169,7 +169,7 @@ export default function Dashboard() {
 
             {/* your twin's metrics */}
             <View style={styles.dashboardSection}>
-              <Text style={styles.sectionTitle}>Your Twin's Metrics</Text>
+              <Text style={styles.sectionTitle}>Your Twin&apos;s Metrics</Text>
 
               {/* grid */}
               <View style={styles.metricsGrid}>
