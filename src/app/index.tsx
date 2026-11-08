@@ -19,6 +19,14 @@ import {
 
 type AuthDestination = '/user/dashboard' | '/user/signUp';
 
+// react-native-web passes an extra `hovered` flag in Pressable's style/children
+// state callbacks, but React Native's own types only declare `pressed`. Type the
+// callback parameter explicitly so typechecking does not depend on the
+// locally-generated expo-env.d.ts (which pulls in expo/types' web augmentations
+// and is gitignored, so CI never sees it). `hovered` is optional because native
+// platforms never set it; hover styles simply don't apply there.
+type PressableState = { hovered?: boolean; pressed: boolean };
+
 const AUTH_DESTINATION_KEY = 'mesquared.authDestination';
 
 export default function Index() {
@@ -196,7 +204,7 @@ export default function Index() {
             {user ? (
               <>
                 <Pressable
-                  style={({ hovered, pressed }) => [
+                  style={({ hovered, pressed }: PressableState) => [
                     styles.loginButton,
                     hovered && styles.loginButtonHover,
                     pressed && styles.loginButtonPressed,
@@ -207,7 +215,7 @@ export default function Index() {
                   <Text style={styles.loginButtonText}>Go to Dashboard</Text>
                 </Pressable>
                 <Pressable
-                  style={({ hovered, pressed }) => [
+                  style={({ hovered, pressed }: PressableState) => [
                     styles.logoutButton,
                     hovered && styles.logoutButtonHover,
                     pressed && styles.logoutButtonPressed,
@@ -221,7 +229,7 @@ export default function Index() {
             ) : (
               <>
                 <Pressable
-                  style={({ hovered, pressed }) => [
+                  style={({ hovered, pressed }: PressableState) => [
                     styles.loginButton,
                     hovered && styles.loginButtonHover,
                     pressed && styles.loginButtonPressed,
@@ -236,7 +244,7 @@ export default function Index() {
                   )}
                 </Pressable>
                 <Pressable
-                  style={({ hovered, pressed }) => [
+                  style={({ hovered, pressed }: PressableState) => [
                     styles.signUpButton,
                     hovered && styles.signUpButtonHover,
                     pressed && styles.signUpButtonPressed,
