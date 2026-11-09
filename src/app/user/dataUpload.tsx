@@ -12,6 +12,7 @@ import {
   Text,
   TextInput,
   View,
+  useWindowDimensions,
 } from "react-native";
 import { colors } from "../../theme/color";
 
@@ -25,8 +26,12 @@ export default function FileUpload() {
   const [steps, setSteps] = useState(0);
   const [waterIntake, setWaterIntake] = useState(0);
 
-  // State for Date (Starts at Nov 4, 2025 based on your design)
-  const [currentDate, setCurrentDate] = useState(new Date(2025, 10, 4)); // Month is 0-indexed (10 = Nov)
+  // State for Date
+  const [currentDate, setCurrentDate] = useState(new Date(2025, 10, 4));
+
+  // Responsive Hook
+  const { width } = useWindowDimensions();
+  const isMobile = width < 768;
 
   const changeDate = (days: number) => {
     const newDate = new Date(currentDate);
@@ -34,7 +39,6 @@ export default function FileUpload() {
     setCurrentDate(newDate);
   };
 
-  // Format: "Tue, Nov 4, 2025"
   const formattedDate = currentDate.toLocaleDateString("en-US", {
     weekday: "short",
     month: "short",
@@ -49,6 +53,7 @@ export default function FileUpload() {
 
   return (
     <View style={{ flex: 1, flexDirection: "row", backgroundColor: "#F8F9FA" }}>
+      {/* Note: You may want to hide the Navbar on mobile, or make it a drawer/bottom tab bar in your Navbar component */}
       <Navbar />
 
       <View style={{ flex: 1 }}>
@@ -56,7 +61,10 @@ export default function FileUpload() {
 
         <ScrollView
           style={styles.scroll}
-          contentContainerStyle={styles.container}
+          contentContainerStyle={[
+            styles.container,
+            isMobile && styles.containerMobile,
+          ]}
           showsVerticalScrollIndicator={true}
         >
           {/* Top Title Area */}
@@ -68,7 +76,7 @@ export default function FileUpload() {
                   color={colors.primary || colors.secondary}
                 />
               </View>
-              <View>
+              <View style={{ flexShrink: 1 }}>
                 <Text style={styles.pageTitle}>Data Logging</Text>
                 <Text style={styles.pageSubtitle}>
                   Track your daily activity and health metrics
@@ -113,8 +121,8 @@ export default function FileUpload() {
               </View>
             </View>
 
-            <View style={styles.activityRow}>
-              {/* Sleep Slider */}
+            {/* Responsive Row -> Column on mobile */}
+            <View style={[styles.activityRow, isMobile && styles.columnLayout]}>
               <View style={styles.sliderCard}>
                 <Text style={styles.sliderTitle}>
                   Sleep: <Text style={styles.sliderValue}>{sleepHours} h</Text>
@@ -136,7 +144,6 @@ export default function FileUpload() {
                 </View>
               </View>
 
-              {/* Exercise Slider */}
               <View style={styles.sliderCard}>
                 <Text style={styles.sliderTitle}>
                   Exercise:{" "}
@@ -159,7 +166,6 @@ export default function FileUpload() {
                 </View>
               </View>
 
-              {/* Steps Slider */}
               <View style={styles.sliderCard}>
                 <Text style={styles.sliderTitle}>
                   Steps:{" "}
@@ -184,13 +190,9 @@ export default function FileUpload() {
                 </View>
               </View>
 
-              {/* Water Intake Slider */}
               <View style={styles.sliderCard}>
                 <Text style={styles.sliderTitle}>
-                  Water Intake:{" "}
-                  <Text style={styles.sliderValue}>
-                    {waterIntake.toLocaleString()}
-                  </Text>
+                  Water: <Text style={styles.sliderValue}>{waterIntake} L</Text>
                 </Text>
                 <Slider
                   style={styles.slider}
@@ -226,7 +228,7 @@ export default function FileUpload() {
               </View>
             </View>
 
-            <View style={styles.wearableRow}>
+            <View style={[styles.wearableRow, isMobile && styles.columnLayout]}>
               <View style={styles.wearableStats}>
                 <View style={styles.statItem}>
                   <Text style={styles.statLabel}>RHR</Text>
@@ -242,10 +244,18 @@ export default function FileUpload() {
                 </View>
               </View>
 
-              <View style={styles.verticalDivider} />
+              {/* Hide vertical divider on mobile */}
+              {!isMobile && <View style={styles.verticalDivider} />}
 
-              <View style={styles.connectAction}>
-                <Pressable style={styles.primaryButton}>
+              <View
+                style={[
+                  styles.connectAction,
+                  isMobile && { marginTop: 24, width: "100%" },
+                ]}
+              >
+                <Pressable
+                  style={[styles.primaryButton, isMobile && { width: "100%" }]}
+                >
                   <Text style={styles.buttonText}>Connect Wearable</Text>
                 </Pressable>
                 <Text style={styles.orText}>
@@ -273,7 +283,10 @@ export default function FileUpload() {
 
             <View style={styles.uploadArea}>
               <View style={styles.uploadActionContainer}>
-                <Pressable onPress={pickFile} style={styles.primaryButton}>
+                <Pressable
+                  onPress={pickFile}
+                  style={[styles.primaryButton, isMobile && { width: "100%" }]}
+                >
                   <Text style={styles.buttonText}>Browse Files</Text>
                 </Pressable>
                 <Text style={styles.supportedText}>
@@ -304,16 +317,21 @@ export default function FileUpload() {
               </View>
             </View>
 
-            <View style={styles.weighInRow}>
+            <View style={[styles.weighInRow, isMobile && styles.columnLayout]}>
               <TextInput
-                style={styles.input}
+                style={[
+                  styles.input,
+                  isMobile && { marginRight: 0, marginBottom: 12 },
+                ]}
                 placeholder="Enter weight (lbs)"
                 placeholderTextColor="#9CA3AF"
-                keyboardType="numeric"
+                keyboardType="number-pad"
                 value={weight}
                 onChangeText={setWeight}
               />
-              <Pressable style={styles.outlineButton}>
+              <Pressable
+                style={[styles.outlineButton, isMobile && { width: "100%" }]}
+              >
                 <Text style={styles.outlineButtonText}>Save Weight</Text>
               </Pressable>
             </View>
@@ -321,7 +339,7 @@ export default function FileUpload() {
 
           {/* Info Banner */}
           <View style={styles.infoBanner}>
-            <Text style={styles.infoText}>
+            <Text style={[styles.infoText, { textAlign: "center" }]}>
               You can always update your data later.
             </Text>
           </View>
@@ -340,6 +358,14 @@ const styles = StyleSheet.create({
     maxWidth: 1200,
     width: "100%",
     alignSelf: "center",
+  },
+  containerMobile: {
+    padding: 16, // Reduce padding on mobile to give more room for content
+  },
+  columnLayout: {
+    flexDirection: "column",
+    alignItems: "stretch",
+    gap: 16,
   },
 
   // Top Header
@@ -361,19 +387,19 @@ const styles = StyleSheet.create({
     marginRight: 16,
   },
   pageTitle: {
-    fontSize: 32,
+    fontSize: 28, // Slightly smaller base font
     fontWeight: "bold",
     color: "#111827",
     fontFamily: "Atkinson Hyperlegible",
   },
   pageSubtitle: {
-    fontSize: 16,
+    fontSize: 14,
     color: "#6B7280",
     marginTop: 4,
     fontFamily: "Atkinson Hyperlegible",
   },
 
-  // Centered Interactive Date Picker
+  // Date Picker
   datePickerContainer: {
     alignItems: "center",
     marginBottom: 24,
@@ -387,6 +413,9 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 1,
     borderColor: "#E5E7EB",
+    width: "100%",
+    maxWidth: 300,
+    justifyContent: "space-between",
   },
   arrowHitbox: {
     paddingHorizontal: 12,
@@ -397,9 +426,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
     color: colors.secondary,
-    marginHorizontal: 8,
     fontFamily: "Atkinson Hyperlegible",
-    width: 120,
     textAlign: "center",
   },
 
@@ -407,7 +434,7 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: "#FFFFFF",
     borderRadius: 12,
-    padding: 24,
+    padding: 20,
     marginBottom: 20,
     borderWidth: 1,
     borderColor: "#E5E7EB",
@@ -430,7 +457,7 @@ const styles = StyleSheet.create({
     fontFamily: "Atkinson Hyperlegible",
   },
 
-  // Activity (Card 1) - Reused styles from SignUp
+  // Activity Sliders
   activityRow: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -449,7 +476,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   sliderTitle: {
-    fontSize: 16,
+    fontSize: 14,
     color: "#374151",
     fontFamily: "Atkinson Hyperlegible",
     textAlign: "center",
@@ -475,7 +502,7 @@ const styles = StyleSheet.create({
     fontFamily: "Atkinson Hyperlegible",
   },
 
-  // Wearable (Card 2)
+  // Wearable
   wearableRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -511,16 +538,21 @@ const styles = StyleSheet.create({
     color: colors.primary || "#14B8A6",
     textDecorationLine: "underline",
   },
-  verticalDivider: { width: 1, height: "80%", backgroundColor: "#E5E7EB" },
+  verticalDivider: {
+    width: 1,
+    height: "80%",
+    backgroundColor: "#E5E7EB",
+    marginHorizontal: 16,
+  },
 
-  // Upload (Card 3)
+  // Upload
   uploadArea: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 20,
+    paddingVertical: 10,
   },
-  uploadActionContainer: { alignItems: "center" },
+  uploadActionContainer: { alignItems: "center", width: "100%" },
   supportedText: {
     fontSize: 12,
     color: "#6B7280",
@@ -540,12 +572,11 @@ const styles = StyleSheet.create({
     fontFamily: "Atkinson Hyperlegible",
   },
 
-  // Weigh-In (Card 4)
+  // Weigh-In
   weighInRow: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "flex-start",
-    paddingLeft: 20,
   },
   input: {
     flex: 1,
@@ -553,7 +584,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#E5E7EB",
     borderRadius: 8,
     paddingHorizontal: 16,
-    marginRight: 20,
+    marginRight: 16,
     fontSize: 14,
     color: "#111827",
     fontFamily: "Atkinson Hyperlegible",
