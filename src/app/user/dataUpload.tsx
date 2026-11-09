@@ -115,8 +115,8 @@ export default function FileUpload() {
                 </Text>
                 <Text style={styles.cardSubtitle}>
                   Log your sleep, exercise, step count and water intake for
-                  today. If you don't have any wearable tech, no worries, you
-                  can manually enter your data.
+                  today. If you don&apos;t have any wearable tech, no worries,
+                  you can manually enter your data.
                 </Text>
               </View>
             </View>
