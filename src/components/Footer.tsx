@@ -1,11 +1,10 @@
 import { colors } from "@/theme/color";
 import { fonts }  from "@/theme/typography";
 import { View, Text, StyleSheet, Dimensions, Pressable } from "react-native";
-import { useRouter, usePathname } from "expo-router";
+import { useRouter } from "expo-router";
 
 export default function Footer(){
     const router = useRouter();
-    const pathname = usePathname();
 
     return (
       <View style={styles.footer}>

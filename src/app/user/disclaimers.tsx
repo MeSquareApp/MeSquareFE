@@ -28,8 +28,8 @@ export default function disclaimers(){
           {/* created using Termly */}
           <Text style={styles.disclaimerSubHeader}>WEBSITE DISCLAIMER</Text>
           <Text style={styles.disclaimerBody}>
-            The information provided by [REPLACE WITH COMPANY NAME] ("we," "us," or "our") on http://mesquared.com 
-            (the "Site") is for general informational purposes only. All information on the Site is provided in 
+            The information provided by [REPLACE WITH COMPANY NAME] (&quot;we,&quot; &quot;us,&quot; or &quot;our&quot;) on http://mesquared.com 
+            (the &quot;Site&quot;) is for general informational purposes only. All information on the Site is provided in 
             good faith, however we make no representation or warranty of any kind, express or implied, regarding 
             the accuracy, adequacy, validity, reliability, availability, or completeness of any information on the Site. 
             UNDER NO CIRCUMSTANCE SHALL WE HAVE ANY LIABILITY TO YOU FOR ANY LOSS OR DAMAGE OF ANY KIND INCURRED AS A 

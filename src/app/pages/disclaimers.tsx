@@ -13,9 +13,9 @@ import { colors }          from "../../theme/color";
 import { fonts, fontsize } from "../../theme/typography";
 
 const DISCLAIMER_LINKS = [
-  { title: "Medical Advice Disclaimer",              href: "../pages/disclaimers/medical-advice-disclaimer" },
-  { title: "Emergency Services Disclaimer",          href: "../pages/disclaimers/emergency-services-disclaimer" },
-  { title: "User-Service Relationship Disclaimer",   href: "../pages/disclaimers/user-service-disclaimer" },
+  { title: "Medical Advice Disclaimer",              href: "../pages/medical-advice-disclaimer" },
+  { title: "Emergency Services Disclaimer",          href: "../pages/emergency-services-disclaimer" },
+  { title: "User-Service Relationship Disclaimer",   href: "../pages/user-service-disclaimer" },
 ] as const;
 
 export default function Disclaimers(){

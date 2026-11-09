@@ -2,19 +2,45 @@
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
-## Get started
+## Create an .env.local file in project root with the following inside:
+
+EXPO_PUBLIC_AUTH0_DOMAIN=dev-tk23yhyc2e62i1a5.us.auth0.com
+EXPO_PUBLIC_AUTH0_CLIENT_ID=Y74WzKfMPGoPgePKQvPgVYZmpAeKfVyP
+EXPO_PUBLIC_AUTH0_AUDIENCE=https://mesquared-api-endpoint
+EXPO_PUBLIC_API_BASE_URL=http://localhost:8000
+
+## Run app with Docker
+
+The app ships with a multi-stage `Dockerfile` that can build both a
+production web image and a development environment.
+
+### Development container
+
+Run the Expo dev server in Docker with the source directory bind-mounted
+(profiles are additive, so naming the service keeps the production `web`
+service from also starting):
+
+```bash
+docker compose --profile dev up dev
+# open http://localhost:8081
+```
+
+`docker compose exec dev npx expo export --platform web` can be used to run
+a one-off web export inside the dev container.
+
+There is also a VS Code dev container (`.devcontainer/devcontainer.json`)
+built from the same Dockerfile `dev` target: open the project in VS Code and
+run **Dev Containers: Reopen in Container**. On first creation it runs
+`npm ci` and copies `.env.example` to `.env.local`.
+
+
+## Get started without docker
 
 1. Install dependencies
 
    ```bash
    npm install
    ```
-2. Create an .env.local file in project root with the following inside:
-
-EXPO_PUBLIC_AUTH0_DOMAIN=dev-tk23yhyc2e62i1a5.us.auth0.com
-EXPO_PUBLIC_AUTH0_CLIENT_ID=Y74WzKfMPGoPgePKQvPgVYZmpAeKfVyP
-EXPO_PUBLIC_AUTH0_AUDIENCE=https://mesquared-api-endpoint
-EXPO_PUBLIC_API_BASE_URL=http://localhost:8000
 
 The audience must match `AUTH0_AUDIENCE` in the backend configuration. The
 dashboard requests an API access token and fetches `/patients/me/biomarkers`;
@@ -26,7 +52,7 @@ in the 'users' table on Supabase. This can be done upon initial signup after
 auth0 account creation, when you're taken to the 
 http://localhost:8081/user/signUp page.
 
-3. Start the app
+2. Start the app
 
    ```bash
    npx expo start
@@ -40,6 +66,93 @@ In the output, you'll find options to open the app in a
 - [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
 
 You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+
+## Testing
+
+Unit tests run with [Jest](https://jestjs.io/) via the
+[jest-expo](https://docs.expo.dev/develop/unit-testing/) preset and
+[@testing-library/react-native](https://callstack.github.io/react-native-testing-library/):
+
+```bash
+npm test              # run all tests once
+npm test -- --watch   # watch mode while developing
+```
+
+Tests live in `__tests__` folders next to the code they cover
+(e.g. `src/services/__tests__/api.test.ts`,
+`src/components/__tests__/MetricCard.test.tsx`). `jest.setup.js`
+provides placeholder `EXPO_PUBLIC_*` values so the API service module
+loads without a local `.env.local` — no secrets are needed to run tests.
+
+## Continuous Integration (CI pipeline)
+
+GitHub Actions (`.github/workflows/ci.yml`) runs lint, typecheck and the
+unit tests on every push to `main`/`develop` and on every pull request
+targeting `main`/`develop`.
+
+Before pushing code to either branch, run the same checks locally so the
+pipeline stays green:
+
+```bash
+npm run lint          # check for lint errors
+npx tsc --noEmit      # check for type errors
+npm test              # run the unit tests
+```
+
+All three commands must pass before you push — the CI pipeline runs the
+same commands and will fail the build otherwise. Lint errors can also be
+flagged as you code by installing the
+[ESLint VS Code extension](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint).
+
+Both `main` and `develop` are protected by branch rules: pull requests
+cannot be merged until the CI checks pass, and direct pushes to these
+branches are rejected — all changes must go through a pull request.
+
+### If the CI pipeline fails on your pull request
+
+When the CI fails, the merge button on the PR stays disabled until it is
+green again. To fix it:
+
+1. **Find out what failed.** On the pull request page, click **Details**
+   next to the failed check (red ✗) to open the Actions log. Expand the
+   failed step — `Lint`, `Typecheck`, or `Run tests` — and read the error
+   messages. The failing file and line number are at the start of each
+   error.
+
+2. **Reproduce it locally.** Run the same three commands in your project
+   root so you can see the errors without waiting for CI:
+
+   ```bash
+   npm run lint          # lint errors (eslint output with file:line)
+   npx tsc --noEmit      # type errors (also file:line)
+   npm test              # failing tests
+   ```
+
+   To re-run a single test file while fixing it (command below is just an example):
+   `npm test -- src/components/__tests__/MetricCard.test.tsx`
+
+3. **Fix the errors on your PR branch.** If you pushed the branch from
+   your machine, commit and push the fixes to the same branch:
+
+   ```bash
+   git add <changed files>
+   git commit -m "Fix CI: <what you fixed>"
+   git push origin <your-branch-name>
+   ```
+
+   GitHub automatically re-runs the CI on the new commit. If you edited
+   the code through the GitHub web UI instead, commit the changes to the
+   PR branch there.
+
+4. **Wait for the checks to finish.** The PR conversation tab shows the
+   checks running. Once all checks pass, the merge button enables and the
+   PR can be merged.
+
+If you believe the failure is unrelated to your change (for example, a
+flaky test or an Actions outage), you can re-run the workflow from the
+failed run's page (**Re-run all jobs**). If a test is genuinely flaky,
+please fix or stabilize it rather than re-running repeatedly.
+
 
 ## Important Note on Authentication-Required Pages
 
@@ -162,4 +275,4 @@ To learn more about developing your project with Expo, look at the following res
 Join our community of developers creating universal apps.
 
 - [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions

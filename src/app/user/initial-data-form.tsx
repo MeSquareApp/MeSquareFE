@@ -104,7 +104,9 @@ const sections = [
 // this is the text that appears when the user clicks on the "Why do we ask this?" link
 const whyContent = [
     // Personal
-    "Your height, weight, waist circumference, race, and region help us set a baseline for your digital twin. Body measurements and background can affect how health indicators are interpreted, so this lets your twin reflect you rather than a generic average. Providing us with as much information as possible ensures that your twin is as accurate and personalized as it can be.",
+    "Your height, weight, waist circumference, race, and region help us set a baseline for your digital twin.",
+     "Body measurements and background can affect how health indicators are interpreted, so this lets your twin reflect you rather than a generic average.",
+     "Providing us with as much information as possible ensures that your twin is as accurate and personalized as it can be.",
     // History
     "Allergies, past medical history, and diagnosed conditions shape your overall health picture. Without them, your twin could miss factors that matter for you.",
     // Medications
