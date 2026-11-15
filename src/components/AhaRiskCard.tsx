@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Linking, Pressable, StyleSheet, Text, View } from "react-native";
 import { Ionicons } from "@react-native-vector-icons/ionicons";
 import { fonts, fontsize } from "@/theme/typography";
 import { colors } from "@/theme/color";
@@ -112,7 +112,17 @@ export default function AhaRiskCard({ risk, onUpdateInputs }: Props) {
         <Ionicons name="heart" size={22} color="#FF2D55" />
         <Text style={styles.title}>Heart disease risk</Text>
       </View>
-      <Text style={styles.sub}>AHA PREVENT equations</Text>
+      <View style={styles.subRow}>
+        <Text style={styles.sub}>AHA PREVENT calculations</Text>
+        <Pressable
+          onPress={() => void Linking.openURL("https://professional.heart.org/en/guidelines-and-statements/prevent-calculator")}
+          accessibilityRole="link"
+          accessibilityLabel="Learn about the AHA PREVENT calculator"
+          hitSlop={8}
+        >
+          <Ionicons name="information-circle-outline" size={16} color={colors.textMuted} />
+        </Pressable>
+      </View>
 
       {generated ? (
         <>
@@ -160,7 +170,7 @@ export default function AhaRiskCard({ risk, onUpdateInputs }: Props) {
 
       <View style={styles.factors}>
         <Text style={styles.factorsTitle}>What goes into these scores</Text>
-        <Text style={styles.factorsSub}>The profile inputs used by the AHA PREVENT equations.</Text>
+        <Text style={styles.factorsSub}>The profile inputs used by the AHA PREVENT calculations.</Text>
         {PREVENT_INPUTS.map((i) => (
           <Text key={i.key} style={styles.factor}>
             · {i.label}
@@ -178,7 +188,8 @@ const styles = StyleSheet.create({
   card: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: 16, padding: 24 },
   titleRow: { flexDirection: "row", alignItems: "center", gap: 10 },
   title: { fontFamily: fonts.bold, fontSize: fontsize.lg, color: colors.text },
-  sub: { marginTop: 2, fontFamily: fonts.regular, fontSize: fontsize.sm, color: colors.textMuted },
+  subRow: { flexDirection: "row", alignItems: "center", gap: 5, marginTop: 2 },
+  sub: { fontFamily: fonts.regular, fontSize: fontsize.sm, color: colors.textMuted },
   seg: { flexDirection: "row", marginTop: 16, borderWidth: 1, borderColor: colors.primary, borderRadius: 10, overflow: "hidden" },
   segBtn: { flex: 1, height: 35, alignItems: "center", justifyContent: "center", backgroundColor: colors.surface },
   segBtnOn: { backgroundColor: colors.primary },

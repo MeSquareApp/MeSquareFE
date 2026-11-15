@@ -5,7 +5,7 @@ import { fonts, fontsize } from "@/theme/typography";
 import Header from "@/components/Header";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-// import BiomarkerTiles from "@/components/BiomarkerTiles";
+import BiomarkerTiles from "@/components/BiomarkerTiles";
 import AhaRiskCard from "@/components/AhaRiskCard";
 // import ForecastUploadCard from "@/components/ForecastUploadCard";
 import { mockForecasts, mockLabPrompt, mockRisk } from "@/data/mockForecast";
@@ -40,7 +40,7 @@ export default function Forecasting() {
           <View style={[styles.columns, isWide && styles.columnsWide]}>
             {/* LEFT: all biomarkers at a glance, the selected chart, then the upload prompt */}
             <View style={styles.left}>
-              {/* <BiomarkerTiles forecasts={forecasts} selectedId={selectedId} onSelect={setSelectedId} /> */}
+              <BiomarkerTiles forecasts={forecasts} selectedId={selectedId} onSelect={setSelectedId} />
               <ForecastTrendCard
                 forecasts={forecasts}
                 selectedId={selectedId}
