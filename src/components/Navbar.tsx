@@ -99,7 +99,7 @@ export default function Navbar() {
 
           <NavItem
             label=    "Data Upload"
-            iconName= "document-attach-outline"
+            iconName= "document-text-outline"
             active=   {pathname === "/user/dataUpload"}
             onPress=  {() => router.push("/user/dataUpload")}
           />

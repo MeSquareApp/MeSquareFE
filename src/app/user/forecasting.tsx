@@ -7,7 +7,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import BiomarkerTiles from "@/components/BiomarkerTiles";
 import AhaRiskCard from "@/components/AhaRiskCard";
-// import ForecastUploadCard from "@/components/ForecastUploadCard";
+import ForecastUploadCard from "@/components/ForecastUploadCard";
 import { mockForecasts, mockLabPrompt, mockRisk } from "@/data/mockForecast";
 import ForecastTrendCard from "@/components/ForecastTrendCard";
 
@@ -17,9 +17,9 @@ export default function Forecasting() {
 
   // TODO: replace with real data from the backend
   const forecasts = mockForecasts;
-  const risk = mockRisk;
+  const risk      = mockRisk;
   const labPrompt = mockLabPrompt;
-  const hasLab = forecasts.some((f) => f.labMeasuredAt !== null);
+  const hasLab    = forecasts.some((f) => f.labMeasuredAt !== null);
 
   const [selectedId, setSelectedId] = useState(forecasts[0].id); // gets selected biomarker from the tiles, defaults to the first biomarker in the list
 
@@ -47,7 +47,7 @@ export default function Forecasting() {
                 onSelect={setSelectedId}
                 onUploadLab={handleUploadLab}
               />
-              {/* <ForecastUploadCard labPrompt={labPrompt} hasLab={hasLab} onUpload={handleUploadLab} /> */}
+              <ForecastUploadCard labPrompt={labPrompt} hasLab={hasLab} onUpload={handleUploadLab} />
             </View>
 
             {/* RIGHT: AHA CVD risk */}
