@@ -4,48 +4,6 @@
 // ---------- Dates ----------
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
-export const DAY = 86400000;
-
-// "2026-11-07" -> milliseconds (local midnight)
-export const toTime = (iso: string) => new Date(`${iso}T00:00:00`).getTime();
-
-// "2026-11-07" -> "Nov 7"
-export function formatShortDate(iso: string): string {
-  const [, m, d] = iso.split("-").map(Number);
-  return `${MONTHS[m - 1]} ${d}`;
-}
-
-// "2026-11-07" -> "Nov 7, 2026"
-export function formatLongDate(iso: string): string {
-  const [y] = iso.split("-").map(Number);
-  return `${formatShortDate(iso)}, ${y}`;
-}
-
-// ---------- Biomarker names ----------
-export const BIOMARKER_NAMES: Record<Biomarker, { full: string; short: string }> = {
-  hba1c: { full: "Glycated Hemoglobin", short: "HbA1c" },
-  non_hdl: { full: "Non-High Density Lipoprotein", short: "Non-HDL" },
-  hdl: { full: "High Density Lipoprotein", short: "HDL" },
-  egfr: { full: "Estimated Glomerular Filtration Rate", short: "eGFR" },
-  sbp: { full: "Systolic Blood Pressure", short: "Systolic BP" },
-};
-
-// ---------- Range status ----------
-// Where does the likely range for the next result sit against the reference range?
-export type RangeStatus = "in" | "maybe" | "out";
-
-export function rangeStatus(f: Forecast): RangeStatus {
-  const { low, high } = f.normalRange;
-  if (f.p10 >= low && f.p90 <= high) return "in";
-  return f.p50 >= low && f.p50 <= high ? "maybe" : "out";
-}
-
-export const STATUS_LABEL: Record<RangeStatus, string> = {
-  in: "In range",
-  maybe: "Watch",
-  out: "Outside",
-};
-
 // Biomarker names match the backend exactly, so API data needs no translation.
 export type Biomarker = "non_hdl" | "hdl" | "hba1c" | "egfr" | "sbp";
 
@@ -97,6 +55,49 @@ export type RiskOut = {
   missing_inputs: string[];
   reason: string | null;
   out_of_range: string[];
+};
+
+// ---------- Dates ----------
+export const DAY = 86400000;
+
+// "2026-11-07" -> milliseconds (local midnight)
+export const toTime = (iso: string) => new Date(`${iso}T00:00:00`).getTime();
+
+// "2026-11-07" -> "Nov 7"
+export function formatShortDate(iso: string): string {
+  const [, m, d] = iso.split("-").map(Number);
+  return `${MONTHS[m - 1]} ${d}`;
+}
+
+// "2026-11-07" -> "Nov 7, 2026"
+export function formatLongDate(iso: string): string {
+  const [y] = iso.split("-").map(Number);
+  return `${formatShortDate(iso)}, ${y}`;
+}
+
+// ---------- Biomarker labels ----------
+export const BIOMARKER_NAMES: Record<Biomarker, { full: string; short: string }> = {
+  hba1c: { full: "Glycated Hemoglobin", short: "HbA1c" },
+  non_hdl: { full: "Non-High Density Lipoprotein", short: "Non-HDL" },
+  hdl: { full: "High Density Lipoprotein", short: "HDL" },
+  egfr: { full: "Estimated Glomerular Filtration Rate", short: "eGFR" },
+  sbp: { full: "Systolic Blood Pressure", short: "Systolic BP" },
+};
+
+// ---------- Range status ----------
+// Where does the likely range for the next result sit against the reference range?
+export type RangeStatus = "in" | "maybe" | "out";
+
+export function rangeStatus(f: Forecast): RangeStatus {
+  const { low, high } = f.normalRange;
+  if (f.p10 >= low && f.p90 <= high) return "in";
+  return f.p50 >= low && f.p50 <= high ? "maybe" : "out";
+}
+
+export const STATUS_LABEL: Record<RangeStatus, string> = {
+  in: "In range",
+  maybe: "Watch",
+  out: "Outside",
 };
 
 // Big headline numbers are larger than anything in your fontsize scale.

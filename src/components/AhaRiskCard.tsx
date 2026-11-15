@@ -24,18 +24,18 @@ const OUTCOME_LABELS: Record<RiskOutcome, string> = {
 // The profile inputs the AHA PREVENT equations use.
 // keys match the backend's FEATURES inputs used.
 const PREVENT_INPUTS: { key: string; label: string }[] = [
-  { key: "sex", label: "Sex" },
-  { key: "age", label: "Age" },
-  { key: "weight_kg", label: "Weight" },
-  { key: "waist_cm", label: "Waist circumference" },
-  { key: "smoking", label: "Current smoking" },
-  { key: "told_high_bp", label: "History of high blood pressure" },
-  { key: "bp_meds", label: "Blood pressure medication" },
+  { key: "sex",            label: "Sex" },
+  { key: "age",            label: "Age" },
+  { key: "weight_kg",      label: "Weight" },
+  { key: "waist_cm",       label: "Waist circumference" },
+  { key: "smoking",        label: "Current smoking" },
+  { key: "told_high_bp",   label: "History of high blood pressure" },
+  { key: "bp_meds",        label: "Blood pressure medication" },
   { key: "told_high_chol", label: "History of high cholesterol" },
-  { key: "chol_meds", label: "Cholesterol medication" },
-  { key: "diabetes_dx", label: "Have diabetes" },
+  { key: "chol_meds",      label: "Cholesterol medication" },
+  { key: "diabetes_dx",    label: "Have diabetes" },
   { key: "prediabetes_dx", label: "Have prediabetes" },
-  { key: "insulin", label: "Insulin use" },
+  { key: "insulin",        label: "Insulin use" },
   { key: "diabetes_pills", label: "Diabetes medication" },
 ];
 
@@ -95,6 +95,12 @@ function OutcomeBlock({ result }: { result: RiskResult }) {
 
 type Props = { risk: RiskOut; onUpdateInputs?: () => void };
 
+/***
+ * Renders the AHA CVD risk card, showing risk outcomes and profile inputs.
+ * @param risk - The risk data to display.
+ * @param onUpdateInputs - Optional callback for updating profile inputs.
+ * @returns The JSX for the AHA risk card.
+ */
 export default function AhaRiskCard({ risk, onUpdateInputs }: Props) {
   const [years, setYears] = useState<10 | 30>(10);
   const generated = risk.status === "generated";
