@@ -109,7 +109,7 @@ export default function AhaRiskCard({ risk, onUpdateInputs }: Props) {
   return (
     <View style={styles.card}>
       <View style={styles.titleRow}>
-        <Ionicons name="heart-outline" size={22} color={colors.text} />
+        <Ionicons name="heart" size={22} color="#FF2D55" />
         <Text style={styles.title}>Heart disease risk</Text>
       </View>
       <Text style={styles.sub}>AHA PREVENT equations</Text>
@@ -174,29 +174,15 @@ export default function AhaRiskCard({ risk, onUpdateInputs }: Props) {
   );
 }
 
-// The "Previous heart disease risk scores" accordion (placeholder until there is history to show).
-export function PreviousRiskScores() {
-  const [open, setOpen] = useState(false);
-  return (
-    <View style={styles.history}>
-      <Pressable style={styles.historyHeader} onPress={() => setOpen((o) => !o)} accessibilityRole="button" accessibilityState={{ expanded: open }}>
-        <Text style={styles.historyTitle}>Previous heart disease risk scores</Text>
-        <Ionicons name={open ? "chevron-up" : "chevron-down"} size={20} color={colors.textMuted} />
-      </Pressable>
-      {open && <Text style={styles.historyBody}>A small trend of past scores, with the date each was calculated.</Text>}
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
   card: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: 16, padding: 24 },
   titleRow: { flexDirection: "row", alignItems: "center", gap: 10 },
   title: { fontFamily: fonts.bold, fontSize: fontsize.lg, color: colors.text },
   sub: { marginTop: 2, fontFamily: fonts.regular, fontSize: fontsize.sm, color: colors.textMuted },
   seg: { flexDirection: "row", marginTop: 16, borderWidth: 1, borderColor: colors.primary, borderRadius: 10, overflow: "hidden" },
-  segBtn: { flex: 1, height: 40, alignItems: "center", justifyContent: "center", backgroundColor: colors.surface },
+  segBtn: { flex: 1, height: 35, alignItems: "center", justifyContent: "center", backgroundColor: colors.surface },
   segBtnOn: { backgroundColor: colors.primary },
-  segText: { fontFamily: fonts.regular, fontSize: fontsize.md, color: colors.primary },
+  segText: { fontFamily: fonts.regular, fontSize: fontsize.sm, color: colors.primary },
   segTextOn: { fontFamily: fonts.bold, color: colors.surface },
   outcome: { marginTop: 22 },
   outcomeHead: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap: 8 },

@@ -6,7 +6,7 @@ import Header from "@/components/Header";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 // import BiomarkerTiles from "@/components/BiomarkerTiles";
-import AhaRiskCard, { PreviousRiskScores } from "@/components/AhaRiskCard";
+import AhaRiskCard from "@/components/AhaRiskCard";
 // import ForecastUploadCard from "@/components/ForecastUploadCard";
 import { mockForecasts, mockLabPrompt, mockRisk } from "@/data/mockForecast";
 // import ForecastTrendCard, { fonts, fontsize, ui } from "@/components/ForecastTrendCard";
@@ -48,7 +48,6 @@ export default function Forecasting() {
                 onUploadLab={handleUploadLab}
               />
               <ForecastUploadCard labPrompt={labPrompt} hasLab={hasLab} onUpload={handleUploadLab} /> */}
-              <PreviousRiskScores />
             </View>
 
             {/* RIGHT: AHA CVD risk */}
