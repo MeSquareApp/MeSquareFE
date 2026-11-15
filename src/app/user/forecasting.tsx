@@ -9,19 +9,19 @@ import Footer from "@/components/Footer";
 import AhaRiskCard from "@/components/AhaRiskCard";
 // import ForecastUploadCard from "@/components/ForecastUploadCard";
 import { mockForecasts, mockLabPrompt, mockRisk } from "@/data/mockForecast";
-// import ForecastTrendCard, { fonts, fontsize, ui } from "@/components/ForecastTrendCard";
+import ForecastTrendCard from "@/components/ForecastTrendCard";
 
 export default function Forecasting() {
-  const { width } = useWindowDimensions(); // updates when the window resizes
+  const { width } = useWindowDimensions();
   const isWide = width >= 900;
 
   // TODO: replace with real data from the backend
-  // const forecasts = mockForecasts;
+  const forecasts = mockForecasts;
   const risk = mockRisk;
-  // const labPrompt = mockLabPrompt;
-  // const hasLab = forecasts.some((f) => f.labMeasuredAt !== null);
+  const labPrompt = mockLabPrompt;
+  const hasLab = forecasts.some((f) => f.labMeasuredAt !== null);
 
-  // const [selectedId, setSelectedId] = useState(forecasts[0].id);
+  const [selectedId, setSelectedId] = useState(forecasts[0].id); // gets selected biomarker from the tiles, defaults to the first biomarker in the list
 
   const handleUploadLab = () => {
     // TODO: open a file picker (expo-document-picker), send the report to the backend,
@@ -41,13 +41,13 @@ export default function Forecasting() {
             {/* LEFT: all biomarkers at a glance, the selected chart, then the upload prompt */}
             <View style={styles.left}>
               {/* <BiomarkerTiles forecasts={forecasts} selectedId={selectedId} onSelect={setSelectedId} /> */}
-              {/* <ForecastTrendCard
+              <ForecastTrendCard
                 forecasts={forecasts}
                 selectedId={selectedId}
                 onSelect={setSelectedId}
                 onUploadLab={handleUploadLab}
               />
-              <ForecastUploadCard labPrompt={labPrompt} hasLab={hasLab} onUpload={handleUploadLab} /> */}
+              {/* <ForecastUploadCard labPrompt={labPrompt} hasLab={hasLab} onUpload={handleUploadLab} /> */}
             </View>
 
             {/* RIGHT: AHA CVD risk */}

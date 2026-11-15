@@ -163,7 +163,7 @@ export default function AhaRiskCard({ risk, onUpdateInputs }: Props) {
         <Text style={styles.factorsSub}>The profile inputs used by the AHA PREVENT equations.</Text>
         {PREVENT_INPUTS.map((i) => (
           <Text key={i.key} style={styles.factor}>
-            {i.label}
+            · {i.label}
           </Text>
         ))}
         <Pressable onPress={onUpdateInputs} accessibilityRole="link">
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
   note: { marginTop: 16, padding: 12, borderRadius: 10, backgroundColor: colors.surface, fontFamily: fonts.regular, fontSize: fontsize.sm, color: colors.text },
   notTitle: { fontFamily: fonts.bold, fontSize: fontsize.sm, color: colors.text, marginBottom: 4 },
   factors: { marginTop: 20, paddingTop: 20, borderTopWidth: 1, borderTopColor: colors.border, gap: 8 },
-  factorsTitle: { fontFamily: fonts.bold, fontSize: fontsize.sm, color: colors.text },
+  factorsTitle: { fontFamily: fonts.bold, fontSize: fontsize.md, color: colors.text },
   factorsSub: { fontFamily: fonts.regular, fontSize: fontsize.sm, color: colors.textMuted },
   factor: { fontFamily: fonts.regular, fontSize: fontsize.sm, color: colors.text },
   link: { marginTop: 6, fontFamily: fonts.bold, fontSize: fontsize.sm, color: colors.primary },
