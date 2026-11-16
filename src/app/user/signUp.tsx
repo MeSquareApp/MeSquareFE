@@ -1,6 +1,7 @@
 import {
   API_AUDIENCE,
   createUserAccount,
+  updatePatientProfile,
   type MeSquaredRole,
 } from "@/services/api";
 import { Picker } from "@react-native-picker/picker";
@@ -72,28 +73,66 @@ export default function SignUp() {
       return;
     }
 
+    if (
+      roleValue === "patient" &&
+      (!sex.trim() || !dateOfBirth || dateOfBirth > maxDobString)
+    ) {
+      setNotification({
+        type: "error",
+        message:
+          "Enter a biological sex and a valid date of birth. Patients must be at least 18 years old.",
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     setNotification(null);
+    let accountCreated = false;
     try {
       const credentials = await getApiCredentials(API_AUDIENCE);
-      await createUserAccount(credentials.accessToken, {
-        first_name: normalizedFirstName,
-        last_name: normalizedLastName,
-        role: roleValue,
-      });
+      if (roleValue === "patient") {
+        await createUserAccount(credentials.accessToken, {
+          first_name: normalizedFirstName,
+          last_name: normalizedLastName,
+          role: "patient",
+          dob: dateOfBirth,
+          sex,
+        });
+      } else {
+        await createUserAccount(credentials.accessToken, {
+          first_name: normalizedFirstName,
+          last_name: normalizedLastName,
+          role: roleValue,
+        });
+      }
+      accountCreated = true;
+
+      if (roleValue === "patient") {
+        await updatePatientProfile(credentials.accessToken, {
+          date_of_birth: dateOfBirth,
+          biological_sex: sex,
+        });
+      }
+
       setNotification({
         type: "success",
-        message: "Account created. Taking you to your dashboard...",
+        message: roleValue === "patient"
+          ? "Account created. Taking you to the patient intake form..."
+          : "Account created. Taking you to your dashboard...",
       });
       await new Promise((resolve) => setTimeout(resolve, 1200));
-      router.replace("/user/dashboard");
+      router.replace(
+        roleValue === "patient" ? "/user/initial-data-form" : "/user/dashboard",
+      );
     } catch (error) {
       console.error("MeSquared account creation failed:", error);
       setNotification({
         type: "error",
         message:
           error instanceof Error
-            ? error.message
+            ? accountCreated
+              ? `Your account was created, but saving the patient profile failed: ${error.message}`
+              : error.message
             : "Account creation failed. Please try again.",
       });
     } finally {
@@ -161,12 +200,11 @@ export default function SignUp() {
             {isPatient && (
               <>
                 <Text style={styles.profileNote}>
-                  These patient details are for a later profile-setup step.
+                  Your biological sex and date of birth are minimally required for
+                  account creation and forecasting.
                   {"\n"}
                   {"\n"}
-                  This signup currently creates your user record, with the
-                  minimum information required for forecasting if you opt out of
-                  providing full personal details later.
+                  You may opt out of providing your full health details later, but doing so may limit the accuracy of your forecasts.
                 </Text>
                 <Picker
                   selectedValue={sex}

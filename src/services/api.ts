@@ -1,3 +1,8 @@
+/*
+  File partially generated with Copilot gpt-6-luna. All generated code has been reviewed and modified
+  by the development team to ensure correctness, security, and maintainability.
+*/
+
 const requiredEnv = (name: string, value: string | undefined): string => {
   if (!value) {
     throw new Error(`Missing ${name}. Add it to the frontend .env.local file.`);
@@ -15,19 +20,68 @@ export const API_AUDIENCE = requiredEnv(
   process.env.EXPO_PUBLIC_AUTH0_AUDIENCE,
 );
 
+export type CreatePatientProfile = {
+  dob?: string;
+  sex?: string;
+};
+type CreateUserAccountRequest = {
+  first_name: string;
+  last_name: string;
+} & (
+  | ({ role: "patient" } & CreatePatientProfile)
+  | { role: Exclude<MeSquaredRole, "patient"> }
+);
+
+export type UpdatePatientProfile = Partial<{
+  date_of_birth: string;
+  biological_sex: string;
+  race: string[] | null;
+  region: string | null;
+  diagnosed_conditions: string[] | null;
+  other_condition: string | null;
+  current_medications: string | null;
+  blood_pressure_medication: string | null;
+  blood_pressure_details: string | null;
+  cholesterol_medication: string | null;
+  cholesterol_details: string | null;
+  alcohol: string | null;
+  smoking: string | null;
+  recreational_drugs: string | null;
+  exercise_hours: string | null;
+  sleep_hours: string | null;
+  high_blood_pressure_history: string | null;
+  high_cholesterol_history: string | null;
+  baseline_height_cm: number | null;
+  baseline_weight_kg: number | null;
+  waist_cm: number | null;
+  allergies: string | null;
+  medical_history: string | null;
+}>;
+
 export type PatientProfile = {
   date_of_birth: string;
   biological_sex: string;
-  baseline_height_cm: number;
-  baseline_weight_kg: number;
-  allergies: string;
-  medical_conditions: string;
-  user: {
-    id: string;
-    email: string;
-    first_name: string;
-    last_name: string;
-  };
+  race: string[] | null;
+  region: string | null;
+  diagnosed_conditions: string[] | null;
+  other_condition: string | null;
+  current_medications: string | null;
+  blood_pressure_medication: string | null;
+  blood_pressure_details: string | null;
+  cholesterol_medication: string | null;
+  cholesterol_details: string | null;
+  alcohol: string | null;
+  smoking: string | null;
+  recreational_drugs: string | null;
+  exercise_hours: string | null;
+  sleep_hours: string | null;
+  high_blood_pressure_history: string | null;
+  high_cholesterol_history: string | null;
+  baseline_height_cm: number | null;
+  baseline_weight_kg: number | null;
+  waist_cm: number | null;
+  allergies: string | null;
+  medical_history: string | null;
 };
 
 export type Biomarker = {
@@ -85,11 +139,7 @@ export async function getCurrentUser(
 
 export async function createUserAccount(
   accessToken: string,
-  profile: {
-    first_name: string;
-    last_name: string;
-    role: MeSquaredRole;
-  },
+  profile: CreateUserAccountRequest,
 ): Promise<OnboardedUser> {
   const response = await fetch(`${API_BASE_URL}/users/me/create-m2-account`, {
     method: "POST",
@@ -103,6 +153,36 @@ export async function createUserAccount(
 
   if (!response.ok) {
     let detail = `Account creation failed (${response.status}).`;
+    try {
+      const body: { detail?: unknown } = await response.json();
+      if (typeof body.detail === "string") {
+        detail = body.detail;
+      }
+    } catch {
+      // Keep the status-based message if the response isn't JSON.
+    }
+    throw new Error(detail);
+  }
+
+  return response.json();
+}
+
+export async function updatePatientProfile(
+  accessToken: string,
+  profile: UpdatePatientProfile,
+): Promise<PatientProfile> {
+  const response = await fetch(`${API_BASE_URL}/patients/me/profile`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify(profile),
+  });
+
+  if (!response.ok) {
+    let detail = `Patient profile update failed (${response.status}).`;
     try {
       const body: { detail?: unknown } = await response.json();
       if (typeof body.detail === "string") {
