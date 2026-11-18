@@ -1,0 +1,32 @@
+{
+  "name": "MeSquareFE",
+  "build": {
+    "dockerfile": "../Dockerfile",
+    "context": "..",
+    "target": "dev"
+  },
+  "workspaceFolder": "/app",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/app,type=bind,consistency=cached",
+  // Preserve the image's node_modules under the bind mount.
+  "mounts": [
+    "source=mesquarefe_devcontainer_node_modules,target=/app/node_modules,type=volume"
+  ],
+  "forwardPorts": [8081],
+  "portsAttributes": {
+    "8081": { "label": "Expo dev server", "onAutoForward": "openBrowser" }
+  },
+  "postCreateCommand": "npm ci --no-audit --no-fund && cp -n .env.example .env.local || true",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "ms-vscode.vscode-typescript-next",
+        "expo.vscode-expo-tools"
+      ],
+      "settings": {
+        "files.eol": "\n"
+      }
+    }
+  }
+}

@@ -1,0 +1,33 @@
+# Version control / IDE
+.git
+.gitignore
+.vscode
+.claude
+.devcontainer
+.github
+
+# Dependencies & builds (deps stage installs from the lockfile)
+node_modules
+dist
+web-build
+.expo
+.kotlin
+ios
+android
+
+# Local env files — EXPO_PUBLIC_* values are passed as Docker build args
+# instead; never bake local secrets into images.
+.env
+.env.*
+!.env.example
+
+# Misc
+*.md
+LICENSE
+Dockerfile
+docker-compose.yml
+.dockerignore
+.devcontainer
+npm-debug.*
+.DS_Store
+metro-health-check*

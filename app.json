@@ -12,6 +12,7 @@
       "bundleIdentifier": "com.anonymous.MeSquareFE"
     },
     "android": {
+      "package": "com.example.mesquarefe",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
@@ -26,12 +27,17 @@
     },
     "plugins": [
       "expo-router",
+      ["expo-splash-screen", {
+        "backgroundColor": "#208AEF",
+        "image": "./assets/images/splash-icon.png",
+        "imageWidth": 76
+      }],
+      "@react-native-vector-icons/ionicons",
+      "expo-font",
       [
-        "expo-splash-screen",
+        "react-native-auth0",
         {
-          "backgroundColor": "#208AEF",
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 76
+          "customScheme": "mesquarefe"
         }
       ]
     ],
