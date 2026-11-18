@@ -25,6 +25,8 @@ import { fonts, fontsize } from "@/theme/typography";
 import Header from "@/components/Header";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { API_AUDIENCE, updatePatientProfile } from "@/services/api";
+import { useAuth0 } from "react-native-auth0";
 
 type FormData = {
     heightCm:                 string;
@@ -490,6 +492,8 @@ export default function App() {
     const [activeSection, setActiveSection]         = useState(0);
     const [form, setForm]                           = useState<FormData>(initialForm);
     const [submitted, setSubmitted]                 = useState(false);
+    const [isSubmitting, setIsSubmitting]           = useState(false);
+    const [submitError, setSubmitError]             = useState<string | null>(null);
     const [fieldErrors, setFieldErrors]             = useState<FieldErrors>({});
     const [measurementSystem, setMeasurementSystem] = useState<"customary" | "metric">("customary");
     const [heightFeet, setHeightFeet]               = useState("");
@@ -498,6 +502,7 @@ export default function App() {
     const [waistInput, setWaistInput]               = useState("");
     const [whyVisible, setWhyVisible]               = useState(false);
     const scrollRef                                 = useRef<ScrollView>(null);
+    const { getApiCredentials }                     = useAuth0();
 
     const update = (field: StringField, value: string) => {
         setFieldErrors((current) => {
@@ -739,6 +744,51 @@ export default function App() {
         return Object.keys(errors).length === 0;
     };
 
+    const submitForm = async () => {
+        if (isSubmitting || !validateAllSections()) return;
+
+        const nullable = (value: string) => value.trim() || null;
+        setIsSubmitting(true);
+        setSubmitError(null);
+        try {
+            const credentials = await getApiCredentials(API_AUDIENCE);
+            await updatePatientProfile(credentials.accessToken, {
+                race: form.race,
+                region: nullable(form.region),
+                diagnosed_conditions: form.diagnosedConditions,
+                other_condition: nullable(form.otherCondition),
+                current_medications: nullable(form.currentMedications),
+                blood_pressure_medication: nullable(form.bloodPressureMedication),
+                blood_pressure_details: nullable(form.bloodPressureDetails),
+                cholesterol_medication: nullable(form.cholesterolMedication),
+                cholesterol_details: nullable(form.cholesterolDetails),
+                alcohol: nullable(form.alcohol),
+                smoking: nullable(form.smoking),
+                recreational_drugs: nullable(form.recreationalDrugs),
+                exercise_hours: nullable(form.exerciseHours),
+                sleep_hours: nullable(form.sleepHours),
+                high_blood_pressure_history: nullable(form.highBloodPressureHistory),
+                high_cholesterol_history: nullable(form.highCholesterolHistory),
+                baseline_height_cm: Number(form.heightCm),
+                baseline_weight_kg: Number(form.weightKg),
+                waist_cm: form.waistCm.trim() ? Number(form.waistCm) : null,
+                allergies: nullable(form.allergies),
+                medical_history: nullable(form.medicalHistory),
+            });
+            setSubmitted(true);
+            scrollRef.current?.scrollTo({ y: 0, animated: true });
+        } catch (error) {
+            console.error("Patient intake submission failed:", error);
+            setSubmitError(
+                error instanceof Error
+                    ? error.message
+                    : "Could not save your information. Please try again.",
+            );
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
     const continueForm = () => {
         if (!validateCurrentSection()) return;
 
@@ -747,10 +797,7 @@ export default function App() {
             return;
         }
 
-        if (!validateAllSections()) return;
-
-        setSubmitted(true);
-        scrollRef.current?.scrollTo({ y: 0, animated: true });
+        void submitForm();
     };
 
     const validateAllSections = () => {
@@ -1056,14 +1103,30 @@ export default function App() {
                                     ) : null}
 
                                     {/* ----- SAVE & CONTINUE / SUBMIT BUTTON  ----- */}
+                                    {submitError ? (
+                                        <Text accessibilityRole="alert" style={styles.submitError}>
+                                            {submitError}
+                                        </Text>
+                                    ) : null}
                                     <View style={styles.actions}>
                                         {activeSection > 0 ? (
                                             <Pressable onPress={() => goTo(activeSection - 1)} style={({ pressed }) => [styles.backButton, pressed && styles.pressed]}>
                                                 <Text style={styles.backText}>←  Back</Text>
                                             </Pressable>
                                         ) : <View />}
-                                        <Pressable onPress={continueForm} style={({ pressed }) => [styles.primaryButton, pressed && styles.buttonPressed]}>
-                                            <Text style={styles.primaryButtonText}>{activeSection === sections.length - 1 ? "Submit intake" : "Save & continue"}  →</Text>
+                                        <Pressable
+                                            disabled={isSubmitting}
+                                            onPress={continueForm}
+                                            style={({ pressed }) => [
+                                                styles.primaryButton,
+                                                (pressed || isSubmitting) && styles.buttonPressed,
+                                            ]}
+                                        >
+                                            <Text style={styles.primaryButtonText}>
+                                                {activeSection === sections.length - 1
+                                                    ? isSubmitting ? "Submitting..." : "Submit intake"
+                                                    : "Save & continue"}  →
+                                            </Text>
                                         </Pressable>
                                     </View>
                                 </View>
@@ -1385,6 +1448,7 @@ const styles = StyleSheet.create({
     reviewTitle: { color: "#2D625A", fontSize: 12, fontWeight: "700", marginBottom: 3 },
     reviewText: { color: "#718B85", fontSize: 11, lineHeight: 16 },
     actions: { alignItems: "center", borderTopColor: "#E8EFED", borderTopWidth: 1, flexDirection: "row", justifyContent: "space-between", marginTop: 10, paddingTop: 22 },
+    submitError: { color: "#B91C1C", fontSize: 12, marginTop: 12 },
     // button
     backButton: { paddingHorizontal: 3, paddingVertical: 13 },
     backText: { color: "#5E7772", fontSize: 12, fontWeight: "600" },
