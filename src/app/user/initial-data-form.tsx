@@ -591,7 +591,8 @@ export default function App() {
             : heightInches.trim() === "";
 
             if (!feetEmpty || !inchesEmpty) {
-            heightCm = String((feet * 12 + inches) * 2.54);
+                // rounds to nearest centimeter
+                heightCm = String(Math.round((feet * 12 + inches) * 2.54));
             }
         }
 
@@ -610,7 +611,7 @@ export default function App() {
         }
 
         if (measurementSystem === "customary") {
-            // Convert kilograms to pounds for display
+            // Convert kilograms to pounds for display, rounds 
             return String(Math.round(weightKg / 0.45359237 * 10) / 10);
         }
 
