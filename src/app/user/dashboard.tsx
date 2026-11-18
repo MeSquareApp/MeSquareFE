@@ -33,7 +33,14 @@ export default function Dashboard() {
   const { getApiCredentials } = useAuth0();
 
   // get patient data from database
-  const [rhr, setRhr] = useState<Biomarker | null>(null);
+  const [rhr, setRhr]           = useState<Biomarker | null>(null);  // Resting Heart Rate
+  const [hrv, setHrv]           = useState<Biomarker | null>(null);  // Heart Rate Variability
+  const [sbp, setSbp]           = useState<Biomarker | null>(null);  // Systolic Blood Pressure
+  const [dbp, setDbp]           = useState<Biomarker | null>(null);  // Diastolic Blood Pressure 
+  const [spo2, setSpo2]         = useState<Biomarker | null>(null);  // Blood Oxygen
+  const [respRate, setRespRate] = useState<Biomarker | null>(null);  // Respiratory Rate
+  const [sleepDur, setSleepDur] = useState<Biomarker | null>(null);  // Sleep Duration
+
 
     useEffect(() => {
         let isCurrent = true;
@@ -43,10 +50,41 @@ export default function Dashboard() {
                 const credentials = await getApiCredentials(API_AUDIENCE);
                 const data = await getBiomarkers(credentials.accessToken);
                 if (isCurrent) {
+                    // RHR
                     const restingHeartRate = data.find(
                       (item) => item.biomarker_abbr === "RHR"
                     );
                     setRhr(restingHeartRate ?? null);
+                    // HRV
+                    const heartRateVariability = data.find(
+                      (item) => item.biomarker_abbr === "HRV"
+                    ); 
+                    setHrv(heartRateVariability ?? null);
+                    // Systolic blood pressure
+                    const systolicBloodPressure = data.find(
+                      (item) => item.biomarker_abbr === "SBP"
+                    );
+                    setSbp(systolicBloodPressure ?? null);
+                    // Diastolic blood pressure
+                    const diastolicBloodPressure = data.find(
+                      (item) => item.biomarker_abbr === "DBP"
+                    );
+                    setDbp(diastolicBloodPressure ?? null);
+                    // Blood oxygen
+                    const bloodOxygen = data.find(
+                      (item) => item.biomarker_abbr === "SpO2"
+                    );
+                    setSpo2(bloodOxygen ?? null);
+                    // Respiratory Rate
+                    const respiratoryRate = data.find(
+                      (item) => item.biomarker_abbr === "RespRate"
+                    );
+                    setRespRate(respiratoryRate ?? null);
+                    // Sleep Duration
+                    const sleepDuration = data.find(
+                      (item) => item.biomarker_abbr === "SleepDur"
+                    );
+                    setSleepDur(sleepDuration ?? null);
                 }
             } catch (error) {
                 console.error("Failed to load authenticated patient biomarkers:", error);
@@ -116,7 +154,7 @@ export default function Dashboard() {
 
                 <MetricCard
                   label="Heart Rate Variability"
-                  value={94}
+                  value={hrv?.value ?? "..."}
                   unit="ms"
                   status="optimal"
                   change="-3.1%"
@@ -124,7 +162,7 @@ export default function Dashboard() {
 
                 <MetricCard
                   label="Blood Pressure"
-                  value="128/82"
+                  value={sbp && dbp ? `${sbp.value}/${dbp.value}` : "..."}
                   unit="mmHg"
                   status="warning"
                   change="+4.7%"
@@ -132,7 +170,7 @@ export default function Dashboard() {
 
                 <MetricCard
                   label="Blood Oxygen"
-                  value={97}
+                  value={spo2?.value ?? "..."}
                   unit="%"
                   status="normal"
                   change="+0.5%"
@@ -140,7 +178,7 @@ export default function Dashboard() {
 
                 <MetricCard
                   label="Respiratory Rate"
-                  value={16}
+                  value={respRate?.value ?? "..."}
                   unit="breaths/min"
                   status="optimal"
                   change=""
@@ -148,7 +186,7 @@ export default function Dashboard() {
 
                 <MetricCard
                   label="Sleep Duration"
-                  value={7.5}
+                  value={sleepDur?.value ?? "..."}
                   unit="hours"
                   status="optimal"
                   change="+3.2%"

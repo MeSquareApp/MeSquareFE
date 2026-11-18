@@ -4,6 +4,7 @@ import { Ionicons } from "@react-native-vector-icons/ionicons";
 import { fonts, fontsize } from "@/theme/typography";
 import { colors } from "@/theme/color";
 import { RiskCategory, RiskOut, RiskOutcome, RiskResult, HERO_SIZE } from "@/lib/forecast";
+import UpdateRiskInputsModal, { EMPTY_RISK_INPUTS, RiskProfileInputs } from "./UpdateRiskInputsModal";
 
 // Colored scale. The band for each result comes from the backend's `category`;
 // if the backend sends null, we fall back to these 10-year cut-offs.
@@ -93,7 +94,7 @@ function OutcomeBlock({ result }: { result: RiskResult }) {
   );
 }
 
-type Props = { risk: RiskOut; onUpdateInputs?: () => void };
+type Props = { risk: RiskOut; onUpdateInputs?: (inputs: RiskProfileInputs) => void };
 
 /***
  * Renders the AHA CVD risk card, showing risk outcomes and profile inputs.
@@ -103,6 +104,13 @@ type Props = { risk: RiskOut; onUpdateInputs?: () => void };
  */
 export default function AhaRiskCard({ risk, onUpdateInputs }: Props) {
   const [years, setYears] = useState<10 | 30>(10);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [profileInputs, setProfileInputs] = useState<RiskProfileInputs>(EMPTY_RISK_INPUTS);
+  const handleSaveInputs = (values: RiskProfileInputs) => {
+    setProfileInputs(values);
+    onUpdateInputs?.(values);
+    setModalVisible(false);
+  };
   const generated = risk.status === "generated";
   const results = risk.results.filter((r) => r.horizon_years === years);
 
@@ -176,10 +184,19 @@ export default function AhaRiskCard({ risk, onUpdateInputs }: Props) {
             · {i.label}
           </Text>
         ))}
-        <Pressable onPress={onUpdateInputs} accessibilityRole="link">
+        <Pressable
+          onPress={() => setModalVisible(true)}
+          accessibilityRole="button"
+        >
           <Text style={styles.link}>Update your inputs</Text>
         </Pressable>
       </View>
+      <UpdateRiskInputsModal
+        visible={modalVisible}
+        initialValues={profileInputs}
+        onClose={() => setModalVisible(false)}
+        onSave={handleSaveInputs}
+      />
     </View>
   );
 }
