@@ -29,8 +29,8 @@ export default function AccountInfo() {
   const [lastName, setLastName] = useState("");
   const [sex, setSex] = useState("");
   const [age, setAge] = useState<number | undefined>();
-  const [height, setHeight] = useState<number | undefined>();
-  const [weight, setWeight] = useState<number | undefined>();
+  const [height, setHeight] = useState<number | null>();
+  const [weight, setWeight] = useState<number | null>();
   const [allergies, setAllergies] = useState("");
   const [medicalCondition, setMedicalCondition] = useState("");
   const [email, setEmail] = useState("");
@@ -52,8 +52,8 @@ export default function AccountInfo() {
           );
           setHeight(data.baseline_height_cm);
           setWeight(data.baseline_weight_kg);
-          setAllergies(data.allergies);
-          setMedicalCondition(data.medical_conditions);
+          setAllergies(data.allergies ?? "");
+          setMedicalCondition(data.diagnosed_conditions?.join(", ") ?? "");
           setEmail(data.user.email);
         }
       } catch (error) {

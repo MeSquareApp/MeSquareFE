@@ -82,6 +82,12 @@ export type PatientProfile = {
   waist_cm: number | null;
   allergies: string | null;
   medical_history: string | null;
+  user: {
+    id: string;
+    email: string;
+    first_name: string;
+    last_name: string;
+  };
 };
 
 export type Biomarker = {
