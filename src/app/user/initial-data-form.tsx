@@ -596,7 +596,7 @@ export default function App() {
             : heightInches.trim() === "";
 
             if (!feetEmpty || !inchesEmpty) {
-            heightCm = String((feet * 12 + inches) * 2.54);
+            heightCm = String(Math.round((feet * 12 + inches) * 2.54));
             }
         }
 
