@@ -74,9 +74,72 @@ export default function UpdateRiskInputsModal({
   onSave,
 }: Props) {
   const [form, setForm] = useState<RiskProfileInputs>(initialValues);
+  const [measurementSystem, setMeasurementSystem] = useState<"customary" | "metric">("customary");
+  const [weightInput, setWeightInput] = useState(() => {
+    const weightKg = Number(initialValues.weight_kg);
+    return initialValues.weight_kg.trim() === "" || !Number.isFinite(weightKg)
+      ? ""
+      : String(Math.round((weightKg / 0.45359237) * 10) / 10);
+  });
+  const [waistInput, setWaistInput] = useState(() => {
+    const waistCm = Number(initialValues.waist_cm);
+    return initialValues.waist_cm.trim() === "" || !Number.isFinite(waistCm)
+      ? ""
+      : String(Math.round((waistCm / 2.54) * 10) / 10);
+  });
 
   const update = (key: keyof RiskProfileInputs, value: string) => {
     setForm((previous) => ({ ...previous, [key]: value }));
+  };
+
+  // Changes the measurement system and converts weight and waist inputs accordingly.
+  const changeMeasurementSystem = (system: "customary" | "metric") => {
+    if (system === measurementSystem) return;
+
+    const weightKg = Number(form.weight_kg);
+    const waistCm = Number(form.waist_cm);
+    setWeightInput(
+      form.weight_kg.trim() === "" || !Number.isFinite(weightKg)
+        ? ""
+        : system === "customary"
+          ? String(Math.round((weightKg / 0.45359237) * 10) / 10)
+          : form.weight_kg
+    );
+    setWaistInput(
+      form.waist_cm.trim() === "" || !Number.isFinite(waistCm)
+        ? ""
+        : system === "customary"
+          ? String(Math.round((waistCm / 2.54) * 10) / 10)
+          : form.waist_cm
+    );
+    setMeasurementSystem(system);
+  };
+
+  const updateMeasurement = (
+    key: "weight_kg" | "waist_cm",
+    value: string
+  ) => {
+    if (key === "weight_kg") {
+      setWeightInput(value);
+    } else {
+      setWaistInput(value);
+    }
+
+    if (value.trim() === "") {
+      update(key, "");
+      return;
+    }
+
+    const enteredValue = Number(value);
+    if (!Number.isFinite(enteredValue)) return;
+
+    const conversionFactor =
+      measurementSystem === "metric"
+        ? 1
+        : key === "weight_kg"
+          ? 0.45359237
+          : 2.54;
+    update(key, String(enteredValue * conversionFactor));
   };
 
   const renderChoice = (
@@ -116,26 +179,29 @@ export default function UpdateRiskInputsModal({
     </View>
   );
 
-  // Renders a numeric input field with a label and suffix. Either weight or waist circumference.
+  // Renders a numeric input field for weight or waist circumference.
   const renderNumber = (
     key: "weight_kg" | "waist_cm",
     label: string,
-    placeholder: string,
-    suffix: string
+    placeholder: string
   ) => (
     <View style={styles.numberField} key={key}>
       <Text style={styles.label}>{label}</Text>
 
       <View style={styles.inputRow}>
         <TextInput
-          value={form[key]}
-          onChangeText={(value) => update(key, value)}
+          value={key === "weight_kg" ? weightInput : waistInput}
+          onChangeText={(value) => updateMeasurement(key, value)}
           placeholder={placeholder}
           placeholderTextColor={colors.gray4}
           keyboardType="numeric"
           style={styles.input}
         />
-        <Text style={styles.suffix}>{suffix}</Text>
+        <Text style={styles.suffix}>
+          {key === "weight_kg"
+            ? measurementSystem === "metric" ? "kg" : "lbs"
+            : measurementSystem === "metric" ? "cm" : "in"}
+        </Text>
       </View>
     </View>
   );
@@ -178,18 +244,46 @@ export default function UpdateRiskInputsModal({
             {/* Personal information */}
             <Text style={styles.sectionTitle}>Personal information</Text>
 
+            <View style={styles.measurementHeader}>
+              <Text style={styles.measurementTitle}>Measurements</Text>
+              <View style={styles.unitToggle}>
+                {(["customary", "metric"] as const).map((system) => {
+                  const selected = measurementSystem === system;
+                  return (
+                    <Pressable
+                      accessibilityRole="button"
+                      accessibilityState={{ selected }}
+                      key={system}
+                      onPress={() => changeMeasurementSystem(system)}
+                      style={[
+                        styles.unitToggleButton,
+                        selected && styles.unitToggleButtonSelected,
+                      ]}
+                    >
+                      <Text
+                        style={[
+                          styles.unitToggleText,
+                          selected && styles.unitToggleTextSelected,
+                        ]}
+                      >
+                        {system === "customary" ? "Customary" : "Metric"}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+            </View>
+
             <View style={styles.numberRow}>
               {renderNumber(
                 "weight_kg",
                 "Weight",
-                "Enter weight",
-                "kg"
+                "Enter weight"
               )}
               {renderNumber(
                 "waist_cm",
                 "Waist circumference",
-                "Enter measurement",
-                "cm"
+                "Enter measurement"
               )}
             </View>
 
@@ -320,8 +414,8 @@ const styles = StyleSheet.create({
     fontFamily: fonts.bold,
     fontSize: fontsize.md,
     color: colors.primary,
-    marginTop: 22,
-    marginBottom: 12,
+    marginTop: 12,
+    marginBottom: 8,
   },
   field: {
     marginBottom: 18,
@@ -329,6 +423,40 @@ const styles = StyleSheet.create({
   numberRow: {
     flexDirection: "row",
     gap: 12,
+  },
+  measurementHeader: {
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 10,
+  },
+  measurementTitle: {
+    fontFamily: fonts.bold,
+    fontSize: fontsize.sm,
+    color: colors.text,
+  },
+  unitToggle: {
+    flexDirection: "row",
+    padding: 3,
+    borderRadius: 8,
+    backgroundColor: colors.gray5,
+  },
+  unitToggleButton: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 6,
+  },
+  unitToggleButtonSelected: {
+    backgroundColor: colors.background,
+  },
+  unitToggleText: {
+    fontFamily: fonts.regular,
+    fontSize: fontsize.xs,
+    color: colors.gray3,
+  },
+  unitToggleTextSelected: {
+    fontFamily: fonts.bold,
+    color: colors.primary,
   },
   numberField: {
     flex: 1,
