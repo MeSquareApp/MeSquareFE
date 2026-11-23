@@ -1,5 +1,6 @@
-import { useState } from "react";
-import { ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { useEffect, useState } from "react";
+import { ActivityIndicator, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { useAuth0 } from "react-native-auth0";
 import { colors } from "@/theme/color";
 import { fonts, fontsize } from "@/theme/typography";
 import Header from "@/components/Header";
@@ -8,56 +9,100 @@ import Footer from "@/components/Footer";
 import BiomarkerTiles from "@/components/BiomarkerTiles";
 import AhaRiskCard from "@/components/AhaRiskCard";
 import ForecastUploadCard from "@/components/ForecastUploadCard";
-import { mockForecasts, mockLabPrompt, mockRisk } from "@/data/mockForecast";
 import ForecastTrendCard from "@/components/ForecastTrendCard";
+import { API_AUDIENCE, getTwin, type TwinState } from "@/services/api";
+import type { Forecast, LabPrompt, RiskOut } from "@/lib/forecast";
+
+// Display-only reference ranges (the ML engine does not return these).
+const NORMAL_RANGES: Record<string, { low: number; high: number }> = {
+  hba1c:   { low: 4.0, high: 5.6 },
+  non_hdl: { low: 70,  high: 130 },
+  hdl:     { low: 40,  high: 100 },
+  sbp:     { low: 90,  high: 120 },
+  egfr:    { low: 90,  high: 120 },
+};
+
+function mapForecasts(state: TwinState): Forecast[] {
+  return state.predictions.map((p) => ({
+    id: p.biomarker,
+    biomarker: p.biomarker,
+    unit: p.unit,
+    asOf: p.as_of,
+    basis: p.basis,
+    basisLabel: p.basis_label,
+    labMeasuredAt: p.lab_measured_at,
+    p10: p.p10, p50: p.p50, p90: p.p90,
+    normalRange: NORMAL_RANGES[p.biomarker] ?? { low: 0, high: 0 },
+    change: p.change
+      ? { percentChange: p.change.percent_change, significant: p.change.significant, previousMeasuredAt: p.change.previous_measured_at }
+      : undefined,
+    history: [], // TODO: build from getBiomarkers() later
+  }));
+}
 
 export default function Forecasting() {
   const { width } = useWindowDimensions();
   const isWide = width >= 900;
+  const { getApiCredentials } = useAuth0();
 
-  // TODO: replace with real data from the backend
-  const forecasts = mockForecasts;
-  const risk      = mockRisk;
-  const labPrompt = mockLabPrompt;
-  const hasLab    = forecasts.some((f) => f.labMeasuredAt !== null);
+  const [forecasts, setForecasts] = useState<Forecast[]>([]);
+  const [risk, setRisk] = useState<RiskOut | null>(null);
+  const [labPrompt, setLabPrompt] = useState<LabPrompt | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const [selectedId, setSelectedId] = useState(forecasts[0].id); // gets selected biomarker from the tiles, defaults to the first biomarker in the list
+  useEffect(() => {
+    let isCurrent = true;
+    async function load() {
+      try {
+        const credentials = await getApiCredentials(API_AUDIENCE);
+        const { state } = await getTwin(credentials.accessToken);
+        if (!isCurrent) return;
+        const fc = mapForecasts(state);
+        setForecasts(fc);
+        setRisk(state.risk);
+        setLabPrompt({ dueOn: state.lab_prompt.due_on, due: state.lab_prompt.due });
+        setSelectedId(fc[0]?.id ?? null);
+      } catch (e) {
+        if (isCurrent) setError(String(e));
+      } finally {
+        if (isCurrent) setLoading(false);
+      }
+    }
+    void load();
+    return () => { isCurrent = false; };
+  }, [getApiCredentials]);
 
-  const handleUploadLab = () => {
-    // TODO: open a file picker (expo-document-picker), send the report to the backend,
-    // then reload the forecasts and the risk.
-    console.log("Upload lab results");
-  };
+  const hasLab = forecasts.some((f) => f.labMeasuredAt !== null);
+  const handleUploadLab = () => console.log("Upload lab results");
 
   return (
     <View style={styles.container}>
       <Navbar />
-
       <View style={styles.nonNavContent}>
         <Header />
-
         <ScrollView contentContainerStyle={[styles.mainContent, !isWide && styles.mainContentNarrow]}>
-          <View style={[styles.columns, isWide && styles.columnsWide]}>
-            {/* LEFT: all biomarkers at a glance, the selected chart, then the upload prompt */}
-            <View style={styles.left}>
-              <BiomarkerTiles forecasts={forecasts} selectedId={selectedId} onSelect={setSelectedId} />
-              <ForecastTrendCard
-                forecasts={forecasts}
-                selectedId={selectedId}
-                onSelect={setSelectedId}
-                onUploadLab={handleUploadLab}
-              />
-              <ForecastUploadCard labPrompt={labPrompt} hasLab={hasLab} onUpload={handleUploadLab} />
+          {loading ? (
+            <ActivityIndicator style={{ marginTop: 48 }} />
+          ) : error ? (
+            <Text style={styles.disclaimer}>Couldn’t load your forecast: {error}</Text>
+          ) : !risk || forecasts.length === 0 || !selectedId ? (
+            <Text style={styles.disclaimer}>No forecast available yet.</Text>
+          ) : (
+            <View style={[styles.columns, isWide && styles.columnsWide]}>
+              <View style={styles.left}>
+                <BiomarkerTiles forecasts={forecasts} selectedId={selectedId} onSelect={setSelectedId} />
+                <ForecastTrendCard forecasts={forecasts} selectedId={selectedId} onSelect={setSelectedId} onUploadLab={handleUploadLab} />
+                <ForecastUploadCard labPrompt={labPrompt!} hasLab={hasLab} onUpload={handleUploadLab} />
+              </View>
+              <View style={isWide ? styles.rightWide : undefined}>
+                <AhaRiskCard risk={risk} />
+                <Text style={styles.disclaimer}>For informational purposes only. Not medical advice.</Text>
+              </View>
             </View>
-
-            {/* RIGHT: AHA CVD risk */}
-            <View style={isWide ? styles.rightWide : undefined}>
-              <AhaRiskCard risk={risk} />
-              <Text style={styles.disclaimer}>For informational purposes only. Not medical advice.</Text>
-            </View>
-          </View>
+          )}
         </ScrollView>
-
         <Footer />
       </View>
     </View>

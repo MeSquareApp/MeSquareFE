@@ -234,3 +234,57 @@ export async function getPatientProfile(
 
   return response.json();
 }
+
+import type { RiskOut } from "@/lib/forecast";
+
+export type TwinPrediction = {
+  biomarker: string;
+  basis: "population" | "lab" | "population_wearable" | "lab_wearable";
+  basis_label: string;
+  p10: number;
+  p50: number;
+  p90: number;
+  unit: string;
+  as_of: string;
+  source_lab_id: string | null;
+  lab_measured_at: string | null;
+  change: {
+    previous_measured_at: string;
+    percent_change: number;
+    significant: boolean;
+  } | null;
+};
+
+export type TwinState = {
+  as_of: string;
+  predictions: TwinPrediction[];
+  risk: RiskOut;
+  lab_prompt: { due_on: string; due: boolean };
+};
+
+export type TwinResponse = {
+  patient_id: string;
+  last_updated: string | null;
+  state: TwinState;
+};
+
+export async function getTwin(accessToken: string): Promise<TwinResponse> {
+  const response = await fetch(`${API_BASE_URL}/patients/me/twin`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  if (!response.ok) {
+    throw new Error(`Failed to fetch twin forecast data: ${response.status}`);
+  }
+  return response.json();
+}
+
+export async function generateTwin(accessToken: string): Promise<TwinResponse> {
+  const response = await fetch(`${API_BASE_URL}/patients/me/twin/sync`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  if (!response.ok) {
+    throw new Error(`Failed to generate forecast: ${response.status}`);
+  }
+  return response.json();
+}
